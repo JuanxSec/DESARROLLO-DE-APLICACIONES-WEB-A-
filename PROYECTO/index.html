@@ -2,12 +2,195 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="JuansecCTI, proyecto personal sobre boletines y noticias de ciberinteligencia.">
+    <meta name="keywords" content="CTI, ciberinteligencia, ciberseguridad, boletines, noticias, empresas">
+    <meta name="author" content="Juan Ramírez">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desarrollo Web</title>
+    <title>JuansecCTI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f9;
+            color: #222;
+        }
+
+        header {
+            background-color: #0f766e;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        nav {
+            background-color: #0f172a;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 10px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: #5eead4;
+        }
+
+        main {
+            width: 85%;
+            max-width: 850px;
+            margin: 25px auto;
+        }
+
+        section, article, aside {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #0f766e;
+        }
+
+        img {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        a {
+            color: #0f766e;
+        }
+
+        footer {
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Consultoría de Ciberseguridad Ofensiva</h1>
-    <h2>Primera página web creada para la asignatura Desarrollo de Aplicaciones Web</h2>
-    <h3>Desarrollado por Juan Pablo Ramírez Benítez</h3>
+
+    <header>
+        <h1>JuansecCTI</h1>
+        <p>Boletines y noticias de ciberinteligencia para empresas y entidades.</p>
+    </header>
+
+    <nav>
+        <a href="#inicio">Inicio</a>
+        <a href="#quienes-somos">Quiénes Somos</a>
+        <a href="#servicios">Servicios o Productos</a>
+        <a href="#contacto">Contacto</a>
+    </nav>
+
+    <main>
+
+        <section id="inicio">
+            <h2>Inicio</h2>
+            <p>
+                JuansecCTI es un proyecto personal enfocado en compartir boletines, noticias y alertas de ciberinteligencia.
+                Su objetivo es presentar información útil sobre ciberseguridad de una forma sencilla, clara y fácil de
+                entender para empresas, entidades y personas interesadas en proteger sus activos digitales.
+            </p>
+        </section>
+
+        <section id="quienes-somos">
+            <h2>Quiénes Somos</h2>
+            <p>
+                JuansecCTI es un proyecto creado con el objetivo de informar sobre temas importantes de ciberinteligencia
+                y ciberseguridad. El sitio busca recopilar noticias, boletines y alertas que puedan aportar valor a empresas
+                y entidades que necesitan conocer los riesgos digitales actuales. La idea principal es explicar amenazas,
+                vulnerabilidades, filtraciones de información y recomendaciones de seguridad de una manera sencilla, sin usar
+                un lenguaje demasiado complicado. Este proyecto también permite aplicar los conocimientos aprendidos en la
+                asignatura Desarrollo de Aplicaciones Web, utilizando una estructura correcta de HTML5, etiquetas semánticas
+                y contenido organizado. JuansecCTI representa un espacio informativo básico, pero útil, para aprender y
+                compartir información relacionada con la seguridad digital.
+            </p>
+
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&q=80" alt="Imagen relacionada con ciberseguridad">
+        </section>
+
+        <section id="servicios">
+            <h2>Servicios o Productos</h2>
+
+            <article>
+                <h3>Contenido que ofrece el proyecto</h3>
+                <ul>
+                    <li>Boletines de ciberinteligencia.</li>
+                    <li>Noticias importantes de ciberseguridad.</li>
+                    <li>Alertas sobre vulnerabilidades.</li>
+                    <li>Recomendaciones para empresas y entidades.</li>
+                    <li>Información sobre amenazas digitales actuales.</li>
+                </ul>
+            </article>
+        </section>
+
+        <section id="video">
+            <h2>Video relacionado</h2>
+            <p>
+                El siguiente video está relacionado con la ciberseguridad y la importancia de proteger la información.
+            </p>
+
+            <iframe 
+                src="https://www.youtube.com/embed/zCnJehJovEo"
+                title="Video sobre ciberseguridad"
+                allowfullscreen>
+            </iframe>
+        </section>
+
+        <section id="contacto">
+            <h2>Contacto</h2>
+
+            <p><strong>Correo electrónico:</strong> 
+                <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a>
+            </p>
+
+            <p><strong>Teléfono:</strong> +593 000 000 000</p>
+
+            <p><strong>Dirección:</strong> Ecuador</p>
+
+            <p><strong>Redes sociales:</strong></p>
+            <ul>
+                <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
+                <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
+            </ul>
+        </section>
+
+        <aside>
+            <h2>Información complementaria</h2>
+            <p>
+                JuansecCTI publicará contenido semanal relacionado con boletines, noticias y recomendaciones de seguridad.
+                El proyecto está pensado para apoyar el aprendizaje académico y mostrar información útil sobre amenazas
+                digitales.
+            </p>
+
+            <p><strong>Horario de actualización:</strong> publicaciones semanales.</p>
+            <p><strong>Promoción:</strong> acceso gratuito a boletines informativos del proyecto.</p>
+        </aside>
+
+    </main>
+
+    <footer>
+        <p>Juan Ramírez | Desarrollo de Aplicaciones Web | 2026</p>
+        <p>Proyecto Integrador U1 - Avance 3/4: HTML5</p>
+    </footer>
+
 </body>
 </html>
