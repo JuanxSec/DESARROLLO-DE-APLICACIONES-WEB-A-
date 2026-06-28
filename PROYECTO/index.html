@@ -17,9 +17,9 @@
 
     <header class="text-center">
         <div class="container">
-            <h1>JuansecCTI</h1>
-            <p>Boletines y noticias de ciberinteligencia para empresas y entidades.</p>
-            <a href="#contacto" class="btn btn-light mt-3">Contactar</a>
+            <h1 id="tituloPrincipal">JuansecCTI</h1>
+            <p id="textoBienvenida">Boletines y noticias de ciberinteligencia para empresas y entidades.</p>
+            <button id="botonBienvenida" class="btn btn-light mt-3">Cambiar mensaje</button>
         </div>
     </header>
 
@@ -41,6 +41,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#servicios">Servicios o Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#registro">Registro CTI</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contacto">Contacto</a>
@@ -129,6 +132,45 @@
             </ul>
         </section>
 
+        <section id="registro" class="caja">
+            <h2>Registro de solicitudes CTI</h2>
+            <p>
+                En esta sección se puede registrar una solicitud relacionada con boletines, noticias o alertas de ciberinteligencia.
+                La información se mostrará en pantalla sin recargar la página.
+            </p>
+
+            <form id="formularioRegistro">
+                <div class="mb-3">
+                    <label for="nombreRegistro" class="form-label">Nombre</label>
+                    <input type="text" id="nombreRegistro" class="form-control" placeholder="Ejemplo: Boletín de vulnerabilidades">
+                </div>
+
+                <div class="mb-3">
+                    <label for="descripcionRegistro" class="form-label">Descripción</label>
+                    <textarea id="descripcionRegistro" class="form-control" rows="3" placeholder="Describe brevemente la solicitud o registro"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="categoriaRegistro" class="form-label">Categoría o tipo</label>
+                    <select id="categoriaRegistro" class="form-control">
+                        <option value="">Seleccione una opción</option>
+                        <option value="Boletín CTI">Boletín CTI</option>
+                        <option value="Noticia de seguridad">Noticia de seguridad</option>
+                        <option value="Alerta de vulnerabilidad">Alerta de vulnerabilidad</option>
+                        <option value="Recomendación">Recomendación</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-cti">Registrar información</button>
+            </form>
+
+            <div id="mensajeFormulario" class="mt-3"></div>
+
+            <h3 class="h5 mt-4">Registros creados: <span id="totalRegistros">0</span></h3>
+
+            <div id="listaRegistros" class="row mt-3"></div>
+        </section>
+
         <section id="video" class="caja">
             <h2>Video relacionado</h2>
             <p>
@@ -141,30 +183,16 @@
         <section id="contacto" class="caja">
             <h2>Contacto</h2>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Correo electrónico:</strong> <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a></p>
-                    <p><strong>Teléfono:</strong> +593 000 000 000</p>
-                    <p><strong>Dirección:</strong> Ecuador</p>
+            <p><strong>Correo electrónico:</strong> <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a></p>
+            <p><strong>Teléfono:</strong> +593 000 000 000</p>
+            <p><strong>Dirección:</strong> Ecuador</p>
 
-                    <p><strong>Redes sociales:</strong></p>
-                    <ul>
-                        <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
-                        <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
-                        <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-6">
-                    <form>
-                        <input type="text" class="form-control mb-3" placeholder="Nombre">
-                        <input type="email" class="form-control mb-3" placeholder="Correo electrónico">
-                        <input type="text" class="form-control mb-3" placeholder="Asunto">
-                        <textarea class="form-control mb-3" rows="4" placeholder="Mensaje"></textarea>
-                        <button type="submit" class="btn btn-cti">Enviar mensaje</button>
-                    </form>
-                </div>
-            </div>
+            <p><strong>Redes sociales:</strong></p>
+            <ul>
+                <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
+                <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
+            </ul>
         </section>
 
         <aside class="caja">
@@ -181,10 +209,11 @@
 
     <footer>
         <p>Juan Ramírez | Desarrollo de Aplicaciones Web | 2026</p>
-        <p>Proyecto Integrador U1 - Avance 4/4: CSS3, diseño responsivo y Bootstrap</p>
+        <p>Proyecto Integrador U2 - Avance 1/4: JavaScript, DOM y eventos</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
