@@ -84,6 +84,19 @@ a {
     border-left: 5px solid #0f766e;
 }
 
+.mensaje-validacion {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.texto-error {
+    color: #dc3545;
+}
+
+.texto-correcto {
+    color: #198754;
+}
+
 @media (max-width: 600px) {
     header {
         padding: 40px 15px;
