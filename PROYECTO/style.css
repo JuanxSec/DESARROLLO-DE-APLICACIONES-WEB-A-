@@ -84,6 +84,10 @@ a {
     border-left: 5px solid #0f766e;
 }
 
+.plantilla-card {
+    border-left: 5px solid #0f766e;
+}
+
 .mensaje-validacion {
     font-size: 14px;
     margin-top: 5px;
@@ -95,6 +99,19 @@ a {
 
 .texto-correcto {
     color: #198754;
+}
+
+.badge-publicado {
+    background-color: #198754;
+}
+
+.badge-revision {
+    background-color: #ffc107;
+    color: #222;
+}
+
+.badge-pendiente {
+    background-color: #6c757d;
 }
 
 @media (max-width: 600px) {
