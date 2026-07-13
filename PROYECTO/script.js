@@ -12,8 +12,41 @@ const mensajeDescripcion = document.getElementById("mensajeDescripcion");
 const mensajeCategoria = document.getElementById("mensajeCategoria");
 
 const mensajeFormulario = document.getElementById("mensajeFormulario");
+const mensajeRegistros = document.getElementById("mensajeRegistros");
 const listaRegistros = document.getElementById("listaRegistros");
 const totalRegistros = document.getElementById("totalRegistros");
+
+const contenedorBoletines = document.getElementById("contenedorBoletines");
+const mensajeBoletines = document.getElementById("mensajeBoletines");
+
+const plantillaBoletin = document.getElementById("plantillaBoletin");
+const plantillaRegistro = document.getElementById("plantillaRegistro");
+
+const boletinesCTI = [
+    {
+        titulo: "Alerta sobre vulnerabilidades críticas",
+        categoria: "Alerta de vulnerabilidad",
+        prioridad: "Alta",
+        estado: "Publicado",
+        descripcion: "Resumen de vulnerabilidades recientes que pueden afectar a empresas y entidades."
+    },
+    {
+        titulo: "Noticias de ciberseguridad empresarial",
+        categoria: "Noticia de seguridad",
+        prioridad: "Media",
+        estado: "En revisión",
+        descripcion: "Selección de noticias relevantes sobre amenazas digitales y buenas prácticas de protección."
+    },
+    {
+        titulo: "Recomendaciones de protección digital",
+        categoria: "Recomendación",
+        prioridad: "Baja",
+        estado: "Pendiente",
+        descripcion: "Consejos básicos para mejorar la postura de seguridad y reducir riesgos comunes."
+    }
+];
+
+let registrosCTI = [];
 
 botonBienvenida.addEventListener("click", function () {
     textoBienvenida.innerText = "JuansecCTI comparte información útil para fortalecer la seguridad digital de empresas y entidades.";
@@ -27,36 +60,54 @@ descripcionRegistro.addEventListener("blur", validarDescripcion);
 
 categoriaRegistro.addEventListener("input", validarCategoria);
 categoriaRegistro.addEventListener("blur", validarCategoria);
+categoriaRegistro.addEventListener("change", validarCategoria);
+
+formularioRegistro.addEventListener("submit", function (evento) {
+    evento.preventDefault();
+
+    const nombreValido = validarNombre();
+    const descripcionValida = validarDescripcion();
+    const categoriaValida = validarCategoria();
+
+    if (!nombreValido || !descripcionValida || !categoriaValida) {
+        mensajeFormulario.className = "alert alert-danger mt-3";
+        mensajeFormulario.innerText = "Revise los campos antes de registrar la información.";
+
+        return;
+    }
+
+    const nuevoRegistro = {
+        nombre: nombreRegistro.value.trim(),
+        descripcion: descripcionRegistro.value.trim(),
+        categoria: categoriaRegistro.value
+    };
+
+    registrosCTI.push(nuevoRegistro);
+
+    renderizarRegistros();
+
+    mensajeFormulario.className = "alert alert-success mt-3";
+    mensajeFormulario.innerText = "Registro agregado correctamente.";
+
+    formularioRegistro.reset();
+
+    limpiarValidaciones();
+});
 
 function validarNombre() {
     const nombre = nombreRegistro.value.trim();
 
     if (nombre === "") {
-        mostrarError(
-            nombreRegistro,
-            mensajeNombre,
-            "El nombre es obligatorio."
-        );
-
+        mostrarError(nombreRegistro, mensajeNombre, "El nombre es obligatorio.");
         return false;
     }
 
     if (nombre.length < 5) {
-        mostrarError(
-            nombreRegistro,
-            mensajeNombre,
-            "El nombre debe tener mínimo 5 caracteres."
-        );
-
+        mostrarError(nombreRegistro, mensajeNombre, "El nombre debe tener mínimo 5 caracteres.");
         return false;
     }
 
-    mostrarCorrecto(
-        nombreRegistro,
-        mensajeNombre,
-        "Nombre válido."
-    );
-
+    mostrarCorrecto(nombreRegistro, mensajeNombre, "Nombre válido.");
     return true;
 }
 
@@ -64,31 +115,16 @@ function validarDescripcion() {
     const descripcion = descripcionRegistro.value.trim();
 
     if (descripcion === "") {
-        mostrarError(
-            descripcionRegistro,
-            mensajeDescripcion,
-            "La descripción es obligatoria."
-        );
-
+        mostrarError(descripcionRegistro, mensajeDescripcion, "La descripción es obligatoria.");
         return false;
     }
 
     if (descripcion.length < 15) {
-        mostrarError(
-            descripcionRegistro,
-            mensajeDescripcion,
-            "La descripción debe tener mínimo 15 caracteres."
-        );
-
+        mostrarError(descripcionRegistro, mensajeDescripcion, "La descripción debe tener mínimo 15 caracteres.");
         return false;
     }
 
-    mostrarCorrecto(
-        descripcionRegistro,
-        mensajeDescripcion,
-        "Descripción válida."
-    );
-
+    mostrarCorrecto(descripcionRegistro, mensajeDescripcion, "Descripción válida.");
     return true;
 }
 
@@ -96,21 +132,11 @@ function validarCategoria() {
     const categoria = categoriaRegistro.value;
 
     if (categoria === "") {
-        mostrarError(
-            categoriaRegistro,
-            mensajeCategoria,
-            "Seleccione una categoría."
-        );
-
+        mostrarError(categoriaRegistro, mensajeCategoria, "Seleccione una categoría.");
         return false;
     }
 
-    mostrarCorrecto(
-        categoriaRegistro,
-        mensajeCategoria,
-        "Categoría seleccionada."
-    );
-
+    mostrarCorrecto(categoriaRegistro, mensajeCategoria, "Categoría seleccionada.");
     return true;
 }
 
@@ -130,36 +156,6 @@ function mostrarCorrecto(campo, mensaje, texto) {
     mensaje.innerText = texto;
 }
 
-formularioRegistro.addEventListener("submit", function (evento) {
-    evento.preventDefault();
-
-    const nombreValido = validarNombre();
-    const descripcionValida = validarDescripcion();
-    const categoriaValida = validarCategoria();
-
-    if (!nombreValido || !descripcionValida || !categoriaValida) {
-        mensajeFormulario.className = "alert alert-danger mt-3";
-        mensajeFormulario.innerText = "Revise los campos antes de registrar la información.";
-
-        return;
-    }
-
-    const nombre = nombreRegistro.value.trim();
-    const descripcion = descripcionRegistro.value.trim();
-    const categoria = categoriaRegistro.value;
-
-    crearRegistro(nombre, descripcion, categoria);
-
-    mensajeFormulario.className = "alert alert-success mt-3";
-    mensajeFormulario.innerText = "Registro agregado correctamente.";
-
-    formularioRegistro.reset();
-
-    limpiarValidaciones();
-
-    actualizarTotal();
-});
-
 function limpiarValidaciones() {
     nombreRegistro.classList.remove("is-valid", "is-invalid");
     descripcionRegistro.classList.remove("is-valid", "is-invalid");
@@ -170,60 +166,80 @@ function limpiarValidaciones() {
     mensajeCategoria.innerText = "";
 }
 
-function crearRegistro(nombre, descripcion, categoria) {
-    const columna = document.createElement("div");
+function renderizarBoletines() {
+    contenedorBoletines.innerHTML = "";
 
-    columna.className = "col-md-6 mb-3";
+    if (boletinesCTI.length === 0) {
+        mensajeBoletines.className = "alert alert-warning";
+        mensajeBoletines.innerText = "No existen boletines disponibles para mostrar.";
+        return;
+    }
 
-    const tarjeta = document.createElement("div");
+    mensajeBoletines.className = "alert alert-success";
+    mensajeBoletines.innerText = "Contenido dinámico generado desde un arreglo de objetos en JavaScript.";
 
-    tarjeta.className = "card registro-card h-100";
+    boletinesCTI.forEach(function (boletin) {
+        const copia = plantillaBoletin.content.cloneNode(true);
 
-    const cuerpo = document.createElement("div");
+        copia.querySelector('[data-campo="titulo"]').innerText = boletin.titulo;
+        copia.querySelector('[data-campo="categoria"]').innerText = boletin.categoria;
+        copia.querySelector('[data-campo="prioridad"]').innerText = boletin.prioridad;
+        copia.querySelector('[data-campo="descripcion"]').innerText = boletin.descripcion;
 
-    cuerpo.className = "card-body";
+        const estado = copia.querySelector('[data-campo="estado"]');
+        estado.innerText = boletin.estado;
+        estado.classList.add(obtenerClaseEstado(boletin.estado));
 
-    const titulo = document.createElement("h3");
-
-    titulo.className = "card-title h5";
-    titulo.innerText = nombre;
-
-    const textoCategoria = document.createElement("p");
-
-    textoCategoria.className = "card-text";
-    textoCategoria.innerText = "Categoría: " + categoria;
-
-    const textoDescripcion = document.createElement("p");
-
-    textoDescripcion.className = "card-text";
-    textoDescripcion.innerText = descripcion;
-
-    const botonEliminar = document.createElement("button");
-
-    botonEliminar.className = "btn btn-danger btn-sm";
-    botonEliminar.innerText = "Eliminar";
-
-    botonEliminar.addEventListener("click", function () {
-        columna.remove();
-
-        mensajeFormulario.className = "alert alert-success mt-3";
-        mensajeFormulario.innerText = "Registro eliminado correctamente.";
-
-        actualizarTotal();
+        contenedorBoletines.appendChild(copia);
     });
-
-    cuerpo.appendChild(titulo);
-    cuerpo.appendChild(textoCategoria);
-    cuerpo.appendChild(textoDescripcion);
-    cuerpo.appendChild(botonEliminar);
-
-    tarjeta.appendChild(cuerpo);
-
-    columna.appendChild(tarjeta);
-
-    listaRegistros.appendChild(columna);
 }
 
-function actualizarTotal() {
-    totalRegistros.innerText = listaRegistros.children.length;
+function obtenerClaseEstado(estado) {
+    if (estado === "Publicado") {
+        return "badge-publicado";
+    }
+
+    if (estado === "En revisión") {
+        return "badge-revision";
+    }
+
+    return "badge-pendiente";
 }
+
+function renderizarRegistros() {
+    listaRegistros.innerHTML = "";
+    totalRegistros.innerText = registrosCTI.length;
+
+    if (registrosCTI.length === 0) {
+        mensajeRegistros.className = "alert alert-info";
+        mensajeRegistros.innerText = "Todavía no existen registros creados desde el formulario.";
+        return;
+    }
+
+    mensajeRegistros.className = "alert alert-success";
+    mensajeRegistros.innerText = "Los registros se están mostrando mediante una plantilla reutilizable.";
+
+    registrosCTI.forEach(function (registro, indice) {
+        const copia = plantillaRegistro.content.cloneNode(true);
+
+        copia.querySelector('[data-campo="nombre"]').innerText = registro.nombre;
+        copia.querySelector('[data-campo="categoria"]').innerText = registro.categoria;
+        copia.querySelector('[data-campo="descripcion"]').innerText = registro.descripcion;
+
+        const botonEliminar = copia.querySelector('[data-accion="eliminar"]');
+
+        botonEliminar.addEventListener("click", function () {
+            registrosCTI.splice(indice, 1);
+
+            renderizarRegistros();
+
+            mensajeFormulario.className = "alert alert-success mt-3";
+            mensajeFormulario.innerText = "Registro eliminado correctamente.";
+        });
+
+        listaRegistros.appendChild(copia);
+    });
+}
+
+renderizarBoletines();
+renderizarRegistros();
