@@ -18,9 +18,15 @@ const totalRegistros = document.getElementById("totalRegistros");
 
 const contenedorBoletines = document.getElementById("contenedorBoletines");
 const mensajeBoletines = document.getElementById("mensajeBoletines");
+const tablaBoletines = document.getElementById("tablaBoletines");
+const spinnerCarga = document.getElementById("spinnerCarga");
 
 const plantillaBoletin = document.getElementById("plantillaBoletin");
 const plantillaRegistro = document.getElementById("plantillaRegistro");
+
+const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetalle"));
+const modalTitulo = document.getElementById("modalTitulo");
+const modalCuerpo = document.getElementById("modalCuerpo");
 
 const boletinesCTI = [
     {
@@ -72,7 +78,6 @@ formularioRegistro.addEventListener("submit", function (evento) {
     if (!nombreValido || !descripcionValida || !categoriaValida) {
         mensajeFormulario.className = "alert alert-danger mt-3";
         mensajeFormulario.innerText = "Revise los campos antes de registrar la información.";
-
         return;
     }
 
@@ -90,7 +95,6 @@ formularioRegistro.addEventListener("submit", function (evento) {
     mensajeFormulario.innerText = "Registro agregado correctamente.";
 
     formularioRegistro.reset();
-
     limpiarValidaciones();
 });
 
@@ -168,42 +172,71 @@ function limpiarValidaciones() {
 
 function renderizarBoletines() {
     contenedorBoletines.innerHTML = "";
+    tablaBoletines.innerHTML = "";
+    spinnerCarga.classList.remove("d-none");
 
-    if (boletinesCTI.length === 0) {
-        mensajeBoletines.className = "alert alert-warning";
-        mensajeBoletines.innerText = "No existen boletines disponibles para mostrar.";
-        return;
-    }
+    setTimeout(function () {
+        spinnerCarga.classList.add("d-none");
 
-    mensajeBoletines.className = "alert alert-success";
-    mensajeBoletines.innerText = "Contenido dinámico generado desde un arreglo de objetos en JavaScript.";
+        if (boletinesCTI.length === 0) {
+            mensajeBoletines.className = "alert alert-warning";
+            mensajeBoletines.innerText = "No existen boletines disponibles para mostrar.";
+            return;
+        }
 
-    boletinesCTI.forEach(function (boletin) {
-        const copia = plantillaBoletin.content.cloneNode(true);
+        mensajeBoletines.className = "alert alert-success";
+        mensajeBoletines.innerText = "Boletines cargados correctamente usando Bootstrap y JavaScript.";
 
-        copia.querySelector('[data-campo="titulo"]').innerText = boletin.titulo;
-        copia.querySelector('[data-campo="categoria"]').innerText = boletin.categoria;
-        copia.querySelector('[data-campo="prioridad"]').innerText = boletin.prioridad;
-        copia.querySelector('[data-campo="descripcion"]').innerText = boletin.descripcion;
+        boletinesCTI.forEach(function (boletin) {
+            const copia = plantillaBoletin.content.cloneNode(true);
 
-        const estado = copia.querySelector('[data-campo="estado"]');
-        estado.innerText = boletin.estado;
-        estado.classList.add(obtenerClaseEstado(boletin.estado));
+            copia.querySelector('[data-campo="titulo"]').innerText = boletin.titulo;
+            copia.querySelector('[data-campo="categoria"]').innerText = boletin.categoria;
+            copia.querySelector('[data-campo="prioridad"]').innerText = boletin.prioridad;
+            copia.querySelector('[data-campo="descripcion"]').innerText = boletin.descripcion;
 
-        contenedorBoletines.appendChild(copia);
-    });
+            const estado = copia.querySelector('[data-campo="estado"]');
+            estado.innerText = boletin.estado;
+            estado.classList.add(obtenerClaseEstado(boletin.estado));
+
+            const botonDetalle = copia.querySelector('[data-accion="detalle"]');
+
+            botonDetalle.addEventListener("click", function () {
+                abrirModalDetalle(
+                    boletin.titulo,
+                    boletin.categoria,
+                    boletin.prioridad,
+                    boletin.estado,
+                    boletin.descripcion
+                );
+            });
+
+            contenedorBoletines.appendChild(copia);
+
+            const fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${boletin.titulo}</td>
+                <td>${boletin.categoria}</td>
+                <td>${boletin.prioridad}</td>
+                <td><span class="badge ${obtenerClaseEstado(boletin.estado)}">${boletin.estado}</span></td>
+            `;
+
+            tablaBoletines.appendChild(fila);
+        });
+    }, 1000);
 }
 
 function obtenerClaseEstado(estado) {
     if (estado === "Publicado") {
-        return "badge-publicado";
+        return "text-bg-success";
     }
 
     if (estado === "En revisión") {
-        return "badge-revision";
+        return "text-bg-warning";
     }
 
-    return "badge-pendiente";
+    return "text-bg-secondary";
 }
 
 function renderizarRegistros() {
@@ -217,7 +250,7 @@ function renderizarRegistros() {
     }
 
     mensajeRegistros.className = "alert alert-success";
-    mensajeRegistros.innerText = "Los registros se están mostrando mediante una plantilla reutilizable.";
+    mensajeRegistros.innerText = "Los registros se muestran mediante tarjetas Bootstrap generadas con JavaScript.";
 
     registrosCTI.forEach(function (registro, indice) {
         const copia = plantillaRegistro.content.cloneNode(true);
@@ -226,7 +259,18 @@ function renderizarRegistros() {
         copia.querySelector('[data-campo="categoria"]').innerText = registro.categoria;
         copia.querySelector('[data-campo="descripcion"]').innerText = registro.descripcion;
 
+        const botonDetalle = copia.querySelector('[data-accion="detalle"]');
         const botonEliminar = copia.querySelector('[data-accion="eliminar"]');
+
+        botonDetalle.addEventListener("click", function () {
+            abrirModalDetalle(
+                registro.nombre,
+                registro.categoria,
+                "No definida",
+                "Registro creado",
+                registro.descripcion
+            );
+        });
 
         botonEliminar.addEventListener("click", function () {
             registrosCTI.splice(indice, 1);
@@ -239,6 +283,37 @@ function renderizarRegistros() {
 
         listaRegistros.appendChild(copia);
     });
+}
+
+function abrirModalDetalle(titulo, categoria, prioridad, estado, descripcion) {
+    modalTitulo.innerText = titulo;
+
+    modalCuerpo.innerHTML = "";
+
+    const categoriaTexto = document.createElement("p");
+    categoriaTexto.innerText = "Categoría: " + categoria;
+
+    const prioridadTexto = document.createElement("p");
+    prioridadTexto.innerText = "Prioridad: " + prioridad;
+
+    const estadoTexto = document.createElement("p");
+    estadoTexto.innerText = "Estado: " + estado;
+
+    const descripcionTexto = document.createElement("p");
+    descripcionTexto.innerText = "Descripción: " + descripcion;
+
+    modalCuerpo.appendChild(categoriaTexto);
+    modalCuerpo.appendChild(prioridadTexto);
+    modalCuerpo.appendChild(estadoTexto);
+    modalCuerpo.appendChild(descripcionTexto);
+
+    modalDetalle.show();
+}
+
+function abrirModalSimple(titulo, descripcion) {
+    modalTitulo.innerText = titulo;
+    modalCuerpo.innerText = descripcion;
+    modalDetalle.show();
 }
 
 renderizarBoletines();
