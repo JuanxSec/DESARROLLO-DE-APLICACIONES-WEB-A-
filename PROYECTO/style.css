@@ -7,12 +7,12 @@ body {
 header {
     background: linear-gradient(90deg, #0f172a, #0f766e);
     color: white;
-    padding: 60px 20px;
+    padding: 65px 20px;
 }
 
 header h1 {
     font-weight: 700;
-    font-size: 42px;
+    font-size: 44px;
 }
 
 header p {
@@ -25,36 +25,27 @@ h2 {
 }
 
 .contenido {
-    max-width: 950px;
+    max-width: 1000px;
 }
 
 .caja {
     background-color: white;
-    border-radius: 12px;
-    padding: 25px;
+    border-radius: 14px;
+    padding: 28px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
 }
 
 .card {
     border: none;
+    border-radius: 14px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
-    transition: transform 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card:hover {
-    transform: scale(1.03);
-}
-
-.btn-cti {
-    background-color: #0f766e;
-    color: white;
-    border: none;
-}
-
-.btn-cti:hover {
-    background-color: #0f172a;
-    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
 }
 
 iframe {
@@ -85,7 +76,7 @@ a {
 }
 
 .plantilla-card {
-    border-left: 5px solid #0f766e;
+    border-left: 5px solid #0d6efd;
 }
 
 .mensaje-validacion {
@@ -101,17 +92,13 @@ a {
     color: #198754;
 }
 
-.badge-publicado {
-    background-color: #198754;
+.table {
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.badge-revision {
-    background-color: #ffc107;
-    color: #222;
-}
-
-.badge-pendiente {
-    background-color: #6c757d;
+#spinnerCarga {
+    color: #0f766e;
 }
 
 @media (max-width: 600px) {

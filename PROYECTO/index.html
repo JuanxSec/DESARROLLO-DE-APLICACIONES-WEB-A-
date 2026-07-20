@@ -15,16 +15,20 @@
 
 <body>
 
-    <!-- base.html: encabezado reutilizable del proyecto -->
     <header class="text-center">
         <div class="container">
             <h1 id="tituloPrincipal">JuansecCTI</h1>
             <p id="textoBienvenida">Boletines y noticias de ciberinteligencia para empresas y entidades.</p>
-            <button id="botonBienvenida" class="btn btn-light mt-3">Cambiar mensaje</button>
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button id="botonBienvenida" class="btn btn-light mt-3">Cambiar mensaje</button>
+                <button class="btn btn-outline-light mt-3" data-bs-toggle="modal" data-bs-target="#modalDetalle">
+                    Ver objetivo
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- base.html: menú de navegación reutilizable -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="#">JuansecCTI</a>
@@ -35,30 +39,17 @@
 
             <div class="collapse navbar-collapse" id="menu">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#inicio">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#quienes-somos">Quiénes Somos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#servicios">Servicios o Productos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#boletines-dinamicos">Contenido dinámico</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#registro">Registro CTI</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contacto">Contacto</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#quienes-somos">Quiénes Somos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#boletines-dinamicos">Contenido dinámico</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#registro">Registro CTI</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- base.html: bloque principal donde cambiaría el contenido de cada página -->
     <main class="container contenido mt-4">
 
         <section id="inicio" class="caja text-center">
@@ -68,7 +59,12 @@
                 Su objetivo es presentar información útil sobre ciberseguridad de una forma sencilla, clara y fácil de
                 entender para empresas, entidades y personas interesadas en proteger sus activos digitales.
             </p>
-            <a href="#servicios" class="btn btn-cti">Ver servicios</a>
+
+            <div class="alert alert-info mt-3" role="alert">
+                Proyecto actualizado con Bootstrap, JavaScript, validaciones y componentes interactivos.
+            </div>
+
+            <a href="#boletines-dinamicos" class="btn btn-primary">Ver contenido dinámico</a>
         </section>
 
         <section id="quienes-somos" class="caja">
@@ -79,11 +75,7 @@
                         JuansecCTI es un proyecto creado con el objetivo de informar sobre temas importantes de ciberinteligencia
                         y ciberseguridad. El sitio busca recopilar noticias, boletines y alertas que puedan aportar valor a empresas
                         y entidades que necesitan conocer los riesgos digitales actuales. La idea principal es explicar amenazas,
-                        vulnerabilidades, filtraciones de información y recomendaciones de seguridad de una manera sencilla, sin usar
-                        un lenguaje demasiado complicado. Este proyecto también permite aplicar los conocimientos aprendidos en la
-                        asignatura Desarrollo de Aplicaciones Web, utilizando una estructura correcta de HTML5, CSS3, Bootstrap,
-                        diseño responsivo y contenido organizado. JuansecCTI representa un espacio informativo básico, pero útil,
-                        para aprender y compartir información relacionada con la seguridad digital.
+                        vulnerabilidades, filtraciones de información y recomendaciones de seguridad de una manera sencilla.
                     </p>
                 </div>
 
@@ -104,6 +96,9 @@
                             <p class="card-text">
                                 Resúmenes sobre amenazas digitales, campañas maliciosas y riesgos relevantes para empresas.
                             </p>
+                            <button class="btn btn-primary btn-sm" onclick="abrirModalSimple('Boletines CTI', 'Los boletines CTI presentan información resumida sobre amenazas, vulnerabilidades y recomendaciones de seguridad.')">
+                                Leer más
+                            </button>
                         </div>
                     </div>
                 </article>
@@ -115,6 +110,9 @@
                             <p class="card-text">
                                 Noticias importantes de ciberseguridad explicadas de manera sencilla y enfocadas en aportar valor.
                             </p>
+                            <button class="btn btn-success btn-sm" onclick="abrirModalSimple('Noticias de seguridad', 'Esta sección resume noticias relevantes para que empresas y entidades conozcan los riesgos digitales actuales.')">
+                                Leer más
+                            </button>
                         </div>
                     </div>
                 </article>
@@ -126,32 +124,47 @@
                             <p class="card-text">
                                 Consejos básicos para que empresas y entidades puedan reducir riesgos digitales.
                             </p>
+                            <button class="btn btn-warning btn-sm" onclick="abrirModalSimple('Recomendaciones', 'Las recomendaciones ayudan a fortalecer la protección digital y mejorar la prevención ante amenazas comunes.')">
+                                Leer más
+                            </button>
                         </div>
                     </div>
                 </article>
             </div>
-
-            <ul class="mt-3">
-                <li>Boletines de ciberinteligencia.</li>
-                <li>Alertas sobre vulnerabilidades.</li>
-                <li>Información sobre amenazas digitales actuales.</li>
-            </ul>
         </section>
 
-        <!-- contenido dinámico: sección renderizada desde arreglos y objetos de JavaScript -->
         <section id="boletines-dinamicos" class="caja">
-            <h2>Boletines destacados renderizados dinámicamente</h2>
+            <h2>Boletines destacados</h2>
             <p>
-                Esta sección simula el uso de plantillas para mostrar contenido dinámico. Los datos se encuentran
-                en JavaScript y se renderizan en tarjetas reutilizables.
+                Esta sección muestra contenido dinámico renderizado con JavaScript usando datos almacenados en un arreglo de objetos.
             </p>
 
             <div id="mensajeBoletines" class="mt-3"></div>
 
+            <div id="spinnerCarga" class="text-center my-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Cargando boletines...</p>
+            </div>
+
             <div id="contenedorBoletines" class="row mt-3"></div>
+
+            <h3 class="h5 mt-4">Resumen en tabla Bootstrap</h3>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Título</th>
+                            <th>Categoría</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBoletines"></tbody>
+                </table>
+            </div>
         </section>
 
-        <!-- plantilla reutilizable: en Flask podría convertirse en una vista parcial o componente dinámico -->
         <template id="plantillaBoletin">
             <article class="col-md-6 mb-3">
                 <div class="card h-100 plantilla-card">
@@ -172,6 +185,10 @@
                         </p>
 
                         <p class="card-text" data-campo="descripcion"></p>
+
+                        <button class="btn btn-primary btn-sm" type="button" data-accion="detalle">
+                            Ver detalle
+                        </button>
                     </div>
                 </div>
             </article>
@@ -186,51 +203,35 @@
             </p>
 
             <form id="formularioRegistro" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombreRegistro" class="form-label">Nombre</label>
+                        <input type="text" id="nombreRegistro" class="form-control" placeholder="Ejemplo: Boletín de vulnerabilidades">
+                        <div id="mensajeNombre" class="mensaje-validacion"></div>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="nombreRegistro" class="form-label">Nombre</label>
-
-                    <input
-                        type="text"
-                        id="nombreRegistro"
-                        class="form-control"
-                        placeholder="Ejemplo: Boletín de vulnerabilidades"
-                    >
-
-                    <div id="mensajeNombre" class="mensaje-validacion"></div>
+                    <div class="col-md-6 mb-3">
+                        <label for="categoriaRegistro" class="form-label">Categoría o tipo</label>
+                        <select id="categoriaRegistro" class="form-select">
+                            <option value="">Seleccione una opción</option>
+                            <option value="Boletín CTI">Boletín CTI</option>
+                            <option value="Noticia de seguridad">Noticia de seguridad</option>
+                            <option value="Alerta de vulnerabilidad">Alerta de vulnerabilidad</option>
+                            <option value="Recomendación">Recomendación</option>
+                        </select>
+                        <div id="mensajeCategoria" class="mensaje-validacion"></div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="descripcionRegistro" class="form-label">Descripción</label>
-
-                    <textarea
-                        id="descripcionRegistro"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Describe brevemente la solicitud o registro"
-                    ></textarea>
-
+                    <textarea id="descripcionRegistro" class="form-control" rows="3" placeholder="Describe brevemente la solicitud o registro"></textarea>
                     <div id="mensajeDescripcion" class="mensaje-validacion"></div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="categoriaRegistro" class="form-label">Categoría o tipo</label>
-
-                    <select id="categoriaRegistro" class="form-select">
-                        <option value="">Seleccione una opción</option>
-                        <option value="Boletín CTI">Boletín CTI</option>
-                        <option value="Noticia de seguridad">Noticia de seguridad</option>
-                        <option value="Alerta de vulnerabilidad">Alerta de vulnerabilidad</option>
-                        <option value="Recomendación">Recomendación</option>
-                    </select>
-
-                    <div id="mensajeCategoria" class="mensaje-validacion"></div>
-                </div>
-
-                <button type="submit" class="btn btn-cti">
+                <button type="submit" class="btn btn-success">
                     Registrar información
                 </button>
-
             </form>
 
             <div id="mensajeFormulario" class="mt-3"></div>
@@ -245,7 +246,6 @@
             <div id="listaRegistros" class="row mt-3"></div>
         </section>
 
-        <!-- plantilla reutilizable: estructura para renderizar registros creados desde el formulario -->
         <template id="plantillaRegistro">
             <article class="col-md-6 mb-3">
                 <div class="card registro-card h-100">
@@ -259,9 +259,15 @@
 
                         <p class="card-text" data-campo="descripcion"></p>
 
-                        <button class="btn btn-danger btn-sm" type="button" data-accion="eliminar">
-                            Eliminar
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" type="button" data-accion="detalle">
+                                Detalle
+                            </button>
+
+                            <button class="btn btn-danger btn-sm" type="button" data-accion="eliminar">
+                                Eliminar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -274,31 +280,28 @@
                 El siguiente video está relacionado con la ciberseguridad y la importancia de proteger la información.
             </p>
 
-            <iframe
-                src="https://www.youtube.com/embed/zCnJehJovEo"
-                title="Video sobre ciberseguridad"
-                allowfullscreen>
-            </iframe>
+            <iframe src="https://www.youtube.com/embed/zCnJehJovEo" title="Video sobre ciberseguridad" allowfullscreen></iframe>
         </section>
 
         <section id="contacto" class="caja">
             <h2>Contacto</h2>
 
-            <p>
-                <strong>Correo electrónico:</strong>
-                <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a>
-            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Correo electrónico:</strong> <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a></p>
+                    <p><strong>Teléfono:</strong> +593 000 000 000</p>
+                    <p><strong>Dirección:</strong> Ecuador</p>
+                </div>
 
-            <p><strong>Teléfono:</strong> +593 000 000 000</p>
-            <p><strong>Dirección:</strong> Ecuador</p>
-
-            <p><strong>Redes sociales:</strong></p>
-
-            <ul>
-                <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
-                <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
-                <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
-            </ul>
+                <div class="col-md-6">
+                    <p><strong>Redes sociales:</strong></p>
+                    <ul>
+                        <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
+                        <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
+                        <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
         <aside class="caja">
@@ -315,10 +318,28 @@
 
     </main>
 
-    <!-- base.html: pie de página reutilizable del proyecto -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalTitulo">Objetivo de JuansecCTI</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body" id="modalCuerpo">
+                    JuansecCTI busca compartir información clara sobre ciberinteligencia, boletines, noticias y recomendaciones de seguridad para empresas y entidades.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>Juan Ramírez | Desarrollo de Aplicaciones Web | 2026</p>
-        <p>Proyecto Integrador U2 - Semana 7: Uso de plantillas para renderizar contenido dinámico</p>
+        <p>Proyecto Integrador U2 - Semana 8: Mejora de interfaces con Bootstrap</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
