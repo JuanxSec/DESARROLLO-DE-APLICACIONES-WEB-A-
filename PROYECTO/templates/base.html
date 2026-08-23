@@ -29,25 +29,7 @@
         </div>
     </header>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('inicio') }}">JuansecCTI</a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="menu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('inicio') }}">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_productos') }}">Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_clientes') }}">Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_proveedores') }}">Proveedores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_facturacion') }}">Facturación</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    {% include "components/navbar.html" %}
 
     <main class="container contenido mt-4">
         {% block content %}
@@ -73,10 +55,7 @@
         </div>
     </div>
 
-    <footer>
-        <p>Juan Ramírez | Desarrollo de Aplicaciones Web | 2026</p>
-        <p>Proyecto Integrador U3 - Semana 9: Flask y manejo de rutas</p>
-    </footer>
+    {% include "components/footer.html" %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
