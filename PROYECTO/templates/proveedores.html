@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="caja">
+    <h2>Proveedores</h2>
+    <p>
+        En este módulo se muestran fuentes y proveedores demostrativos de información para el proyecto.
+    </p>
+
+    <div class="row">
+        {% for proveedor in proveedores %}
+        <article class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title h5">{{ proveedor.nombre }}</h3>
+                    <p><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
+                    <p>{{ proveedor.aporte }}</p>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
