@@ -9,6 +9,9 @@ from forms.facturacion_form import FacturacionForm
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tu_clave_secreta_segura_2026'
 
+# Semana 12: Persistencia de datos en SQLite - Base de datos ferreteria.db con tabla productos
+# Implementación de operaciones CRUD: INSERT, SELECT con validación y protección CSRF
+
 titulo_sitio = "JuanzecCTI"
 mensaje_bienvenida = "Boletines y noticias de ciberinteligencia para empresas y entidades"
 
