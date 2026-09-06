@@ -5,31 +5,126 @@
 <section class="caja">
     <h2>Productos CTI</h2>
     <p>
-        En este módulo se presentan los productos o servicios informativos de JuansecCTI.
+        En este módulo se presentan los productos o servicios informativos de JuanzecCTI.
     </p>
-    <p class="text-muted">Total de productos disponibles: <strong>{{ productos|length }}</strong></p>
 
-    <div class="row">
-        {% for producto in productos %}
-        <article class="col-md-4 mb-3">
-            <div class="card h-100 plantilla-card">
-                <div class="card-body">
-                    <h3 class="card-title h5">{{ producto.nombre|upper }}</h3>
-                    <p><strong>Categoría:</strong> {{ producto.categoria }}</p>
-                    <p><strong>Estado:</strong> {{ producto.estado }}</p>
-                    <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Agregar Nuevo Producto</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
 
-                    {% if producto.stock > 0 %}
-                        <span class="badge bg-success">Disponible</span>
+                <div class="mb-3">
+                    {{ form.nombre.label(class="form-label") }}
+                    {% if form.nombre.errors %}
+                        {{ form.nombre(class="form-control is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.nombre.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
                     {% else %}
-                        <span class="badge bg-danger">Agotado</span>
+                        {{ form.nombre(class="form-control") }}
                     {% endif %}
-
-                    <p class="mt-3">{{ producto.descripcion }}</p>
                 </div>
-            </div>
-        </article>
-        {% endfor %}
+
+                <div class="mb-3">
+                    {{ form.categoria.label(class="form-label") }}
+                    {% if form.categoria.errors %}
+                        {{ form.categoria(class="form-control is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.categoria.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.categoria(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.estado.label(class="form-label") }}
+                    {% if form.estado.errors %}
+                        {{ form.estado(class="form-select is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.estado.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.estado(class="form-select") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.stock.label(class="form-label") }}
+                    {% if form.stock.errors %}
+                        {{ form.stock(class="form-control is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.stock.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.stock(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.descripcion.label(class="form-label") }}
+                    {% if form.descripcion.errors %}
+                        {{ form.descripcion(class="form-control is-invalid", rows="4") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.descripcion.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.descripcion(class="form-control", rows="4") }}
+                    {% endif %}
+                </div>
+
+                {{ form.enviar(class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Productos Registrados</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Total de productos disponibles: <strong>{{ productos|length }}</strong></p>
+
+            {% if productos %}
+                <div class="row">
+                    {% for producto in productos %}
+                    <article class="col-md-4 mb-3">
+                        <div class="card h-100 plantilla-card">
+                            <div class="card-body">
+                                <h3 class="card-title h5">{{ producto.nombre|upper }}</h3>
+                                <p><strong>Categoría:</strong> {{ producto.categoria }}</p>
+                                <p><strong>Estado:</strong> {{ producto.estado }}</p>
+                                <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>
+
+                                {% if producto.stock > 0 %}
+                                    <span class="badge bg-success">Disponible</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Agotado</span>
+                                {% endif %}
+
+                                <p class="mt-3">{{ producto.descripcion }}</p>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No hay productos registrados aún. Completa el formulario anterior para agregar nuevos productos.</p>
+            {% endif %}
+        </div>
     </div>
 </section>
 
