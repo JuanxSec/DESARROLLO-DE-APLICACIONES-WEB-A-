@@ -8,18 +8,80 @@
         En este módulo se muestran fuentes y proveedores demostrativos de información para el proyecto.
     </p>
 
-    <div class="row">
-        {% for proveedor in proveedores %}
-        <article class="col-md-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h3 class="card-title h5">{{ proveedor.nombre }}</h3>
-                    <p><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
-                    <p>{{ proveedor.aporte }}</p>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Agregar Nuevo Proveedor</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.nombre.label(class="form-label") }}
+                    {% if form.nombre.errors %}
+                        {{ form.nombre(class="form-control is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.nombre.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.nombre(class="form-control") }}
+                    {% endif %}
                 </div>
+
+                <div class="mb-3">
+                    {{ form.tipo.label(class="form-label") }}
+                    {% if form.tipo.errors %}
+                        {{ form.tipo(class="form-control is-invalid") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.tipo.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.tipo(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.aporte.label(class="form-label") }}
+                    {% if form.aporte.errors %}
+                        {{ form.aporte(class="form-control is-invalid", rows="4") }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.aporte.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.aporte(class="form-control", rows="4") }}
+                    {% endif %}
+                </div>
+
+                {{ form.enviar(class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Proveedores Registrados</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for proveedor in proveedores %}
+                <article class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title h5">{{ proveedor.nombre }}</h3>
+                            <p><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
+                            <p>{{ proveedor.aporte }}</p>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
             </div>
-        </article>
-        {% endfor %}
+        </div>
     </div>
 </section>
 
