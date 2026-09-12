@@ -1,5 +1,5 @@
 from wtforms import StringField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, InputRequired, Length
 from flask_wtf import FlaskForm
 
 class FacturacionForm(FlaskForm):
@@ -8,9 +8,8 @@ class FacturacionForm(FlaskForm):
         Length(min=3, max=20, message='El código debe tener entre 3 y 20 caracteres')
     ])
 
-    cliente = StringField('Cliente', validators=[
-        DataRequired(message='El cliente es requerido'),
-        Length(min=3, max=100, message='El cliente debe tener entre 3 y 100 caracteres')
+    id_cliente = SelectField('Cliente', coerce=int, validators=[
+        InputRequired(message='Debe seleccionar un cliente')
     ])
 
     servicio = StringField('Servicio', validators=[

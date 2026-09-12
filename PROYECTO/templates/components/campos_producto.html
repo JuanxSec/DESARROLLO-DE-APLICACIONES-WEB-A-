@@ -1,0 +1,32 @@
+{% macro campo(field, clase="form-control", rows=None) %}
+<div class="mb-3">
+    {{ field.label(class="form-label") }}
+    {% set clases = clase ~ (" is-invalid" if field.errors else "") %}
+    {% if rows %}
+        {{ field(class=clases, rows=rows) }}
+    {% else %}
+        {{ field(class=clases) }}
+    {% endif %}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in field.errors %}
+                <span>{{ error }}</span><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro campos_producto(form) %}
+    {{ form.hidden_tag() }}
+    {{ campo(form.nombre) }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.categoria) }}</div>
+        <div class="col-md-6">{{ campo(form.id_proveedor, clase="form-select") }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.estado, clase="form-select") }}</div>
+        <div class="col-md-6">{{ campo(form.stock) }}</div>
+    </div>
+    {{ campo(form.descripcion, rows="4") }}
+{% endmacro %}
