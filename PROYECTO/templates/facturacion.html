@@ -31,16 +31,16 @@
                 </div>
 
                 <div class="mb-3">
-                    {{ form.cliente.label(class="form-label") }}
-                    {% if form.cliente.errors %}
-                        {{ form.cliente(class="form-control is-invalid") }}
+                    {{ form.id_cliente.label(class="form-label") }}
+                    {% if form.id_cliente.errors %}
+                        {{ form.id_cliente(class="form-select is-invalid") }}
                         <div class="invalid-feedback d-block">
-                            {% for error in form.cliente.errors %}
+                            {% for error in form.id_cliente.errors %}
                                 <span>{{ error }}</span><br>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.cliente(class="form-control") }}
+                        {{ form.id_cliente(class="form-select") }}
                     {% endif %}
                 </div>
 
@@ -91,6 +91,7 @@
                             <th>Código</th>
                             <th>Cliente</th>
                             <th>Servicio</th>
+                            <th>Fecha</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -101,6 +102,7 @@
                             <td><strong>{{ factura.codigo }}</strong></td>
                             <td>{{ factura.cliente }}</td>
                             <td>{{ factura.servicio }}</td>
+                            <td>{{ factura.fecha }}</td>
                             <td>
                                 {% if factura.estado|lower == "pagado" %}
                                     <span class="badge bg-success">{{ factura.estado }}</span>
