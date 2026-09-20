@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_login %}
 
 {% block content %}
 
@@ -15,36 +16,7 @@
                     </p>
 
                     <form method="POST" action="{{ url_for('login') }}" novalidate>
-                        {{ form.hidden_tag() }}
-
-                        <div class="mb-3">
-                            {{ form.usuario.label(class="form-label") }}
-                            {% if form.usuario.errors %}
-                                {{ form.usuario(class="form-control is-invalid") }}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.usuario.errors %}
-                                        <span>{{ error }}</span><br>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.usuario(class="form-control") }}
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {% if form.password.errors %}
-                                {{ form.password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.password.errors %}
-                                        <span>{{ error }}</span><br>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.password(class="form-control") }}
-                            {% endif %}
-                        </div>
-
+                        {{ campos_login(form) }}
                         {{ form.enviar(class="btn btn-primary w-100") }}
                     </form>
 

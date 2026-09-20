@@ -100,6 +100,13 @@
 {% endmacro %}
 
 
+{% macro campos_login(form) %}
+    {{ form.hidden_tag() }}
+    {{ campo(form.usuario) }}
+    {{ campo(form.password) }}
+{% endmacro %}
+
+
 {% macro campos_usuario(form) %}
     {{ form.hidden_tag() }}
     <div class="row">

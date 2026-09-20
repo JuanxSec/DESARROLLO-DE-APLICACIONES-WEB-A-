@@ -1,32 +1,15 @@
-const botonBienvenida = document.getElementById("botonBienvenida");
-const textoBienvenida = document.getElementById("textoBienvenida");
+/* ===========================================================================
+   JuansecCTI - JavaScript del proyecto
+   Semanas 5 a 8: manipulacion del DOM, eventos, validaciones dinamicas,
+   renderizado de contenido y componentes de Bootstrap.
 
-const formularioRegistro = document.getElementById("formularioRegistro");
+   El archivo se carga desde base.html en todas las paginas del sistema, por
+   eso cada bloque comprueba primero que sus elementos existan en la pagina
+   actual. Asi las pantallas internas (productos, clientes, login, etc.) no
+   generan errores en la consola.
+   =========================================================================== */
 
-const nombreRegistro = document.getElementById("nombreRegistro");
-const descripcionRegistro = document.getElementById("descripcionRegistro");
-const categoriaRegistro = document.getElementById("categoriaRegistro");
-
-const mensajeNombre = document.getElementById("mensajeNombre");
-const mensajeDescripcion = document.getElementById("mensajeDescripcion");
-const mensajeCategoria = document.getElementById("mensajeCategoria");
-
-const mensajeFormulario = document.getElementById("mensajeFormulario");
-const mensajeRegistros = document.getElementById("mensajeRegistros");
-const listaRegistros = document.getElementById("listaRegistros");
-const totalRegistros = document.getElementById("totalRegistros");
-
-const contenedorBoletines = document.getElementById("contenedorBoletines");
-const mensajeBoletines = document.getElementById("mensajeBoletines");
-const tablaBoletines = document.getElementById("tablaBoletines");
-const spinnerCarga = document.getElementById("spinnerCarga");
-
-const plantillaBoletin = document.getElementById("plantillaBoletin");
-const plantillaRegistro = document.getElementById("plantillaRegistro");
-
-const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetalle"));
-const modalTitulo = document.getElementById("modalTitulo");
-const modalCuerpo = document.getElementById("modalCuerpo");
+/* --------------------------- Datos del proyecto --------------------------- */
 
 const boletinesCTI = [
     {
@@ -54,177 +37,10 @@ const boletinesCTI = [
 
 let registrosCTI = [];
 
-botonBienvenida.addEventListener("click", function () {
-    textoBienvenida.innerText = "JuansecCTI comparte información útil para fortalecer la seguridad digital de empresas y entidades.";
-});
+/* ------------------------------- Utilidades ------------------------------- */
 
-nombreRegistro.addEventListener("input", validarNombre);
-nombreRegistro.addEventListener("blur", validarNombre);
-
-descripcionRegistro.addEventListener("input", validarDescripcion);
-descripcionRegistro.addEventListener("blur", validarDescripcion);
-
-categoriaRegistro.addEventListener("input", validarCategoria);
-categoriaRegistro.addEventListener("blur", validarCategoria);
-categoriaRegistro.addEventListener("change", validarCategoria);
-
-formularioRegistro.addEventListener("submit", function (evento) {
-    evento.preventDefault();
-
-    const nombreValido = validarNombre();
-    const descripcionValida = validarDescripcion();
-    const categoriaValida = validarCategoria();
-
-    if (!nombreValido || !descripcionValida || !categoriaValida) {
-        mensajeFormulario.className = "alert alert-danger mt-3";
-        mensajeFormulario.innerText = "Revise los campos antes de registrar la información.";
-        return;
-    }
-
-    const nuevoRegistro = {
-        nombre: nombreRegistro.value.trim(),
-        descripcion: descripcionRegistro.value.trim(),
-        categoria: categoriaRegistro.value
-    };
-
-    registrosCTI.push(nuevoRegistro);
-
-    renderizarRegistros();
-
-    mensajeFormulario.className = "alert alert-success mt-3";
-    mensajeFormulario.innerText = "Registro agregado correctamente.";
-
-    formularioRegistro.reset();
-    limpiarValidaciones();
-});
-
-function validarNombre() {
-    const nombre = nombreRegistro.value.trim();
-
-    if (nombre === "") {
-        mostrarError(nombreRegistro, mensajeNombre, "El nombre es obligatorio.");
-        return false;
-    }
-
-    if (nombre.length < 5) {
-        mostrarError(nombreRegistro, mensajeNombre, "El nombre debe tener mínimo 5 caracteres.");
-        return false;
-    }
-
-    mostrarCorrecto(nombreRegistro, mensajeNombre, "Nombre válido.");
-    return true;
-}
-
-function validarDescripcion() {
-    const descripcion = descripcionRegistro.value.trim();
-
-    if (descripcion === "") {
-        mostrarError(descripcionRegistro, mensajeDescripcion, "La descripción es obligatoria.");
-        return false;
-    }
-
-    if (descripcion.length < 15) {
-        mostrarError(descripcionRegistro, mensajeDescripcion, "La descripción debe tener mínimo 15 caracteres.");
-        return false;
-    }
-
-    mostrarCorrecto(descripcionRegistro, mensajeDescripcion, "Descripción válida.");
-    return true;
-}
-
-function validarCategoria() {
-    const categoria = categoriaRegistro.value;
-
-    if (categoria === "") {
-        mostrarError(categoriaRegistro, mensajeCategoria, "Seleccione una categoría.");
-        return false;
-    }
-
-    mostrarCorrecto(categoriaRegistro, mensajeCategoria, "Categoría seleccionada.");
-    return true;
-}
-
-function mostrarError(campo, mensaje, texto) {
-    campo.classList.remove("is-valid");
-    campo.classList.add("is-invalid");
-
-    mensaje.className = "mensaje-validacion texto-error";
-    mensaje.innerText = texto;
-}
-
-function mostrarCorrecto(campo, mensaje, texto) {
-    campo.classList.remove("is-invalid");
-    campo.classList.add("is-valid");
-
-    mensaje.className = "mensaje-validacion texto-correcto";
-    mensaje.innerText = texto;
-}
-
-function limpiarValidaciones() {
-    nombreRegistro.classList.remove("is-valid", "is-invalid");
-    descripcionRegistro.classList.remove("is-valid", "is-invalid");
-    categoriaRegistro.classList.remove("is-valid", "is-invalid");
-
-    mensajeNombre.innerText = "";
-    mensajeDescripcion.innerText = "";
-    mensajeCategoria.innerText = "";
-}
-
-function renderizarBoletines() {
-    contenedorBoletines.innerHTML = "";
-    tablaBoletines.innerHTML = "";
-    spinnerCarga.classList.remove("d-none");
-
-    setTimeout(function () {
-        spinnerCarga.classList.add("d-none");
-
-        if (boletinesCTI.length === 0) {
-            mensajeBoletines.className = "alert alert-warning";
-            mensajeBoletines.innerText = "No existen boletines disponibles para mostrar.";
-            return;
-        }
-
-        mensajeBoletines.className = "alert alert-success";
-        mensajeBoletines.innerText = "Boletines cargados correctamente usando Bootstrap y JavaScript.";
-
-        boletinesCTI.forEach(function (boletin) {
-            const copia = plantillaBoletin.content.cloneNode(true);
-
-            copia.querySelector('[data-campo="titulo"]').innerText = boletin.titulo;
-            copia.querySelector('[data-campo="categoria"]').innerText = boletin.categoria;
-            copia.querySelector('[data-campo="prioridad"]').innerText = boletin.prioridad;
-            copia.querySelector('[data-campo="descripcion"]').innerText = boletin.descripcion;
-
-            const estado = copia.querySelector('[data-campo="estado"]');
-            estado.innerText = boletin.estado;
-            estado.classList.add(obtenerClaseEstado(boletin.estado));
-
-            const botonDetalle = copia.querySelector('[data-accion="detalle"]');
-
-            botonDetalle.addEventListener("click", function () {
-                abrirModalDetalle(
-                    boletin.titulo,
-                    boletin.categoria,
-                    boletin.prioridad,
-                    boletin.estado,
-                    boletin.descripcion
-                );
-            });
-
-            contenedorBoletines.appendChild(copia);
-
-            const fila = document.createElement("tr");
-
-            fila.innerHTML = `
-                <td>${boletin.titulo}</td>
-                <td>${boletin.categoria}</td>
-                <td>${boletin.prioridad}</td>
-                <td><span class="badge ${obtenerClaseEstado(boletin.estado)}">${boletin.estado}</span></td>
-            `;
-
-            tablaBoletines.appendChild(fila);
-        });
-    }, 1000);
+function elemento(id) {
+    return document.getElementById(id);
 }
 
 function obtenerClaseEstado(estado) {
@@ -239,30 +55,252 @@ function obtenerClaseEstado(estado) {
     return "text-bg-secondary";
 }
 
-function renderizarRegistros() {
-    listaRegistros.innerHTML = "";
-    totalRegistros.innerText = registrosCTI.length;
+/* ------------------- Modal de detalle (vive en base.html) ------------------ */
 
-    if (registrosCTI.length === 0) {
-        mensajeRegistros.className = "alert alert-info";
-        mensajeRegistros.innerText = "Todavía no existen registros creados desde el formulario.";
+let modalDetalle = null;
+
+function inicializarModal() {
+    const contenedor = elemento("modalDetalle");
+
+    if (!contenedor) {
         return;
     }
 
-    mensajeRegistros.className = "alert alert-success";
-    mensajeRegistros.innerText = "Los registros se muestran mediante tarjetas Bootstrap generadas con JavaScript.";
+    modalDetalle = new bootstrap.Modal(contenedor);
+}
+
+function abrirModalDetalle(titulo, categoria, prioridad, estado, descripcion) {
+    const modalTitulo = elemento("modalTitulo");
+    const modalCuerpo = elemento("modalCuerpo");
+
+    if (!modalDetalle || !modalTitulo || !modalCuerpo) {
+        return;
+    }
+
+    modalTitulo.innerText = titulo;
+    modalCuerpo.innerHTML = "";
+
+    const datos = [
+        "Categoría: " + categoria,
+        "Prioridad: " + prioridad,
+        "Estado: " + estado,
+        "Descripción: " + descripcion
+    ];
+
+    datos.forEach(function (texto) {
+        const parrafo = document.createElement("p");
+        parrafo.innerText = texto;
+        modalCuerpo.appendChild(parrafo);
+    });
+
+    modalDetalle.show();
+}
+
+/* Se llama desde los botones "Leer más" del HTML, por eso es global. */
+function abrirModalSimple(titulo, descripcion) {
+    const modalTitulo = elemento("modalTitulo");
+    const modalCuerpo = elemento("modalCuerpo");
+
+    if (!modalDetalle || !modalTitulo || !modalCuerpo) {
+        return;
+    }
+
+    modalTitulo.innerText = titulo;
+    modalCuerpo.innerText = descripcion;
+    modalDetalle.show();
+}
+
+/* ------------------ Mensaje de bienvenida de la cabecera ------------------ */
+
+function inicializarBienvenida() {
+    const boton = elemento("botonBienvenida");
+    const texto = elemento("textoBienvenida");
+
+    if (!boton || !texto) {
+        return;
+    }
+
+    boton.addEventListener("click", function () {
+        texto.innerText = "JuansecCTI comparte información útil para fortalecer la seguridad digital de empresas y entidades.";
+    });
+}
+
+/* ------- Formulario dinamico con validaciones (Semanas 5, 6 y 8) --------- */
+
+function inicializarFormularioRegistro() {
+    const formulario = elemento("formularioRegistro");
+    const nombre = elemento("nombreRegistro");
+    const descripcion = elemento("descripcionRegistro");
+    const categoria = elemento("categoriaRegistro");
+
+    if (!formulario || !nombre || !descripcion || !categoria) {
+        return;
+    }
+
+    const mensajeNombre = elemento("mensajeNombre");
+    const mensajeDescripcion = elemento("mensajeDescripcion");
+    const mensajeCategoria = elemento("mensajeCategoria");
+    const mensajeFormulario = elemento("mensajeFormulario");
+
+    function mostrarError(campo, mensaje, texto) {
+        campo.classList.remove("is-valid");
+        campo.classList.add("is-invalid");
+
+        if (mensaje) {
+            mensaje.className = "mensaje-validacion texto-error";
+            mensaje.innerText = texto;
+        }
+    }
+
+    function mostrarCorrecto(campo, mensaje, texto) {
+        campo.classList.remove("is-invalid");
+        campo.classList.add("is-valid");
+
+        if (mensaje) {
+            mensaje.className = "mensaje-validacion texto-correcto";
+            mensaje.innerText = texto;
+        }
+    }
+
+    function validarNombre() {
+        const valor = nombre.value.trim();
+
+        if (valor === "") {
+            mostrarError(nombre, mensajeNombre, "El nombre es obligatorio.");
+            return false;
+        }
+
+        if (valor.length < 5) {
+            mostrarError(nombre, mensajeNombre, "El nombre debe tener mínimo 5 caracteres.");
+            return false;
+        }
+
+        mostrarCorrecto(nombre, mensajeNombre, "Nombre válido.");
+        return true;
+    }
+
+    function validarDescripcion() {
+        const valor = descripcion.value.trim();
+
+        if (valor === "") {
+            mostrarError(descripcion, mensajeDescripcion, "La descripción es obligatoria.");
+            return false;
+        }
+
+        if (valor.length < 15) {
+            mostrarError(descripcion, mensajeDescripcion, "La descripción debe tener mínimo 15 caracteres.");
+            return false;
+        }
+
+        mostrarCorrecto(descripcion, mensajeDescripcion, "Descripción válida.");
+        return true;
+    }
+
+    function validarCategoria() {
+        if (categoria.value === "") {
+            mostrarError(categoria, mensajeCategoria, "Seleccione una categoría.");
+            return false;
+        }
+
+        mostrarCorrecto(categoria, mensajeCategoria, "Categoría seleccionada.");
+        return true;
+    }
+
+    function limpiarValidaciones() {
+        [nombre, descripcion, categoria].forEach(function (campo) {
+            campo.classList.remove("is-valid", "is-invalid");
+        });
+
+        [mensajeNombre, mensajeDescripcion, mensajeCategoria].forEach(function (mensaje) {
+            if (mensaje) {
+                mensaje.innerText = "";
+            }
+        });
+    }
+
+    // Validacion en tiempo real: eventos input, blur y change.
+    nombre.addEventListener("input", validarNombre);
+    nombre.addEventListener("blur", validarNombre);
+
+    descripcion.addEventListener("input", validarDescripcion);
+    descripcion.addEventListener("blur", validarDescripcion);
+
+    categoria.addEventListener("input", validarCategoria);
+    categoria.addEventListener("blur", validarCategoria);
+    categoria.addEventListener("change", validarCategoria);
+
+    formulario.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const nombreValido = validarNombre();
+        const descripcionValida = validarDescripcion();
+        const categoriaValida = validarCategoria();
+
+        if (!nombreValido || !descripcionValida || !categoriaValida) {
+            if (mensajeFormulario) {
+                mensajeFormulario.className = "alert alert-danger mt-3";
+                mensajeFormulario.innerText = "Revise los campos antes de registrar la información.";
+            }
+            return;
+        }
+
+        registrosCTI.push({
+            nombre: nombre.value.trim(),
+            descripcion: descripcion.value.trim(),
+            categoria: categoria.value
+        });
+
+        renderizarRegistros();
+
+        if (mensajeFormulario) {
+            mensajeFormulario.className = "alert alert-success mt-3";
+            mensajeFormulario.innerText = "Registro agregado correctamente.";
+        }
+
+        formulario.reset();
+        limpiarValidaciones();
+    });
+
+    renderizarRegistros();
+}
+
+function renderizarRegistros() {
+    const lista = elemento("listaRegistros");
+    const total = elemento("totalRegistros");
+    const mensajeRegistros = elemento("mensajeRegistros");
+    const plantilla = elemento("plantillaRegistro");
+
+    if (!lista || !plantilla) {
+        return;
+    }
+
+    lista.innerHTML = "";
+
+    if (total) {
+        total.innerText = registrosCTI.length;
+    }
+
+    if (registrosCTI.length === 0) {
+        if (mensajeRegistros) {
+            mensajeRegistros.className = "alert alert-info";
+            mensajeRegistros.innerText = "Todavía no existen registros creados desde el formulario.";
+        }
+        return;
+    }
+
+    if (mensajeRegistros) {
+        mensajeRegistros.className = "alert alert-success";
+        mensajeRegistros.innerText = "Los registros se muestran mediante tarjetas Bootstrap generadas con JavaScript.";
+    }
 
     registrosCTI.forEach(function (registro, indice) {
-        const copia = plantillaRegistro.content.cloneNode(true);
+        const copia = plantilla.content.cloneNode(true);
 
         copia.querySelector('[data-campo="nombre"]').innerText = registro.nombre;
         copia.querySelector('[data-campo="categoria"]').innerText = registro.categoria;
         copia.querySelector('[data-campo="descripcion"]').innerText = registro.descripcion;
 
-        const botonDetalle = copia.querySelector('[data-accion="detalle"]');
-        const botonEliminar = copia.querySelector('[data-accion="eliminar"]');
-
-        botonDetalle.addEventListener("click", function () {
+        copia.querySelector('[data-accion="detalle"]').addEventListener("click", function () {
             abrirModalDetalle(
                 registro.nombre,
                 registro.categoria,
@@ -272,49 +310,255 @@ function renderizarRegistros() {
             );
         });
 
-        botonEliminar.addEventListener("click", function () {
+        copia.querySelector('[data-accion="eliminar"]').addEventListener("click", function () {
             registrosCTI.splice(indice, 1);
-
             renderizarRegistros();
 
-            mensajeFormulario.className = "alert alert-success mt-3";
-            mensajeFormulario.innerText = "Registro eliminado correctamente.";
+            const mensajeFormulario = elemento("mensajeFormulario");
+
+            if (mensajeFormulario) {
+                mensajeFormulario.className = "alert alert-success mt-3";
+                mensajeFormulario.innerText = "Registro eliminado correctamente.";
+            }
         });
 
-        listaRegistros.appendChild(copia);
+        lista.appendChild(copia);
     });
 }
 
-function abrirModalDetalle(titulo, categoria, prioridad, estado, descripcion) {
-    modalTitulo.innerText = titulo;
+/* --------- Boletines destacados: tarjetas, tabla y spinner (Semana 8) ------ */
 
-    modalCuerpo.innerHTML = "";
+function renderizarBoletines() {
+    const contenedor = elemento("contenedorBoletines");
+    const plantilla = elemento("plantillaBoletin");
 
-    const categoriaTexto = document.createElement("p");
-    categoriaTexto.innerText = "Categoría: " + categoria;
+    if (!contenedor || !plantilla) {
+        return;
+    }
 
-    const prioridadTexto = document.createElement("p");
-    prioridadTexto.innerText = "Prioridad: " + prioridad;
+    const tabla = elemento("tablaBoletines");
+    const mensaje = elemento("mensajeBoletines");
+    const spinner = elemento("spinnerCarga");
 
-    const estadoTexto = document.createElement("p");
-    estadoTexto.innerText = "Estado: " + estado;
+    contenedor.innerHTML = "";
 
-    const descripcionTexto = document.createElement("p");
-    descripcionTexto.innerText = "Descripción: " + descripcion;
+    if (tabla) {
+        tabla.innerHTML = "";
+    }
 
-    modalCuerpo.appendChild(categoriaTexto);
-    modalCuerpo.appendChild(prioridadTexto);
-    modalCuerpo.appendChild(estadoTexto);
-    modalCuerpo.appendChild(descripcionTexto);
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
 
-    modalDetalle.show();
+    setTimeout(function () {
+        if (spinner) {
+            spinner.classList.add("d-none");
+        }
+
+        if (boletinesCTI.length === 0) {
+            if (mensaje) {
+                mensaje.className = "alert alert-warning";
+                mensaje.innerText = "No existen boletines disponibles para mostrar.";
+            }
+            return;
+        }
+
+        if (mensaje) {
+            mensaje.className = "alert alert-success";
+            mensaje.innerText = "Boletines cargados correctamente usando Bootstrap y JavaScript.";
+        }
+
+        boletinesCTI.forEach(function (boletin) {
+            const copia = plantilla.content.cloneNode(true);
+
+            copia.querySelector('[data-campo="titulo"]').innerText = boletin.titulo;
+            copia.querySelector('[data-campo="categoria"]').innerText = boletin.categoria;
+            copia.querySelector('[data-campo="prioridad"]').innerText = boletin.prioridad;
+            copia.querySelector('[data-campo="descripcion"]').innerText = boletin.descripcion;
+
+            const estado = copia.querySelector('[data-campo="estado"]');
+            estado.innerText = boletin.estado;
+            estado.classList.add(obtenerClaseEstado(boletin.estado));
+
+            copia.querySelector('[data-accion="detalle"]').addEventListener("click", function () {
+                abrirModalDetalle(
+                    boletin.titulo,
+                    boletin.categoria,
+                    boletin.prioridad,
+                    boletin.estado,
+                    boletin.descripcion
+                );
+            });
+
+            contenedor.appendChild(copia);
+
+            if (tabla) {
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>${boletin.titulo}</td>
+                    <td>${boletin.categoria}</td>
+                    <td>${boletin.prioridad}</td>
+                    <td><span class="badge ${obtenerClaseEstado(boletin.estado)}">${boletin.estado}</span></td>
+                `;
+
+                tabla.appendChild(fila);
+            }
+        });
+    }, 1000);
 }
 
-function abrirModalSimple(titulo, descripcion) {
-    modalTitulo.innerText = titulo;
-    modalCuerpo.innerText = descripcion;
-    modalDetalle.show();
+/* ------------- Formulario de contacto con validacion (Semana 4) ------------ */
+
+function inicializarFormularioContacto() {
+    const formulario = elemento("formularioContacto");
+
+    if (!formulario) {
+        return;
+    }
+
+    const campos = [
+        {
+            campo: elemento("contactoNombre"),
+            mensaje: elemento("mensajeContactoNombre"),
+            validar: function (valor) {
+                if (valor === "") {
+                    return "El nombre es obligatorio.";
+                }
+                if (valor.length < 5) {
+                    return "El nombre debe tener mínimo 5 caracteres.";
+                }
+                return "";
+            }
+        },
+        {
+            campo: elemento("contactoCorreo"),
+            mensaje: elemento("mensajeContactoCorreo"),
+            validar: function (valor) {
+                if (valor === "") {
+                    return "El correo electrónico es obligatorio.";
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) {
+                    return "Ingrese un correo electrónico válido.";
+                }
+                return "";
+            }
+        },
+        {
+            campo: elemento("contactoAsunto"),
+            mensaje: elemento("mensajeContactoAsunto"),
+            validar: function (valor) {
+                if (valor === "") {
+                    return "El asunto es obligatorio.";
+                }
+                if (valor.length < 5) {
+                    return "El asunto debe tener mínimo 5 caracteres.";
+                }
+                return "";
+            }
+        },
+        {
+            campo: elemento("contactoMensaje"),
+            mensaje: elemento("mensajeContactoMensaje"),
+            validar: function (valor) {
+                if (valor === "") {
+                    return "El mensaje es obligatorio.";
+                }
+                if (valor.length < 15) {
+                    return "El mensaje debe tener mínimo 15 caracteres.";
+                }
+                return "";
+            }
+        }
+    ];
+
+    const aviso = elemento("mensajeContacto");
+
+    function revisar(item) {
+        if (!item.campo) {
+            return true;
+        }
+
+        const error = item.validar(item.campo.value.trim());
+
+        if (error === "") {
+            item.campo.classList.remove("is-invalid");
+            item.campo.classList.add("is-valid");
+
+            if (item.mensaje) {
+                item.mensaje.className = "mensaje-validacion texto-correcto";
+                item.mensaje.innerText = "Dato válido.";
+            }
+            return true;
+        }
+
+        item.campo.classList.remove("is-valid");
+        item.campo.classList.add("is-invalid");
+
+        if (item.mensaje) {
+            item.mensaje.className = "mensaje-validacion texto-error";
+            item.mensaje.innerText = error;
+        }
+        return false;
+    }
+
+    campos.forEach(function (item) {
+        if (!item.campo) {
+            return;
+        }
+
+        item.campo.addEventListener("input", function () {
+            revisar(item);
+        });
+
+        item.campo.addEventListener("blur", function () {
+            revisar(item);
+        });
+    });
+
+    formulario.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        let valido = true;
+
+        campos.forEach(function (item) {
+            if (!revisar(item)) {
+                valido = false;
+            }
+        });
+
+        if (!aviso) {
+            return;
+        }
+
+        if (!valido) {
+            aviso.className = "alert alert-danger";
+            aviso.innerText = "Revise los campos marcados antes de enviar el mensaje.";
+            return;
+        }
+
+        aviso.className = "alert alert-success";
+        aviso.innerText = "Mensaje registrado correctamente. Nos pondremos en contacto pronto.";
+
+        formulario.reset();
+
+        campos.forEach(function (item) {
+            if (item.campo) {
+                item.campo.classList.remove("is-valid", "is-invalid");
+            }
+            if (item.mensaje) {
+                item.mensaje.innerText = "";
+            }
+        });
+    });
 }
 
-renderizarBoletines();
-renderizarRegistros();
+/* ------------------------------ Arranque ---------------------------------- */
+
+document.addEventListener("DOMContentLoaded", function () {
+    inicializarModal();
+    inicializarBienvenida();
+    inicializarFormularioRegistro();
+    inicializarFormularioContacto();
+    renderizarBoletines();
+});
