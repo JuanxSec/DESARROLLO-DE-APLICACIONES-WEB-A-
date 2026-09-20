@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="caja">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Iniciar sesión</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Ingrese sus credenciales para acceder a los módulos de administración del sistema.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('login') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.usuario.label(class="form-label") }}
+                            {% if form.usuario.errors %}
+                                {{ form.usuario(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.usuario.errors %}
+                                        <span>{{ error }}</span><br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.usuario(class="form-control") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {% if form.password.errors %}
+                                {{ form.password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span><br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.password(class="form-control") }}
+                            {% endif %}
+                        </div>
+
+                        {{ form.enviar(class="btn btn-primary w-100") }}
+                    </form>
+
+                    <hr>
+
+                    <p class="mb-0 text-center">
+                        ¿No tiene una cuenta?
+                        <a href="{{ url_for('registro') }}">Registrarse</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

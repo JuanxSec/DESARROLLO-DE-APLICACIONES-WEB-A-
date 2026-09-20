@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="caja">
+    <h2>Panel de control</h2>
+    <p>
+        Sesión iniciada como <strong>{{ current_user.usuario }}</strong>
+        (identificador {{ current_user.id }}). Esta página está protegida con
+        <code>@login_required</code>: solo es accesible con una sesión activa.
+    </p>
+
+    <div class="row mt-4">
+        <article class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h3 class="card-title display-6">{{ resumen.productos }}</h3>
+                    <p class="card-text">Productos</p>
+                    <a href="{{ url_for('ver_productos') }}" class="btn btn-primary btn-sm">Administrar</a>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h3 class="card-title display-6">{{ resumen.clientes }}</h3>
+                    <p class="card-text">Clientes</p>
+                    <a href="{{ url_for('ver_clientes') }}" class="btn btn-success btn-sm">Administrar</a>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h3 class="card-title display-6">{{ resumen.proveedores }}</h3>
+                    <p class="card-text">Proveedores</p>
+                    <a href="{{ url_for('ver_proveedores') }}" class="btn btn-warning btn-sm">Administrar</a>
+                </div>
+            </div>
+        </article>
+
+        <article class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h3 class="card-title display-6">{{ resumen.facturas }}</h3>
+                    <p class="card-text">Facturas</p>
+                    <a href="{{ url_for('ver_facturacion') }}" class="btn btn-danger btn-sm">Administrar</a>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark mt-3">Cerrar sesión</a>
+</section>
+
+{% endblock %}

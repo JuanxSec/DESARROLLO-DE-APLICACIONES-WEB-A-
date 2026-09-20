@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="caja">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Registro de usuario</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        La contraseña se almacena protegida mediante <code>generate_password_hash()</code>,
+                        nunca en texto plano.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('registro') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.usuario.label(class="form-label") }}
+                            {% if form.usuario.errors %}
+                                {{ form.usuario(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.usuario.errors %}
+                                        <span>{{ error }}</span><br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.usuario(class="form-control") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {% if form.password.errors %}
+                                {{ form.password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span><br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.password(class="form-control") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.confirmar.label(class="form-label") }}
+                            {% if form.confirmar.errors %}
+                                {{ form.confirmar(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.confirmar.errors %}
+                                        <span>{{ error }}</span><br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.confirmar(class="form-control") }}
+                            {% endif %}
+                        </div>
+
+                        {{ form.enviar(class="btn btn-success w-100") }}
+                    </form>
+
+                    <hr>
+
+                    <p class="mb-0 text-center">
+                        ¿Ya tiene una cuenta?
+                        <a href="{{ url_for('login') }}">Iniciar sesión</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

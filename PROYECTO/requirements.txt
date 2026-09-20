@@ -2,3 +2,5 @@ Flask
 Flask-WTF
 WTForms
 mysql-connector-python
+Flask-Login
+Werkzeug

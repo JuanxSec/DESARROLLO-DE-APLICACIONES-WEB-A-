@@ -1,14 +1,20 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash, abort
+from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_wtf.csrf import CSRFProtect
+from flask_login import (LoginManager, login_user, logout_user,
+                         login_required, current_user)
+from werkzeug.security import generate_password_hash, check_password_hash
 from conexion.conexion import get_db_connection
+from models import Usuario
 from forms.producto_form import ProductoForm
 from forms.cliente_form import ClienteForm
 from forms.proveedor_form import ProveedorForm
 from forms.facturacion_form import FacturacionForm
+from forms.login_form import LoginForm
+from forms.usuario_form import UsuarioForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'tu_clave_secreta_segura_2026'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu_clave_secreta_segura_2026')
 csrf = CSRFProtect(app)
 
 # Configuración de la base de datos MySQL (Semana 13).
@@ -18,6 +24,13 @@ app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_PORT', '3306'))
 app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
 app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', '')
 app.config['MYSQL_DATABASE'] = os.environ.get('MYSQL_DATABASE', 'juanseccti')
+
+# Gestión de sesiones de usuario (Semana 14).
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Debe iniciar sesión para acceder a esta página.'
+login_manager.login_message_category = 'warning'
 
 titulo_sitio = "JuansecCTI"
 mensaje_bienvenida = "Boletines y noticias de ciberinteligencia para empresas y entidades"
@@ -54,7 +67,79 @@ def opciones_clientes():
     return [(c['id_cliente'], c['nombre']) for c in clientes]
 
 
+# ---------------- AUTENTICACIÓN: registro, login, sesión y logout ----------------
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Reconstruye el usuario autenticado a partir de su identificador."""
+    data = consultar('SELECT id, usuario, password FROM usuarios WHERE id = %s',
+                     (user_id,), uno=True)
+    if data:
+        return Usuario(data['id'], data['usuario'], data['password'])
+    return None
+
+
+@app.route("/registro", methods=['GET', 'POST'])
+def registro():
+    form = UsuarioForm()
+    if form.validate_on_submit():
+        existente = consultar('SELECT id FROM usuarios WHERE usuario = %s',
+                              (form.usuario.data,), uno=True)
+        if existente:
+            flash('El usuario "' + form.usuario.data + '" ya está registrado.', 'danger')
+        else:
+            # La contraseña se transforma con hash: nunca se almacena en texto plano.
+            ejecutar('INSERT INTO usuarios (usuario, password) VALUES (%s, %s)',
+                     (form.usuario.data, generate_password_hash(form.password.data)))
+            flash('Usuario "' + form.usuario.data + '" registrado correctamente. Ya puede iniciar sesión.', 'success')
+            return redirect(url_for('login'))
+
+    return render_template("registro.html", titulo="Registro", form=form, titulo_sitio=titulo_sitio)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        data = consultar('SELECT id, usuario, password FROM usuarios WHERE usuario = %s',
+                         (form.usuario.data,), uno=True)
+        # La contraseña escrita nunca se compara directamente con la almacenada.
+        if data and check_password_hash(data['password'], form.password.data):
+            login_user(Usuario(data['id'], data['usuario'], data['password']))
+            flash('Bienvenido, ' + data['usuario'] + '.', 'success')
+            siguiente = request.args.get('next')
+            return redirect(siguiente or url_for('dashboard'))
+        flash('Usuario o contraseña incorrectos.', 'danger')
+
+    return render_template("login.html", titulo="Iniciar sesión", form=form, titulo_sitio=titulo_sitio)
+
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    resumen = {
+        'productos': consultar('SELECT COUNT(*) AS t FROM productos', uno=True)['t'],
+        'clientes': consultar('SELECT COUNT(*) AS t FROM clientes', uno=True)['t'],
+        'proveedores': consultar('SELECT COUNT(*) AS t FROM proveedores', uno=True)['t'],
+        'facturas': consultar('SELECT COUNT(*) AS t FROM facturas', uno=True)['t'],
+    }
+    return render_template("dashboard.html", titulo="Panel de control", resumen=resumen, titulo_sitio=titulo_sitio)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    nombre = current_user.usuario
+    logout_user()
+    flash('Sesión cerrada correctamente. Hasta pronto, ' + nombre + '.', 'info')
+    return redirect(url_for('login'))
+
+
 @app.route("/test_db")
+@login_required
 def test_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -74,6 +159,7 @@ def inicio():
 # ---------------- PRODUCTOS: SELECT / INSERT / UPDATE / DELETE sobre MySQL ----------------
 
 @app.route("/productos", methods=['GET', 'POST'])
+@login_required
 def ver_productos():
     form = ProductoForm()
     form.id_proveedor.choices = opciones_proveedores()
@@ -99,6 +185,7 @@ def ver_productos():
 
 
 @app.route("/productos/editar/<int:id_producto>", methods=['GET', 'POST'])
+@login_required
 def editar_producto(id_producto):
     producto = consultar('SELECT * FROM productos WHERE id_producto = %s', (id_producto,), uno=True)
     if producto is None:
@@ -123,6 +210,7 @@ def editar_producto(id_producto):
 
 
 @app.route("/productos/eliminar/<int:id_producto>", methods=['POST'])
+@login_required
 def eliminar_producto(id_producto):
     filas = ejecutar('DELETE FROM productos WHERE id_producto = %s', (id_producto,))
     if filas:
@@ -135,6 +223,7 @@ def eliminar_producto(id_producto):
 # ---------------- CLIENTES ----------------
 
 @app.route("/clientes", methods=['GET', 'POST'])
+@login_required
 def ver_clientes():
     form = ClienteForm()
     if form.validate_on_submit():
@@ -153,6 +242,7 @@ def ver_clientes():
 # ---------------- PROVEEDORES ----------------
 
 @app.route("/proveedores", methods=['GET', 'POST'])
+@login_required
 def ver_proveedores():
     form = ProveedorForm()
     if form.validate_on_submit():
@@ -175,6 +265,7 @@ def ver_proveedores():
 # ---------------- FACTURACIÓN ----------------
 
 @app.route("/facturacion", methods=['GET', 'POST'])
+@login_required
 def ver_facturacion():
     form = FacturacionForm()
     form.id_cliente.choices = opciones_clientes()
