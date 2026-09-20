@@ -1,0 +1,117 @@
+{# ---------------------------------------------------------------------------
+   Componente reutilizable de formularios (Semanas 10 y 11).
+
+   campo()  : dibuja una etiqueta, su campo y los mensajes de validación que
+              devuelve WTForms, aplicando las clases de Bootstrap is-invalid /
+              invalid-feedback.
+
+   Los macros campos_*  agrupan los campos de cada módulo y siempre empiezan
+   con form.hidden_tag(), que incluye el token de protección CSRF. Cada macro
+   se usa tanto en la pantalla de registro como en la de edición, por lo que
+   no se duplica el formulario.
+--------------------------------------------------------------------------- #}
+
+{% macro campo(field, clase="form-control", rows=None) %}
+<div class="mb-3">
+    {{ field.label(class="form-label") }}
+    {% set clases = clase ~ (" is-invalid" if field.errors else "") %}
+    {% if rows %}
+        {{ field(class=clases, rows=rows) }}
+    {% else %}
+        {{ field(class=clases) }}
+    {% endif %}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in field.errors %}
+                <span>{{ error }}</span><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+{% macro campos_producto(form) %}
+    {{ form.hidden_tag() }}
+    {{ campo(form.nombre) }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.id_categoria, clase="form-select") }}</div>
+        <div class="col-md-6">{{ campo(form.id_proveedor, clase="form-select") }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">{{ campo(form.id_estado, clase="form-select") }}</div>
+        <div class="col-md-4">{{ campo(form.precio) }}</div>
+        <div class="col-md-4">{{ campo(form.stock) }}</div>
+    </div>
+    {{ campo(form.descripcion, rows="4") }}
+{% endmacro %}
+
+
+{% macro campos_cliente(form) %}
+    {{ form.hidden_tag() }}
+    {{ campo(form.nombre) }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.id_sector, clase="form-select") }}</div>
+        <div class="col-md-6">{{ campo(form.servicio, clase="form-select") }}</div>
+    </div>
+    {{ campo(form.id_parroquia, clase="form-select") }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.correo) }}</div>
+        <div class="col-md-6">{{ campo(form.telefono) }}</div>
+    </div>
+{% endmacro %}
+
+
+{% macro campos_proveedor(form) %}
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.nombre) }}</div>
+        <div class="col-md-6">{{ campo(form.id_tipo, clase="form-select") }}</div>
+    </div>
+    {{ campo(form.aporte, rows="3") }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.correo) }}</div>
+        <div class="col-md-6">{{ campo(form.telefono) }}</div>
+    </div>
+{% endmacro %}
+
+
+{% macro campos_factura(form) %}
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-4">{{ campo(form.codigo) }}</div>
+        <div class="col-md-8">{{ campo(form.id_cliente, clase="form-select") }}</div>
+    </div>
+    {{ campo(form.servicio) }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.id_estado, clase="form-select") }}</div>
+        <div class="col-md-6">{{ campo(form.fecha) }}</div>
+    </div>
+{% endmacro %}
+
+
+{% macro campos_detalle(form) %}
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.id_producto, clase="form-select") }}</div>
+        <div class="col-md-3">{{ campo(form.cantidad) }}</div>
+        <div class="col-md-3">{{ campo(form.precio_unitario) }}</div>
+    </div>
+{% endmacro %}
+
+
+{% macro campos_usuario(form) %}
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.usuario) }}</div>
+        <div class="col-md-6">{{ campo(form.nombre_completo) }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.correo) }}</div>
+        <div class="col-md-6">{{ campo(form.id_rol, clase="form-select") }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">{{ campo(form.password) }}</div>
+        <div class="col-md-6">{{ campo(form.confirmar) }}</div>
+    </div>
+{% endmacro %}

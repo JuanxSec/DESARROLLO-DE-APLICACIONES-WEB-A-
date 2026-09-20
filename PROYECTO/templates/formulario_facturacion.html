@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_factura %}
+
+{% block content %}
+
+<section class="caja">
+    <h2>Editar factura</h2>
+    <p>
+        Modificando el registro <strong>ID {{ factura.id_factura }}</strong>.
+        Se reutiliza el mismo formulario del registro y los cambios se guardan con
+        <code>UPDATE ... WHERE id_factura = {{ factura.id_factura }}</code>.
+    </p>
+
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="card-title mb-0">Factura {{ factura.codigo }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('editar_factura', id_factura=factura.id_factura) }}" novalidate>
+                {{ campos_factura(form) }}
+                <div class="d-flex gap-2">
+                    {{ form.enviar(class="btn btn-warning") }}
+                    <a href="{{ url_for('ver_facturacion') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

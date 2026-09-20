@@ -1,18 +1,20 @@
 {% extends "base.html" %}
-{% from "components/campos_producto.html" import campos_producto %}
+{% from "components/campos_formulario.html" import campos_producto %}
 
 {% block content %}
 
 <section class="caja">
-    <h2>Productos CTI</h2>
+    <h2>Servicios CTI</h2>
     <p>
-        En este módulo se gestionan los productos o servicios informativos de JuansecCTI.
-        Los registros se almacenan en la base de datos MySQL <code>juanseccti</code>.
+        En este módulo se gestionan los servicios informativos de JuansecCTI: boletines,
+        alertas, noticias, informes y capacitaciones. Los registros se almacenan en la
+        base de datos MySQL <code>juanseccti</code> y se listan mediante una consulta
+        <code>SELECT</code> con <code>JOIN</code> a las tablas de categorías, estados y proveedores.
     </p>
 
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">Agregar Nuevo Producto</h5>
+            <h5 class="card-title mb-0">Agregar nuevo servicio</h5>
         </div>
         <div class="card-body">
             <form method="POST" action="{{ url_for('ver_productos') }}" novalidate>
@@ -24,10 +26,10 @@
 
     <div class="card">
         <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">Productos Registrados</h5>
+            <h5 class="card-title mb-0">Servicios registrados</h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Total de productos registrados: <strong>{{ productos|length }}</strong></p>
+            <p class="text-muted">Total de servicios registrados: <strong>{{ productos|length }}</strong></p>
 
             {% if productos %}
             <div class="table-responsive">
@@ -39,7 +41,8 @@
                             <th>Categoría</th>
                             <th>Proveedor</th>
                             <th>Estado</th>
-                            <th>Stock</th>
+                            <th class="text-end">Precio</th>
+                            <th class="text-end">Stock</th>
                             <th>Disponibilidad</th>
                             <th class="text-end">Acciones</th>
                         </tr>
@@ -55,7 +58,8 @@
                             <td>{{ producto.categoria }}</td>
                             <td>{{ producto.proveedor or 'Sin proveedor' }}</td>
                             <td>{{ producto.estado }}</td>
-                            <td>{{ producto.stock }}</td>
+                            <td class="text-end">{{ "%.2f"|format(producto.precio) }}</td>
+                            <td class="text-end">{{ producto.stock }}</td>
                             <td>
                                 {% if producto.stock > 0 %}
                                     <span class="badge bg-success">Disponible</span>
@@ -82,7 +86,7 @@
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            ¿Desea eliminar definitivamente el producto <strong>{{ producto.nombre }}</strong> (ID {{ producto.id_producto }})?
+                            ¿Desea eliminar definitivamente el servicio <strong>{{ producto.nombre }}</strong> (ID {{ producto.id_producto }})?
                             Esta acción ejecuta un <code>DELETE</code> sobre la base de datos.
                         </div>
                         <div class="modal-footer">
@@ -97,7 +101,7 @@
             </div>
             {% endfor %}
             {% else %}
-                <p class="text-muted">No hay productos registrados aún. Completa el formulario anterior para agregar nuevos productos.</p>
+                <p class="text-muted">No hay servicios registrados aún. Completa el formulario anterior para agregar nuevos servicios.</p>
             {% endif %}
         </div>
     </div>

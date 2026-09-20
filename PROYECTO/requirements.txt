@@ -1,6 +1,7 @@
 Flask
 Flask-WTF
 WTForms
+email-validator
 mysql-connector-python
 Flask-Login
 Werkzeug
