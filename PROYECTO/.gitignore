@@ -1,4 +1,8 @@
 __pycache__/
 *.pyc
-data/
 .env
+venv/
+env/
+
+# La base local data/juanseccti.db si se versiona: es la evidencia de la
+# persistencia con SQLite trabajada en la Semana 12 (Avance 12/16).

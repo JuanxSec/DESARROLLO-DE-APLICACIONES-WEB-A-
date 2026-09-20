@@ -1,63 +1,24 @@
 {% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_proveedor %}
 
 {% block content %}
 
 <section class="caja">
     <h2>Proveedores</h2>
     <p>
-        En este módulo se muestran fuentes y proveedores demostrativos de información para el proyecto.
+        En este módulo se gestionan las fuentes de información que alimentan los boletines
+        y alertas de JuansecCTI. Cada proveedor pertenece a un tipo definido en la tabla de
+        catálogo <code>tipos_proveedor</code> y se muestra junto al número de servicios
+        que aporta.
     </p>
 
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">Agregar Nuevo Proveedor</h5>
+            <h5 class="card-title mb-0">Agregar nuevo proveedor</h5>
         </div>
         <div class="card-body">
-            <form method="POST" novalidate>
-                {{ form.hidden_tag() }}
-
-                <div class="mb-3">
-                    {{ form.nombre.label(class="form-label") }}
-                    {% if form.nombre.errors %}
-                        {{ form.nombre(class="form-control is-invalid") }}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.nombre.errors %}
-                                <span>{{ error }}</span><br>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.nombre(class="form-control") }}
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    {{ form.tipo.label(class="form-label") }}
-                    {% if form.tipo.errors %}
-                        {{ form.tipo(class="form-control is-invalid") }}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.tipo.errors %}
-                                <span>{{ error }}</span><br>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.tipo(class="form-control") }}
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    {{ form.aporte.label(class="form-label") }}
-                    {% if form.aporte.errors %}
-                        {{ form.aporte(class="form-control is-invalid", rows="4") }}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.aporte.errors %}
-                                <span>{{ error }}</span><br>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.aporte(class="form-control", rows="4") }}
-                    {% endif %}
-                </div>
-
+            <form method="POST" action="{{ url_for('ver_proveedores') }}" novalidate>
+                {{ campos_proveedor(form) }}
                 {{ form.enviar(class="btn btn-primary") }}
             </form>
         </div>
@@ -65,23 +26,65 @@
 
     <div class="card">
         <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">Proveedores Registrados</h5>
+            <h5 class="card-title mb-0">Proveedores registrados</h5>
         </div>
         <div class="card-body">
+            <p class="text-muted">Total de proveedores registrados: <strong>{{ proveedores|length }}</strong></p>
+
+            {% if proveedores %}
             <div class="row">
                 {% for proveedor in proveedores %}
-                <article class="col-md-4 mb-3">
+                <article class="col-md-6 col-lg-4 mb-3">
                     <div class="card h-100">
                         <div class="card-body">
                             <h3 class="card-title h5">{{ proveedor.nombre }}</h3>
-                            <p><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
-                            <p>{{ proveedor.aporte }}</p>
-                            <span class="badge bg-primary">{{ proveedor.total_productos }} producto(s) asociados</span>
+                            <p class="mb-1"><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
+                            <p class="small">{{ proveedor.aporte }}</p>
+                            <p class="small text-muted mb-2">
+                                {% if proveedor.correo %}{{ proveedor.correo }}<br>{% endif %}
+                                {% if proveedor.telefono %}{{ proveedor.telefono }}{% endif %}
+                            </p>
+                            {% if proveedor.total_productos > 0 %}
+                                <span class="badge bg-primary">{{ proveedor.total_productos }} servicio(s) asociados</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Sin servicios asociados</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex gap-2 justify-content-end">
+                            <a href="{{ url_for('editar_proveedor', id_proveedor=proveedor.id_proveedor) }}" class="btn btn-warning btn-sm">Editar</a>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-proveedor-{{ proveedor.id_proveedor }}">Eliminar</button>
                         </div>
                     </div>
                 </article>
                 {% endfor %}
             </div>
+
+            {% for proveedor in proveedores %}
+            <div class="modal fade" id="eliminar-proveedor-{{ proveedor.id_proveedor }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">Confirmar eliminación</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Desea eliminar definitivamente al proveedor <strong>{{ proveedor.nombre }}</strong> (ID {{ proveedor.id_proveedor }})?
+                            Los servicios asociados quedarán sin proveedor asignado.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form method="POST" action="{{ url_for('eliminar_proveedor', id_proveedor=proveedor.id_proveedor) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+                <p class="text-muted">No hay proveedores registrados aún.</p>
+            {% endif %}
         </div>
     </div>
 </section>

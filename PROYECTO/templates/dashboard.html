@@ -6,22 +6,24 @@
     <h2>Panel de control</h2>
     <p>
         Sesión iniciada como <strong>{{ current_user.usuario }}</strong>
-        (identificador {{ current_user.id }}). Esta página está protegida con
-        <code>@login_required</code>: solo es accesible con una sesión activa.
+        {% if current_user.nombre_completo %}({{ current_user.nombre_completo }}){% endif %}
+        con el rol <span class="badge bg-dark">{{ current_user.rol }}</span>.
+        Esta página está protegida con <code>@login_required</code>: solo es accesible
+        con una sesión activa.
     </p>
 
     <div class="row mt-4">
-        <article class="col-md-3 mb-3">
+        <article class="col-6 col-md-3 mb-3">
             <div class="card h-100 text-center">
                 <div class="card-body">
                     <h3 class="card-title display-6">{{ resumen.productos }}</h3>
-                    <p class="card-text">Productos</p>
+                    <p class="card-text">Servicios CTI</p>
                     <a href="{{ url_for('ver_productos') }}" class="btn btn-primary btn-sm">Administrar</a>
                 </div>
             </div>
         </article>
 
-        <article class="col-md-3 mb-3">
+        <article class="col-6 col-md-3 mb-3">
             <div class="card h-100 text-center">
                 <div class="card-body">
                     <h3 class="card-title display-6">{{ resumen.clientes }}</h3>
@@ -31,7 +33,7 @@
             </div>
         </article>
 
-        <article class="col-md-3 mb-3">
+        <article class="col-6 col-md-3 mb-3">
             <div class="card h-100 text-center">
                 <div class="card-body">
                     <h3 class="card-title display-6">{{ resumen.proveedores }}</h3>
@@ -41,7 +43,7 @@
             </div>
         </article>
 
-        <article class="col-md-3 mb-3">
+        <article class="col-6 col-md-3 mb-3">
             <div class="card h-100 text-center">
                 <div class="card-body">
                     <h3 class="card-title display-6">{{ resumen.facturas }}</h3>
@@ -50,6 +52,47 @@
                 </div>
             </div>
         </article>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Servicios más facturados</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        Consulta relacionada entre <code>detalle_factura</code> y
+                        <code>productos</code> mediante la clave foránea del detalle.
+                    </p>
+                    {% if mas_facturados %}
+                    <ul class="list-group list-group-flush">
+                        {% for fila in mas_facturados %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>{{ fila.nombre }}</span>
+                            <span class="badge bg-primary">{{ fila.unidades }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">Todavía no hay servicios facturados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h5 class="card-title">Total facturado</h5>
+                    <p class="display-5 mb-0">{{ "%.2f"|format(facturado) }} USD</p>
+                    <p class="text-muted small mt-2">
+                        Suma de la columna <code>total</code> de la tabla <code>facturas</code>,
+                        recalculada a partir del detalle de cada factura.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark mt-3">Cerrar sesión</a>

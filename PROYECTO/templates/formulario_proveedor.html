@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_proveedor %}
+
+{% block content %}
+
+<section class="caja">
+    <h2>Editar proveedor</h2>
+    <p>
+        Modificando el registro <strong>ID {{ proveedor.id_proveedor }}</strong>.
+        Se reutiliza el mismo formulario del registro y los cambios se guardan con
+        <code>UPDATE ... WHERE id_proveedor = {{ proveedor.id_proveedor }}</code>.
+    </p>
+
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="card-title mb-0">{{ proveedor.nombre }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('editar_proveedor', id_proveedor=proveedor.id_proveedor) }}" novalidate>
+                {{ campos_proveedor(form) }}
+                <div class="d-flex gap-2">
+                    {{ form.enviar(class="btn btn-warning") }}
+                    <a href="{{ url_for('ver_proveedores') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

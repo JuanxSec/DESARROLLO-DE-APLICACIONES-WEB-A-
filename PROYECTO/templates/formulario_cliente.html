@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_cliente %}
+
+{% block content %}
+
+<section class="caja">
+    <h2>Editar cliente</h2>
+    <p>
+        Modificando el registro <strong>ID {{ cliente.id_cliente }}</strong>.
+        Se reutiliza el mismo formulario del registro y los cambios se guardan con
+        <code>UPDATE ... WHERE id_cliente = {{ cliente.id_cliente }}</code>.
+    </p>
+
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="card-title mb-0">{{ cliente.nombre }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('editar_cliente', id_cliente=cliente.id_cliente) }}" novalidate>
+                {{ campos_cliente(form) }}
+                <div class="d-flex gap-2">
+                    {{ form.enviar(class="btn btn-warning") }}
+                    <a href="{{ url_for('ver_clientes') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% from "components/campos_producto.html" import campos_producto %}
+{% from "components/campos_formulario.html" import campos_producto %}
 
 {% block content %}
 
 <section class="caja">
-    <h2>Editar producto</h2>
+    <h2>Editar servicio</h2>
     <p>
         Modificando el registro <strong>ID {{ producto.id_producto }}</strong>.
-        Los cambios se guardan con <code>UPDATE ... WHERE id_producto = {{ producto.id_producto }}</code>.
+        Se reutiliza el mismo formulario del registro y los cambios se guardan con
+        <code>UPDATE ... WHERE id_producto = {{ producto.id_producto }}</code>.
     </p>
 
     <div class="card">
