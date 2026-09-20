@@ -7,12 +7,36 @@
         </button>
 
         <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('inicio') }}">Inicio</a></li>
+
+                {% if current_user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Panel</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_productos') }}">Productos</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_clientes') }}">Clientes</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_proveedores') }}">Proveedores</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_facturacion') }}">Facturación</a></li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="navbar-text me-3">
+                        Sesión: <strong class="text-white">{{ current_user.usuario }}</strong>
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-light btn-sm me-2" href="{{ url_for('login') }}">Iniciar sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-light btn-sm" href="{{ url_for('registro') }}">Registrarse</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>

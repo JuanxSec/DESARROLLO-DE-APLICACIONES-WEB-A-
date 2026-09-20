@@ -1,4 +1,4 @@
--- Esquema relacional del Proyecto Integrador JuansecCTI (Semana 13)
+-- Esquema relacional del Proyecto Integrador JuansecCTI (Semanas 13 y 14)
 -- Motor: MySQL. Ejecutar: mysql -u root -p < sql/esquema.sql
 
 CREATE DATABASE IF NOT EXISTS juanseccti CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -43,6 +43,12 @@ CREATE TABLE IF NOT EXISTS facturas (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS usuarios (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    usuario  VARCHAR(50)  UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
 -- Datos iniciales (los mismos que se manejaban en las semanas anteriores)
 INSERT INTO proveedores (nombre, tipo, aporte) VALUES
     ('Fuentes OSINT', 'Información pública', 'Apoyo para recopilar noticias y alertas de ciberseguridad.'),
@@ -63,3 +69,7 @@ INSERT INTO facturas (codigo, id_cliente, servicio, estado) VALUES
     ('FAC-001', 1, 'Boletín CTI semanal', 'Pagado'),
     ('FAC-002', 2, 'Noticias de seguridad', 'Pendiente'),
     ('FAC-003', 3, 'Alerta de vulnerabilidad', 'Emitida');
+
+-- La tabla usuarios se llena desde la ruta /registro de la aplicacion:
+-- la contrasena se transforma con generate_password_hash() antes del INSERT,
+-- por eso aqui no se insertan usuarios de ejemplo en texto plano.
