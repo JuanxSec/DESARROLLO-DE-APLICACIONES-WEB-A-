@@ -27,6 +27,7 @@ y el sistema de login, está desplegada en Render y también puede ejecutarse en
 PROYECTO/
 ├── app.py                      Rutas, lógica y consultas SQL
 ├── models.py                   Clase Usuario para Flask-Login
+├── init_db.py                  Carga el esquema en la base configurada
 ├── requirements.txt            Dependencias del proyecto
 ├── .python-version             Versión de Python usada en el despliegue
 ├── .env.example                Plantilla de variables de entorno
@@ -148,8 +149,22 @@ Variables de entorno que debe tener el servicio:
 | `MYSQL_SSL` | `1` para exigir conexión cifrada con TLS |
 
 La base de datos no vive dentro del servicio web: es un servidor MySQL gestionado
-externo, de modo que la información persiste aunque el servicio se reinicie. El esquema
-se carga una sola vez con `sql/esquema.sql`.
+externo, de modo que la información persiste aunque el servicio se reinicie.
+
+El esquema se carga una sola vez con `init_db.py`. El script existe porque
+`sql/esquema.sql` está escrito para un MySQL propio: empieza con `DROP DATABASE` y
+`CREATE DATABASE`, y en un servidor gestionado la base ya viene creada y el usuario no
+tiene permiso para borrarla. `init_db.py` descarta esas tres sentencias y ejecuta el
+resto contra la base que indican las variables de entorno.
+
+```bash
+# Copie .env.example como .env y complete los datos del servidor gestionado.
+python init_db.py           # carga las 15 tablas y los datos de catálogo
+python init_db.py --reset   # borra lo existente y vuelve a cargar
+```
+
+Al terminar, el script lista cada tabla con su número de registros, de modo que sirve
+también como comprobación de que la carga fue correcta.
 
 ## Correspondencia con los avances de la asignatura
 
