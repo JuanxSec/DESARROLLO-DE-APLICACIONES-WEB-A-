@@ -1,29 +1,29 @@
-"""Carga el esquema relacional en la base de datos indicada por el entorno.
+"""Carga el esquema relacional en la base de datos configurada.
 
-El archivo sql/esquema.sql está pensado para un MySQL propio: crea la base
-`juanseccti` desde cero. En un servidor MySQL gestionado eso no se puede hacer,
-porque el proveedor entrega la base ya creada y el usuario no tiene permiso para
-borrarla. Este script toma el mismo esquema, descarta las tres sentencias de
-nivel de base de datos (DROP DATABASE, CREATE DATABASE y USE) y ejecuta el resto
-contra la base a la que apuntan las variables de entorno.
+Funciona con los dos motores del proyecto y elige el archivo correcto según la
+variable de entorno DB_ENGINE:
+
+    DB_ENGINE=mysql      ->  sql/esquema.sql           (motor de la asignatura)
+    DB_ENGINE=postgres   ->  sql/esquema_postgres.sql  (despliegue en Render)
+
+En MySQL el script descarta además las tres sentencias de nivel de base de
+datos (DROP DATABASE, CREATE DATABASE y USE), porque un servidor gestionado
+entrega la base ya creada y el usuario no tiene permiso para borrarla.
 
 Uso:
 
     python init_db.py            # carga el esquema en una base vacía
     python init_db.py --reset    # borra las tablas existentes y vuelve a cargar
 
-Las credenciales se leen de las variables de entorno o del archivo .env que esté
-junto a este script. Nunca se escriben dentro del código.
+Las credenciales se leen de las variables de entorno o del archivo .env que
+esté junto a este script. Nunca se escriben dentro del código.
 """
 
 import os
 import re
 import sys
 
-import mysql.connector
-
 BASE = os.path.dirname(os.path.abspath(__file__))
-ESQUEMA = os.path.join(BASE, 'sql', 'esquema.sql')
 
 
 def cargar_dotenv():
@@ -41,7 +41,24 @@ def cargar_dotenv():
             os.environ.setdefault(clave.strip(), valor.strip().strip('"').strip("'"))
 
 
+def motor():
+    return os.environ.get('DB_ENGINE', 'mysql').lower()
+
+
+def archivo_esquema():
+    nombre = 'esquema_postgres.sql' if motor() == 'postgres' else 'esquema.sql'
+    return os.path.join(BASE, 'sql', nombre)
+
+
 def conectar():
+    if motor() == 'postgres':
+        import psycopg
+        url = os.environ.get('DATABASE_URL', '')
+        if not url:
+            raise SystemExit('Falta DATABASE_URL para conectarse a PostgreSQL.')
+        return psycopg.connect(url)
+
+    import mysql.connector
     parametros = {
         'host': os.environ.get('MYSQL_HOST', '127.0.0.1'),
         'port': int(os.environ.get('MYSQL_PORT', '3306')),
@@ -59,7 +76,7 @@ def conectar():
 
 def sentencias_del_esquema():
     """Devuelve las sentencias del esquema listas para ejecutar."""
-    with open(ESQUEMA, encoding='utf-8') as archivo:
+    with open(archivo_esquema(), encoding='utf-8') as archivo:
         contenido = archivo.read()
 
     # Fuera los comentarios de línea, que pueden contener punto y coma.
@@ -71,7 +88,7 @@ def sentencias_del_esquema():
         if not sentencia:
             continue
         # Las sentencias de nivel de base de datos no aplican en un servidor
-        # gestionado: la base ya existe y es la que indica MYSQL_DATABASE.
+        # gestionado: la base ya existe y es la que indica la configuración.
         if re.match(r'^(DROP\s+DATABASE|CREATE\s+DATABASE|USE)\b', sentencia, re.IGNORECASE):
             continue
         sentencias.append(sentencia)
@@ -79,12 +96,21 @@ def sentencias_del_esquema():
 
 
 def tablas_existentes(cursor):
-    cursor.execute('SHOW TABLES')
+    if motor() == 'postgres':
+        cursor.execute("SELECT table_name FROM information_schema.tables "
+                       "WHERE table_schema = 'public' ORDER BY table_name")
+    else:
+        cursor.execute('SHOW TABLES')
     return [fila[0] for fila in cursor.fetchall()]
 
 
 def vaciar(cursor, tablas):
     """Borra las tablas ignorando el orden de las claves foráneas."""
+    if motor() == 'postgres':
+        for tabla in tablas:
+            cursor.execute('DROP TABLE IF EXISTS "' + tabla + '" CASCADE')
+        return
+
     cursor.execute('SET FOREIGN_KEY_CHECKS = 0')
     for tabla in tablas:
         cursor.execute('DROP TABLE IF EXISTS `' + tabla + '`')
@@ -97,20 +123,23 @@ def main():
 
     conn = conectar()
     cursor = conn.cursor()
-    base = os.environ.get('MYSQL_DATABASE', 'juanseccti')
-    print('Conectado a ' + base + ' en ' + os.environ.get('MYSQL_HOST', '127.0.0.1'))
+    print('Motor: ' + motor())
+    print('Esquema: ' + os.path.basename(archivo_esquema()))
 
     existentes = tablas_existentes(cursor)
     if existentes and not reiniciar:
-        print('La base ya tiene ' + str(len(existentes)) + ' tablas.')
+        # No es un error: el esquema ya está puesto y no hay nada que hacer.
+        # Devolver 0 permite llamar al script en cada arranque sin romper nada.
+        print('La base ya tiene ' + str(len(existentes)) + ' tablas, no hay nada que cargar.')
         print('Use --reset si desea borrarlas y volver a cargar el esquema.')
         cursor.close()
         conn.close()
-        return 1
+        return 0
 
     if existentes:
         print('Borrando ' + str(len(existentes)) + ' tablas existentes...')
         vaciar(cursor, existentes)
+        conn.commit()
 
     sentencias = sentencias_del_esquema()
     print('Ejecutando ' + str(len(sentencias)) + ' sentencias...')
@@ -121,7 +150,7 @@ def main():
     creadas = tablas_existentes(cursor)
     print('Listo. La base quedó con ' + str(len(creadas)) + ' tablas:')
     for tabla in creadas:
-        cursor.execute('SELECT COUNT(*) FROM `' + tabla + '`')
+        cursor.execute('SELECT COUNT(*) FROM ' + tabla)
         print('  - ' + tabla + ': ' + str(cursor.fetchone()[0]) + ' registros')
 
     cursor.close()

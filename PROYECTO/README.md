@@ -39,6 +39,7 @@ PROYECTO/
 │
 ├── sql/
 │   ├── esquema.sql             Modelo relacional MySQL (15 tablas)
+│   ├── esquema_postgres.sql    El mismo modelo para PostgreSQL (despliegue)
 │   └── esquema_sqlite.sql      Persistencia local SQLite (Semana 12)
 │
 ├── data/
@@ -141,30 +142,50 @@ Variables de entorno que debe tener el servicio:
 | Variable | Para qué sirve |
 |---|---|
 | `SECRET_KEY` | Firma la sesión y los tokens CSRF |
-| `MYSQL_HOST` | Servidor MySQL gestionado |
-| `MYSQL_PORT` | Puerto del servidor MySQL |
-| `MYSQL_USER` | Usuario de la base de datos |
-| `MYSQL_PASSWORD` | Contraseña de la base de datos |
-| `MYSQL_DATABASE` | Nombre de la base de datos |
-| `MYSQL_SSL` | `1` para exigir conexión cifrada con TLS |
+| `DB_ENGINE` | `postgres` en Render, `mysql` en local |
+| `DATABASE_URL` | Cadena de conexión, la inyecta el propio servicio de base de datos |
+| `AUTO_INIT_DB` | `1` para que el esquema se cargue en el primer arranque |
 
-La base de datos no vive dentro del servicio web: es un servidor MySQL gestionado
-externo, de modo que la información persiste aunque el servicio se reinicie.
+### Los dos motores de base de datos
 
-El esquema se carga una sola vez con `init_db.py`. El script existe porque
-`sql/esquema.sql` está escrito para un MySQL propio: empieza con `DROP DATABASE` y
+El proyecto trabaja con MySQL y con PostgreSQL, y `DB_ENGINE` decide cuál se usa:
+
+- **MySQL** es el motor de la asignatura, el que documenta `sql/esquema.sql` y el que se
+  usa al desarrollar en local. Es el valor por defecto.
+- **PostgreSQL** es el motor del despliegue, porque es el que Render ofrece gestionado.
+  El mismo modelo está en `sql/esquema_postgres.sql`, con las 15 tablas, las mismas
+  claves foráneas y los mismos datos. Las únicas diferencias son `SERIAL` en vez de
+  `AUTO_INCREMENT`, una restricción `CHECK` en vez de `ENUM`, y la sintaxis del
+  `DEFAULT` de la fecha.
+
+El resto de la aplicación no cambia. Las funciones `consultar()`, `ejecutar()` e
+`insertar()` de `app.py` siguen escritas igual, y `conexion/conexion.py` traduce la
+interfaz cuando el motor es PostgreSQL. El caso a destacar es `lastrowid`, que psycopg no
+expone: en PostgreSQL el identificador recién generado se obtiene con `lastval()`.
+
+La base de datos no vive dentro del servicio web, así que la información persiste aunque
+el servicio se reinicie.
+
+### Carga del esquema
+
+El esquema lo carga `init_db.py`, que elige el archivo según `DB_ENGINE`. El script existe
+porque `sql/esquema.sql` está escrito para un MySQL propio: empieza con `DROP DATABASE` y
 `CREATE DATABASE`, y en un servidor gestionado la base ya viene creada y el usuario no
-tiene permiso para borrarla. `init_db.py` descarta esas tres sentencias y ejecuta el
-resto contra la base que indican las variables de entorno.
+tiene permiso para borrarla.
+
+En Render no hace falta ejecutarlo a mano. Con `AUTO_INIT_DB=1` la propia aplicación lo
+llama al arrancar, y como el script solo actúa cuando no hay tablas, los reinicios
+posteriores no tocan los datos. En local se ejecuta directamente:
 
 ```bash
-# Copie .env.example como .env y complete los datos del servidor gestionado.
+# Copie .env.example como .env y complete los datos de conexión.
 python init_db.py           # carga las 15 tablas y los datos de catálogo
 python init_db.py --reset   # borra lo existente y vuelve a cargar
 ```
 
 Al terminar, el script lista cada tabla con su número de registros, de modo que sirve
-también como comprobación de que la carga fue correcta.
+también como comprobación de que la carga fue correcta. La ruta `/test_db` hace lo mismo
+desde la aplicación ya desplegada.
 
 ## Correspondencia con los avances de la asignatura
 

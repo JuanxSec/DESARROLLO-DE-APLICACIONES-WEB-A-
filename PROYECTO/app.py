@@ -32,6 +32,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu_clave_secreta_segura_2026')
 csrf = CSRFProtect(app)
 
+# Motor de base de datos. 'mysql' es el de la asignatura y el que se usa en
+# local; 'postgres' es el del despliegue en Render, que entrega la cadena de
+# conexión ya armada en DATABASE_URL.
+app.config['DB_ENGINE'] = os.environ.get('DB_ENGINE', 'mysql').lower()
+app.config['DATABASE_URL'] = os.environ.get('DATABASE_URL', '')
+
 # Configuración de la base de datos MySQL (Semana 13).
 # Las credenciales reales se toman de variables de entorno para no subirlas al repositorio.
 app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
@@ -42,6 +48,18 @@ app.config['MYSQL_DATABASE'] = os.environ.get('MYSQL_DATABASE', 'juanseccti')
 # En producción el servidor MySQL gestionado obliga a cifrar la conexión.
 app.config['MYSQL_SSL'] = os.environ.get('MYSQL_SSL', '0') == '1'
 app.config['MYSQL_SSL_CA'] = os.environ.get('MYSQL_SSL_CA', '')
+
+# En el despliegue la base de datos nace vacía y el plan gratuito no da consola
+# donde ejecutar init_db.py a mano, así que el esquema se carga en el primer
+# arranque. El script solo actúa si todavía no hay tablas, de modo que los
+# reinicios posteriores no tocan los datos. Si algo falla no se corta el
+# arranque: la portada sigue en pie y /test_db permite ver qué pasó.
+if os.environ.get('AUTO_INIT_DB', '0') == '1':
+    try:
+        import init_db
+        init_db.main()
+    except Exception as error:
+        app.logger.error('No se pudo preparar el esquema: %s', error)
 
 # Gestión de sesiones de usuario (Semana 14).
 login_manager = LoginManager()
@@ -271,13 +289,24 @@ def logout():
 @app.route("/test_db")
 @login_required
 def test_db():
+    # Cada motor lista sus tablas de una forma distinta: MySQL con SHOW TABLES
+    # y PostgreSQL consultando el catálogo del esquema público.
+    if app.config['DB_ENGINE'] == 'postgres':
+        sql = ("SELECT table_name FROM information_schema.tables "
+               "WHERE table_schema = 'public' ORDER BY table_name")
+        nombre_base = 'PostgreSQL (Render)'
+    else:
+        sql = "SHOW TABLES"
+        nombre_base = app.config['MYSQL_DATABASE']
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SHOW TABLES")
+    cursor.execute(sql)
     tablas = [t[0] for t in cursor.fetchall()]
     cursor.close()
     conn.close()
-    return {"base_de_datos": app.config['MYSQL_DATABASE'],
+    return {"motor": app.config['DB_ENGINE'],
+            "base_de_datos": nombre_base,
             "total_tablas": len(tablas),
             "tablas": tablas}
 

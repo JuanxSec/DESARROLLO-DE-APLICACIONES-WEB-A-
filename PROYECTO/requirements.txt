@@ -3,6 +3,7 @@ Flask-WTF
 WTForms
 email-validator
 mysql-connector-python
+psycopg[binary]
 Flask-Login
 Werkzeug
 gunicorn
