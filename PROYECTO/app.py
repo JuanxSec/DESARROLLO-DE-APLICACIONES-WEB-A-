@@ -39,6 +39,9 @@ app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_PORT', '3306'))
 app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
 app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', '')
 app.config['MYSQL_DATABASE'] = os.environ.get('MYSQL_DATABASE', 'juanseccti')
+# En producción el servidor MySQL gestionado obliga a cifrar la conexión.
+app.config['MYSQL_SSL'] = os.environ.get('MYSQL_SSL', '0') == '1'
+app.config['MYSQL_SSL_CA'] = os.environ.get('MYSQL_SSL_CA', '')
 
 # Gestión de sesiones de usuario (Semana 14).
 login_manager = LoginManager()
@@ -281,7 +284,12 @@ def test_db():
 
 @app.route("/")
 def inicio():
-    total_productos = consultar('SELECT COUNT(*) AS total FROM productos', uno=True)['total']
+    # La portada es pública, así que no debe caerse si la base de datos aún
+    # no responde: en ese caso simplemente se muestra sin el contador.
+    try:
+        total_productos = consultar('SELECT COUNT(*) AS total FROM productos', uno=True)['total']
+    except Exception:
+        total_productos = None
     return render_template("index.html", titulo="Inicio", total_productos=total_productos,
                            titulo_sitio=titulo_sitio)
 
@@ -686,4 +694,9 @@ def eliminar_detalle(id_factura, id_detalle):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # En producción el servidor lo levanta gunicorn, así que este bloque solo
+    # se usa en desarrollo. El modo depuración queda apagado salvo que se pida
+    # de forma explícita, porque expone una consola interactiva.
+    puerto = int(os.environ.get('PORT', '5000'))
+    depuracion = os.environ.get('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=puerto, debug=depuracion)
