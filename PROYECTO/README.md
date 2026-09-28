@@ -28,6 +28,9 @@ PROYECTO/
 ├── app.py                      Rutas, lógica y consultas SQL
 ├── models.py                   Clase Usuario para Flask-Login
 ├── init_db.py                  Carga el esquema en la base configurada
+│
+├── pruebas/
+│   └── prueba_sistema.py       Pruebas del sistema (Semana 16)
 ├── requirements.txt            Dependencias del proyecto
 ├── .python-version             Versión de Python usada en el despliegue
 ├── .env.example                Plantilla de variables de entorno
@@ -187,6 +190,25 @@ Al terminar, el script lista cada tabla con su número de registros, de modo que
 también como comprobación de que la carga fue correcta. La ruta `/test_db` hace lo mismo
 desde la aplicación ya desplegada.
 
+## Pruebas del sistema
+
+`pruebas/prueba_sistema.py` recorre la aplicación completa y comprueba que funciona:
+catálogos cargados, registro con contraseña en hash, perfil asociado, protección de las
+rutas privadas, lectura de las seis pantallas internas, las cuatro operaciones CRUD en
+los cuatro módulos, la relación muchos a muchos del detalle de factura con su recálculo
+de total, la integridad referencial y el cierre de sesión.
+
+```bash
+python pruebas/prueba_sistema.py
+```
+
+Usa la misma configuración que la aplicación, así que sirve igual con MySQL en local que
+con PostgreSQL en el despliegue. La prueba es **no destructiva**: crea sus propios
+registros con el prefijo `__prueba_sistema__`, los verifica y los borra al terminar, de
+modo que la base queda como estaba.
+
+Resultado de la última ejecución: **36 de 36 comprobaciones correctas**.
+
 ## Correspondencia con los avances de la asignatura
 
 | Semana | Avance | Dónde se evidencia |
@@ -206,6 +228,7 @@ desde la aplicación ya desplegada.
 | 13 | Base de datos relacional | `conexion/conexion.py`, `sql/esquema.sql`, CRUD completo en los cuatro módulos |
 | 14 | Sistema de login | Flask-Login, `models.py`, `@login_required`, `current_user`, logout |
 | 15 | CRUD completo de la aplicación | `crear`, `leer`, `actualizar` y `eliminar` en los módulos de servicios, clientes, proveedores y facturación, incluido el detalle de factura |
+| 16 | Pruebas y despliegue local | `pruebas/prueba_sistema.py`, 36 comprobaciones sobre login, CRUD, relación N:N e integridad referencial |
 
 ## Seguridad
 
