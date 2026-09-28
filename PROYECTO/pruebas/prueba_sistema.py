@@ -85,14 +85,14 @@ def main():
         n = contar(tabla)
         check("catalogo " + tabla + " con datos", n >= minimo, str(n) + " registros")
 
-    rol = uno("SELECT id_rol FROM roles ORDER BY id_rol")["id_rol"]
-    categoria = uno("SELECT id_categoria FROM categorias ORDER BY id_categoria")["id_categoria"]
-    sector = uno("SELECT id_sector FROM sectores ORDER BY id_sector")["id_sector"]
-    parroquia = uno("SELECT id_parroquia FROM parroquias ORDER BY id_parroquia")["id_parroquia"]
-    tipo = uno("SELECT id_tipo FROM tipos_proveedor ORDER BY id_tipo")["id_tipo"]
-    est_prod = uno("SELECT id_estado FROM estados WHERE ambito = %s ORDER BY id_estado",
+    rol = uno("SELECT id_rol FROM roles ORDER BY id_rol LIMIT 1")["id_rol"]
+    categoria = uno("SELECT id_categoria FROM categorias ORDER BY id_categoria LIMIT 1")["id_categoria"]
+    sector = uno("SELECT id_sector FROM sectores ORDER BY id_sector LIMIT 1")["id_sector"]
+    parroquia = uno("SELECT id_parroquia FROM parroquias ORDER BY id_parroquia LIMIT 1")["id_parroquia"]
+    tipo = uno("SELECT id_tipo FROM tipos_proveedor ORDER BY id_tipo LIMIT 1")["id_tipo"]
+    est_prod = uno("SELECT id_estado FROM estados WHERE ambito = %s ORDER BY id_estado LIMIT 1",
                    ("producto",))["id_estado"]
-    est_fact = uno("SELECT id_estado FROM estados WHERE ambito = %s ORDER BY id_estado",
+    est_fact = uno("SELECT id_estado FROM estados WHERE ambito = %s ORDER BY id_estado LIMIT 1",
                    ("factura",))["id_estado"]
 
     print("\n--- Autenticacion (Semana 14) ---")

@@ -79,7 +79,13 @@ def consultar(sql, params=(), uno=False):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute(sql, params)
-    resultado = cursor.fetchone() if uno else cursor.fetchall()
+    if uno:
+        resultado = cursor.fetchone()
+        # MySQL no permite cerrar un cursor con filas pendientes de leer, asi
+        # que si la consulta devolvio mas de una se descarta el resto.
+        cursor.fetchall()
+    else:
+        resultado = cursor.fetchall()
     cursor.close()
     conn.close()
     return resultado
