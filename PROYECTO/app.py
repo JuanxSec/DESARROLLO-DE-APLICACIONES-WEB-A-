@@ -396,7 +396,7 @@ def editar_producto(id_producto):
         flash(f'Servicio "{form.nombre.data}" actualizado correctamente.', 'success')
         return redirect(url_for('ver_productos'))
 
-    return render_template("formulario_producto.html", titulo="Editar servicio", form=form,
+    return render_template("formulario_producto.html", titulo="Editar servicio CTI", form=form,
                            producto=producto, titulo_sitio=titulo_sitio)
 
 
@@ -456,7 +456,7 @@ def ver_clientes():
         return redirect(url_for('ver_clientes'))
 
     clientes = listar_clientes()
-    return render_template("clientes.html", titulo="Clientes", clientes=clientes,
+    return render_template("clientes.html", titulo="Organizaciones", clientes=clientes,
                            total_clientes=len(clientes), form=form, titulo_sitio=titulo_sitio)
 
 
@@ -484,7 +484,7 @@ def editar_cliente(id_cliente):
         flash(f'Cliente "{form.nombre.data}" actualizado correctamente.', 'success')
         return redirect(url_for('ver_clientes'))
 
-    return render_template("formulario_cliente.html", titulo="Editar cliente", form=form,
+    return render_template("formulario_cliente.html", titulo="Editar organización", form=form,
                            cliente=cliente, titulo_sitio=titulo_sitio)
 
 
@@ -536,7 +536,7 @@ def ver_proveedores():
         flash(f'Proveedor "{form.nombre.data}" agregado correctamente.', 'success')
         return redirect(url_for('ver_proveedores'))
 
-    return render_template("proveedores.html", titulo="Proveedores",
+    return render_template("proveedores.html", titulo="Fuentes de inteligencia",
                            proveedores=listar_proveedores(), form=form,
                            titulo_sitio=titulo_sitio)
 
@@ -564,7 +564,7 @@ def editar_proveedor(id_proveedor):
         flash(f'Proveedor "{form.nombre.data}" actualizado correctamente.', 'success')
         return redirect(url_for('ver_proveedores'))
 
-    return render_template("formulario_proveedor.html", titulo="Editar proveedor", form=form,
+    return render_template("formulario_proveedor.html", titulo="Editar fuente", form=form,
                            proveedor=proveedor, titulo_sitio=titulo_sitio)
 
 
@@ -623,7 +623,7 @@ def ver_facturacion():
             return redirect(url_for('ver_facturacion'))
 
     facturas = listar_facturas()
-    return render_template("facturacion.html", titulo="Facturación", facturas=facturas,
+    return render_template("facturacion.html", titulo="Suscripciones", facturas=facturas,
                            total_facturas=len(facturas), form=form, titulo_sitio=titulo_sitio)
 
 
@@ -650,7 +650,7 @@ def editar_factura(id_factura):
         flash(f'Factura {form.codigo.data} actualizada correctamente.', 'success')
         return redirect(url_for('ver_facturacion'))
 
-    return render_template("formulario_facturacion.html", titulo="Editar factura", form=form,
+    return render_template("formulario_facturacion.html", titulo="Editar suscripción", form=form,
                            factura=factura, titulo_sitio=titulo_sitio)
 
 
@@ -710,7 +710,7 @@ def detalle_factura(id_factura):
         'WHERE d.id_factura = %s ORDER BY d.id_detalle',
         (id_factura,)
     )
-    return render_template("detalle_factura.html", titulo="Detalle de factura",
+    return render_template("detalle_factura.html", titulo="Detalle de la suscripción",
                            factura=factura, lineas=lineas, form=form,
                            titulo_sitio=titulo_sitio)
 

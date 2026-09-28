@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Alerta de vulnerabilidad critica">
+  <path d="M32 8 60 56H4Z" fill="#fdf0d5" stroke="#d98324" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M32 24v16" stroke="#d98324" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="32" cy="48" r="2.8" fill="#d98324"/>
+</svg>

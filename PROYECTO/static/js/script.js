@@ -290,7 +290,7 @@ function renderizarRegistros() {
 
     if (mensajeRegistros) {
         mensajeRegistros.className = "alert alert-success";
-        mensajeRegistros.innerText = "Los registros se muestran mediante tarjetas Bootstrap generadas con JavaScript.";
+        mensajeRegistros.innerText = "Suscripciones registradas en esta sesion.";
     }
 
     registrosCTI.forEach(function (registro, indice) {
@@ -365,7 +365,7 @@ function renderizarBoletines() {
 
         if (mensaje) {
             mensaje.className = "alert alert-success";
-            mensaje.innerText = "Boletines cargados correctamente usando Bootstrap y JavaScript.";
+            mensaje.innerText = "Boletines de ciberinteligencia actualizados.";
         }
 
         boletinesCTI.forEach(function (boletin) {
