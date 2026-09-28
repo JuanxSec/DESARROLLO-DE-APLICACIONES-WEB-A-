@@ -77,8 +77,18 @@ PROYECTO/
 └── static/
     ├── css/style.css
     ├── js/script.js
-    └── img/ciberinteligencia.jpg
+    └── img/                    Identidad visual propia, en SVG
+        ├── logo-juanseccti.svg
+        ├── portada-cti.svg
+        └── servicio-*.svg      Un icono por linea de servicio
 ```
+
+## Identidad visual
+
+Las imagenes del proyecto son SVG creados para el, sin dependencias de terceros ni
+material con licencia ajena. La portada representa un panel de monitoreo de amenazas y
+hay un icono por cada linea de servicio: boletin, alerta, noticias, informe y
+capacitacion. Al ser vectoriales se ven nitidas en cualquier tamano y pesan poco.
 
 ## Modelo relacional
 

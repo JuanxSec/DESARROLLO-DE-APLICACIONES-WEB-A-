@@ -11,10 +11,10 @@
     </p>
 
     <div class="alert alert-info mt-3" role="alert">
-        Proyecto actualizado con Flask, Bootstrap, JavaScript, rutas y plantillas Jinja2.
+        Boletines semanales, alertas de vulnerabilidad e informes de amenazas para organizaciones del Ecuador.
     </div>
 
-    <a href="{{ url_for('ver_productos') }}" class="btn btn-primary">Ver productos</a>
+    <a href="{{ url_for('ver_productos') }}" class="btn btn-primary">Ver servicios CTI</a>
 </section>
 
 <section id="quienes-somos" class="caja">
@@ -24,26 +24,27 @@
             <p>
                 JuansecCTI es un proyecto creado con el objetivo de informar sobre temas importantes de ciberinteligencia
                 y ciberseguridad. El sitio busca recopilar noticias, boletines y alertas que puedan aportar valor a empresas
-                y entidades que necesitan conocer los riesgos digitales actuales. En esta semana el proyecto se integra con
-                Flask para organizar mejor las rutas, las plantillas HTML y los archivos estáticos.
+                y entidades que necesitan conocer los riesgos digitales actuales. El catálogo cubre cinco líneas de servicio:
+                boletines, alertas, noticias, informes técnicos y capacitación en concienciación.
             </p>
         </div>
 
         <div class="col-md-6">
-            <img src="{{ url_for('static', filename='img/ciberinteligencia.jpg') }}" class="img-fluid rounded" alt="Imagen relacionada con ciberseguridad">
+            <img src="{{ url_for('static', filename='img/portada-cti.svg') }}" class="img-fluid rounded" alt="Panel de monitoreo de amenazas con boletines, alertas e informes">
         </div>
     </div>
 </section>
 
 <section class="caja">
-    <h2 class="text-center mb-4">Módulos del sistema</h2>
+    <h2 class="text-center mb-4">Operación del servicio</h2>
 
     <div class="row">
         <article class="col-md-3 mb-3">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title h5">Productos</h3>
-                    <p class="card-text">Servicios y contenidos CTI disponibles.</p>
+                    <img src="{{ url_for('static', filename='img/servicio-boletin.svg') }}" class="mb-2" width="48" height="48" alt="">
+                    <h3 class="card-title h5">Servicios CTI</h3>
+                    <p class="card-text">Catálogo de boletines, alertas, informes y capacitación.</p>
                     <a href="{{ url_for('ver_productos') }}" class="btn btn-primary btn-sm">Abrir</a>
                 </div>
             </div>
@@ -52,8 +53,9 @@
         <article class="col-md-3 mb-3">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title h5">Clientes</h3>
-                    <p class="card-text">Clientes demostrativos del proyecto.</p>
+                    <img src="{{ url_for('static', filename='img/servicio-capacitacion.svg') }}" class="mb-2" width="48" height="48" alt="">
+                    <h3 class="card-title h5">Organizaciones</h3>
+                    <p class="card-text">Entidades suscritas y el servicio que reciben.</p>
                     <a href="{{ url_for('ver_clientes') }}" class="btn btn-success btn-sm">Abrir</a>
                 </div>
             </div>
@@ -62,8 +64,9 @@
         <article class="col-md-3 mb-3">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title h5">Proveedores</h3>
-                    <p class="card-text">Fuentes de información y apoyo.</p>
+                    <img src="{{ url_for('static', filename='img/servicio-noticias.svg') }}" class="mb-2" width="48" height="48" alt="">
+                    <h3 class="card-title h5">Fuentes de inteligencia</h3>
+                    <p class="card-text">Orígenes OSINT, comunidades y avisos de fabricantes.</p>
                     <a href="{{ url_for('ver_proveedores') }}" class="btn btn-warning btn-sm">Abrir</a>
                 </div>
             </div>
@@ -72,8 +75,9 @@
         <article class="col-md-3 mb-3">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title h5">Facturación</h3>
-                    <p class="card-text">Ejemplo básico de facturas.</p>
+                    <img src="{{ url_for('static', filename='img/servicio-informe.svg') }}" class="mb-2" width="48" height="48" alt="">
+                    <h3 class="card-title h5">Suscripciones</h3>
+                    <p class="card-text">Servicios contratados por cada organización.</p>
                     <a href="{{ url_for('ver_facturacion') }}" class="btn btn-danger btn-sm">Abrir</a>
                 </div>
             </div>
@@ -84,7 +88,7 @@
 <section id="boletines-dinamicos" class="caja">
     <h2>Boletines destacados</h2>
     <p>
-        Esta sección conserva parte del contenido dinámico trabajado con JavaScript en las semanas anteriores.
+        Últimas publicaciones de ciberinteligencia, cargadas dinámicamente en el navegador.
     </p>
 
     <div id="mensajeBoletines" class="mt-3"></div>

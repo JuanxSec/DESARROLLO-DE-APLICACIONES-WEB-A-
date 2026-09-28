@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Capacitacion y concienciacion en seguridad">
+  <path d="M32 12 60 24 32 36 4 24Z" fill="#cfeae4" stroke="#11998e" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M16 30v12c0 4 7.2 7 16 7s16-3 16-7V30" fill="none" stroke="#11998e" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M56 26v14" stroke="#0f3057" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="56" cy="43" r="3" fill="#0f3057"/>
+</svg>
