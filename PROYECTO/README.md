@@ -13,7 +13,8 @@ marca, superficie de ataque externa, búsqueda proactiva de amenazas y apoyo en 
 El proyecto tiene dos caras:
 
 - **Sitio público**: portada con quiénes somos, misión y visión, servicios con imagen y
-  cupos disponibles, ciclo de inteligencia, boletines publicados, video, contacto con
+  cupos disponibles, ciclo de inteligencia, boletines publicados, video, tecnologías del
+  proyecto, contacto con
   mapa y un formulario de solicitud que se guarda en la base de datos.
 - **Sistema interno** (con inicio de sesión): panel de control con indicadores y gráfico,
   CRUD de servicios, fuentes de inteligencia, boletines, organizaciones, suscripciones con
@@ -39,6 +40,7 @@ de datos y login está desplegada en Render y también se ejecuta en local.
 | Panel de control | Indicadores en tiempo real, ingresos por mes (Chart.js), servicios más contratados, avisos de servicios sin cupos, solicitudes recientes |
 | Servicios CTI | CRUD con imagen, categoría, fuente, precio y **cupos disponibles** (stock) |
 | Fuentes | CRUD de las fuentes de inteligencia (proveedores) |
+| Catálogos | CRUD de las tablas padre (categorías, sectores y tipos de fuente) con protección de claves foráneas |
 | Boletines | CRUD; los activos se publican automáticamente en el sitio público |
 | Organizaciones | CRUD con validación de RUC ecuatoriano, teléfono y nombre solo con letras |
 | Suscripciones | Cabecera + detalle (relación N:N), descuento y devolución de cupos, comprobante imprimible y PDF |
@@ -175,19 +177,20 @@ solicitud, protección de las diez rutas privadas, registro con contraseña segu
 login con usuario y con correo, restricción por rol, lectura de todas las pantallas,
 validaciones del servidor (nombre con números, RUC inválido), CREATE, UPDATE, baja
 lógica, reactivación y DELETE en los seis módulos, detalle con descuento y devolución de
-cupos, comprobante en PDF, reportes en CSV, JSON y PDF, integridad referencial, usuarios,
+cupos, comprobante en PDF, reportes en CSV, JSON y PDF, integridad referencial, CRUD de
+catálogos con nombres únicos y claves foráneas protegidas, usuarios,
 bitácora y cierre de sesión.
 
 La prueba es **no destructiva**: crea sus propios registros, los verifica y los borra al
-terminar. Resultado de la última ejecución: **128 de 128 comprobaciones correctas** con
-MySQL y **128 de 128** con SQLite.
+terminar. Resultado de la última ejecución: **138 de 138 comprobaciones correctas** con
+MySQL y **138 de 138** con SQLite.
 
 ## Correspondencia con los avances de la asignatura
 
 | Semana | Avance | Dónde se evidencia |
 |---|---|---|
 | 1 | Cliente-servidor, HTTP y HTTPS | La aplicación sigue el modelo cliente-servidor y se publica sobre HTTPS en Render |
-| 2 | Herramientas y primera página HTML | `index.html`: `h1` del proyecto, `h2` del propósito y `h3` con el autor |
+| 2 | Herramientas y primera página HTML | `index.html`: `h1` del proyecto, `h2` del propósito, `h3` con el autor y sección de herramientas de desarrollo |
 | 3 | HTML5 semántico | `header`, `nav`, `main`, `section`, `article`, `aside`, `footer`, lista `ul/li`, video de YouTube |
 | 4 | CSS3, responsivo y Bootstrap | `style.css` (variables, grid, flex, selectores avanzados, media queries), Bootstrap 5 por CDN, formulario de contacto |
 | 5 | JavaScript, DOM y eventos | `script.js`: `createElement`, `appendChild`, `addEventListener`, `preventDefault`, registro con conteo y eliminación |
@@ -201,7 +204,7 @@ MySQL y **128 de 128** con SQLite.
 | 13 | Base de datos relacional | `sql/esquema.sql` con 18 tablas, consultas parametrizadas con `JOIN` |
 | 14 | Login | Flask-Login, Werkzeug, `@login_required`, roles, logout |
 | 15 | CRUD completo | Seis módulos con alta, consulta, edición, baja lógica y eliminación; reportes exportables |
-| 16 | Pruebas y entrega | `pruebas/prueba_sistema.py` (128 comprobaciones), README, script SQL, despliegue en Render |
+| 16 | Pruebas y entrega | `pruebas/prueba_sistema.py` (138 comprobaciones), README, script SQL, despliegue en Render |
 
 ## Seguridad
 

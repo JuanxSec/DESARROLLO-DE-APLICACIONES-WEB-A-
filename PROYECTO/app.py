@@ -51,6 +51,7 @@ from forms.login_form import LoginForm
 from forms.usuario_form import UsuarioForm
 from forms.boletin_form import BoletinForm, NIVELES
 from forms.solicitud_form import SolicitudForm
+from forms.catalogo_form import CatalogoForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu_clave_secreta_segura_2026')
@@ -1780,6 +1781,130 @@ def generar_pdf(titulo, lineas, encabezados, filas):
                             ' desde el sistema JuansecCTI.', estilos['Italic']))
     documento.build(partes)
     return memoria.getvalue()
+
+
+# ---------------- CATÁLOGOS (tablas padre: categorías, sectores, tipos de fuente) ----------------
+#
+# Las tres tablas tienen la misma estructura (nombre único y descripción), así
+# que comparten rutas, formulario y plantillas. Cada entrada indica su tabla,
+# su clave primaria y las tablas hijas que la referencian por clave foránea.
+
+CATALOGOS = {
+    'categorias': {
+        'tabla': 'categorias', 'id': 'id_categoria', 'titulo': 'Categorías de servicio',
+        'singular': 'categoría', 'icono': 'bi-tags',
+        'usos': [('productos', 'id_categoria'), ('boletines', 'id_categoria')],
+    },
+    'sectores': {
+        'tabla': 'sectores', 'id': 'id_sector', 'titulo': 'Sectores de las organizaciones',
+        'singular': 'sector', 'icono': 'bi-diagram-3',
+        'usos': [('clientes', 'id_sector')],
+    },
+    'tipos-fuente': {
+        'tabla': 'tipos_proveedor', 'id': 'id_tipo', 'titulo': 'Tipos de fuente',
+        'singular': 'tipo de fuente', 'icono': 'bi-broadcast-pin',
+        'usos': [('proveedores', 'id_tipo')],
+    },
+}
+
+
+def catalogo_pedido(clave):
+    if clave not in CATALOGOS:
+        abort(404)
+    return CATALOGOS[clave]
+
+
+def usos_catalogo(cat, id_registro):
+    """Cuántos registros de las tablas hijas usan este elemento del catálogo."""
+    return sum(contar('SELECT COUNT(*) AS t FROM ' + hija + ' WHERE ' + columna + ' = %s', (id_registro,))
+               for hija, columna in cat['usos'])
+
+
+def nombre_repetido(cat, nombre, excluir=None):
+    sql = 'SELECT COUNT(*) AS t FROM ' + cat['tabla'] + ' WHERE LOWER(nombre) = LOWER(%s)'
+    params = (nombre,)
+    if excluir:
+        sql += ' AND ' + cat['id'] + ' <> %s'
+        params = (nombre, excluir)
+    return contar(sql, params)
+
+
+@app.route('/catalogos')
+@app.route('/catalogos/<clave>')
+@login_required
+def ver_catalogos(clave='categorias'):
+    cat = catalogo_pedido(clave)
+    q = texto_buscado()
+    usos = ' + '.join('(SELECT COUNT(*) FROM ' + hija + ' h WHERE h.' + columna + ' = c.' + cat['id'] + ')'
+                      for hija, columna in cat['usos'])
+    sql = ('SELECT c.' + cat['id'] + ' AS id, c.nombre, c.descripcion, ' + usos + ' AS usos '
+           'FROM ' + cat['tabla'] + ' c ')
+    params = ()
+    if q:
+        sql += 'WHERE LOWER(c.nombre) LIKE LOWER(%s) '
+        params = ('%' + q + '%',)
+    registros = consultar(sql + 'ORDER BY c.nombre', params)
+    return render_template('catalogos.html', titulo='Catálogos', catalogos=CATALOGOS, clave=clave,
+                           cat=cat, registros=registros, q=q)
+
+
+@app.route('/catalogos/<clave>/nuevo', methods=['GET', 'POST'])
+@login_required
+def nuevo_catalogo(clave):
+    cat = catalogo_pedido(clave)
+    form = CatalogoForm()
+    if form.validate_on_submit():
+        nombre = form.nombre.data.strip()
+        if nombre_repetido(cat, nombre):
+            form.nombre.errors.append('Ya existe un registro con ese nombre')
+        else:
+            insertar('INSERT INTO ' + cat['tabla'] + ' (nombre, descripcion) VALUES (%s, %s)',
+                     (nombre, form.descripcion.data.strip()))
+            registrar('CREAR', 'Catálogos', cat['singular'].capitalize() + ' ' + nombre)
+            flash('Registro "' + nombre + '" agregado al catálogo.', 'success')
+            return redirect(url_for('ver_catalogos', clave=clave))
+    return render_template('formulario_catalogo.html', titulo='Catálogos', form=form, cat=cat,
+                           clave=clave, registro=None)
+
+
+@app.route('/catalogos/<clave>/editar/<int:id_registro>', methods=['GET', 'POST'])
+@login_required
+def editar_catalogo(clave, id_registro):
+    cat = catalogo_pedido(clave)
+    registro = consultar('SELECT ' + cat['id'] + ' AS id, nombre, descripcion FROM ' + cat['tabla'] +
+                         ' WHERE ' + cat['id'] + ' = %s', (id_registro,), uno=True)
+    if registro is None:
+        abort(404)
+    form = CatalogoForm(data=registro)
+    form.enviar.label.text = 'Actualizar'
+    if form.validate_on_submit():
+        nombre = form.nombre.data.strip()
+        if nombre_repetido(cat, nombre, id_registro):
+            form.nombre.errors.append('Ya existe un registro con ese nombre')
+        else:
+            ejecutar('UPDATE ' + cat['tabla'] + ' SET nombre = %s, descripcion = %s WHERE ' + cat['id'] + ' = %s',
+                     (nombre, form.descripcion.data.strip(), id_registro))
+            registrar('EDITAR', 'Catálogos', cat['singular'].capitalize() + ' ' + nombre)
+            flash('Registro "' + nombre + '" actualizado correctamente.', 'success')
+            return redirect(url_for('ver_catalogos', clave=clave))
+    return render_template('formulario_catalogo.html', titulo='Catálogos', form=form, cat=cat,
+                           clave=clave, registro=registro)
+
+
+@app.route('/catalogos/<clave>/eliminar/<int:id_registro>', methods=['POST'])
+@login_required
+def eliminar_catalogo(clave, id_registro):
+    cat = catalogo_pedido(clave)
+    usados = usos_catalogo(cat, id_registro)
+    if usados:
+        flash('No se puede eliminar: lo usan ' + str(usados) + ' registro(s) relacionados. '
+              'La clave foránea protege la integridad de los datos.', 'danger')
+    elif ejecutar('DELETE FROM ' + cat['tabla'] + ' WHERE ' + cat['id'] + ' = %s', (id_registro,)):
+        registrar('ELIMINAR', 'Catálogos', cat['singular'].capitalize() + ' ID ' + str(id_registro))
+        flash('Registro eliminado definitivamente.', 'warning')
+    else:
+        flash('El registro no existe o ya fue eliminado.', 'danger')
+    return redirect(url_for('ver_catalogos', clave=clave))
 
 
 # ---------------- USUARIOS Y BITÁCORA (solo Administrador) ----------------
