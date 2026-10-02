@@ -18,7 +18,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_login import (LoginManager, login_user, logout_user,
                          login_required, current_user)
 from werkzeug.security import generate_password_hash, check_password_hash
-from conexion.conexion import get_db_connection
+from conexion.conexion import get_db_connection, motor
 from models import Usuario
 from forms.producto_form import ProductoForm
 from forms.cliente_form import ClienteForm
@@ -162,6 +162,42 @@ def cambiar_activo(tabla, columna_id, id_registro, activo):
         'UPDATE ' + tabla + ' SET activo = %s WHERE ' + columna_id + ' = %s',
         (activo, id_registro)
     )
+
+
+TABLAS_CON_BAJA = ('productos', 'clientes', 'proveedores', 'facturas')
+
+
+def asegurar_columna_activo():
+    """Añade la columna activo a las bases creadas antes de la baja lógica.
+
+    La comprobación se hace contra information_schema, que existe tanto en
+    MySQL como en PostgreSQL, y se ejecuta una sola vez al arrancar. Si la
+    columna ya está, no hace nada.
+    """
+    tipo = 'BOOLEAN NOT NULL DEFAULT TRUE'
+    # Cada motor nombra de forma distinta al esquema en uso.
+    esquema = 'current_schema()' if motor() == 'postgres' else 'DATABASE()'
+
+    for tabla in TABLAS_CON_BAJA:
+        existe = consultar(
+            'SELECT COUNT(*) AS n FROM information_schema.columns '
+            'WHERE table_schema = ' + esquema + ' '
+            '  AND table_name = %s AND column_name = %s',
+            (tabla, 'activo'), uno=True
+        )['n']
+        if not existe:
+            ejecutar('ALTER TABLE ' + tabla + ' ADD COLUMN activo ' + tipo)
+            print('[migracion] columna activo agregada a ' + tabla)
+
+
+with app.app_context():
+    # El despliegue puede tener una base creada antes de esta funcionalidad. La
+    # migración se intenta al arrancar y nunca impide que la aplicación suba:
+    # si la base todavía no responde, las rutas que la necesiten ya avisarán.
+    try:
+        asegurar_columna_activo()
+    except Exception as error:  # noqa: BLE001
+        print('[migracion] no se pudo comprobar la columna activo: ' + str(error))
 
 
 # ---------------- Catálogos: alimentan los SelectField de los formularios ----------------
