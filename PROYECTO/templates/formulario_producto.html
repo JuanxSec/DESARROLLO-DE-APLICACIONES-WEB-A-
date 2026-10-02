@@ -1,30 +1,28 @@
 {% extends "base.html" %}
 {% from "components/campos_formulario.html" import campos_producto %}
 
+{% block modo %}panel{% endblock %}
+
+{#- Un solo formulario para registrar y editar: si llega "producto" es una
+    edición (UPDATE ... WHERE id_producto), si no, un registro nuevo (INSERT). -#}
 {% block content %}
-
-<section class="caja">
-    <h2>Editar servicio</h2>
-    <p>
-        Modificando el registro <strong>ID {{ producto.id_producto }}</strong>.
-        Se reutiliza el mismo formulario del registro y los cambios se guardan con
-        <code>UPDATE ... WHERE id_producto = {{ producto.id_producto }}</code>.
-    </p>
-
-    <div class="card">
-        <div class="card-header bg-warning">
-            <h5 class="card-title mb-0">{{ producto.nombre }}</h5>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('editar_producto', id_producto=producto.id_producto) }}" novalidate>
-                {{ campos_producto(form) }}
-                <div class="d-flex gap-2">
-                    {{ form.enviar(class="btn btn-warning") }}
-                    <a href="{{ url_for('ver_productos') }}" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
-        </div>
+<div class="tarjeta-panel" style="max-width: 980px">
+    <div class="cabecera">
+        <h2>
+            {% if producto %}<i class="bi bi-pencil-square me-2"></i>Editar servicio <span class="text-muted">#{{ producto.id_producto }}</span>
+            {% else %}<i class="bi bi-plus-square me-2"></i>Nuevo servicio{% endif %}
+        </h2>
+        <a class="btn btn-light btn-sm" href="{{ url_for('ver_productos') }}"><i class="bi bi-arrow-left me-1"></i>Volver al listado</a>
     </div>
-</section>
-
+    <div class="cuerpo">
+        <form method="POST" novalidate
+              action="{{ url_for('editar_producto', id_producto=producto.id_producto) if producto else url_for('nuevo_producto') }}">
+            {{ campos_producto(form) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a href="{{ url_for('ver_productos') }}" class="btn btn-light">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

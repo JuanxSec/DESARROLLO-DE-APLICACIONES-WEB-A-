@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="seccion" style="padding-top: 8rem">
+    <div class="container">
+        <div class="row align-items-center g-4 mb-5">
+            <div class="col-lg-7">
+                <span class="etiqueta-seccion">Boletines</span>
+                <h1 class="display-6">Boletines de ciberinteligencia</h1>
+                <p class="text-muted mb-0">Resúmenes de amenazas, vulnerabilidades y campañas que afectan a organizaciones del Ecuador, con la recomendación de qué hacer en cada caso.</p>
+            </div>
+            <div class="col-lg-5">
+                <img class="imagen-redondeada" style="max-height:220px" src="{{ url_for('static', filename='img/boletines-cti.jpg') }}" alt="Teclado iluminado de una computadora portátil">
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <span class="small text-muted me-2">Nivel de riesgo:</span>
+            {% for clave, etiqueta in nivel_etiqueta.items() %}
+            <span class="badge text-bg-{{ nivel_color[clave] }}">{{ etiqueta }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="row g-4">
+            {% for boletin in boletines %}
+            <div class="col-md-6">
+                <article class="tarjeta-boletin nivel-{{ boletin.nivel }}">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <span class="badge text-bg-{{ nivel_color[boletin.nivel] }}">{{ nivel_etiqueta[boletin.nivel] }}</span>
+                        <span class="chip-categoria">{{ boletin.categoria }}</span>
+                        <small class="text-muted ms-auto">{{ boletin.fecha|fecha }}</small>
+                    </div>
+                    <h2 class="h5 mt-2">{{ boletin.titulo }}</h2>
+                    <p>{{ boletin.resumen }}</p>
+                    <small class="text-muted">Fuente: {{ boletin.fuente or 'JuansecCTI' }}{% if boletin.referencia %} · {{ boletin.referencia }}{% endif %}</small>
+                </article>
+            </div>
+            {% else %}
+            <p class="text-muted">Todavía no hay boletines publicados.</p>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted">¿Quiere recibir los boletines completos cada semana?</p>
+            <a class="btn btn-acento" href="{{ url_for('solicitar') }}"><i class="bi bi-envelope-paper me-2"></i>Suscribir a mi organización</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

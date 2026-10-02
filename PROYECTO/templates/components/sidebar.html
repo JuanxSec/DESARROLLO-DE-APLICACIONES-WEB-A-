@@ -1,0 +1,49 @@
+{# Componente reutilizable: menú lateral del panel de administración. #}
+{% macro enlace(destino, icono, texto, prefijos, insignia=None) %}
+    {% set activo = namespace(si=false) %}
+    {% for p in prefijos %}{% if (request.endpoint or '').startswith(p) %}{% set activo.si = true %}{% endif %}{% endfor %}
+    <a class="nav-link{{ ' active' if activo.si }}" href="{{ url_for(destino) }}">
+        <i class="bi {{ icono }}"></i><span>{{ texto }}</span>
+        {% if insignia %}<span class="badge rounded-pill text-bg-info ms-auto">{{ insignia }}</span>{% endif %}
+    </a>
+{% endmacro %}
+
+<aside class="lateral" id="menuLateral">
+    <a class="marca" href="{{ url_for('dashboard') }}">
+        <img src="{{ url_for('static', filename='img/logo-juanseccti.svg') }}" width="30" height="30" alt="">
+        Juansec<span>CTI</span>
+    </a>
+
+    <nav class="nav flex-column">
+        <div class="grupo">General</div>
+        {{ enlace('dashboard', 'bi-speedometer2', 'Panel de control', ['dashboard']) }}
+
+        <div class="grupo">Catálogo</div>
+        {{ enlace('ver_productos', 'bi-shield-check', 'Servicios CTI', ['ver_productos', 'nuevo_producto', 'editar_producto']) }}
+        {{ enlace('ver_proveedores', 'bi-broadcast', 'Fuentes', ['ver_proveedores', 'nuevo_proveedor', 'editar_proveedor']) }}
+        {{ enlace('ver_boletines', 'bi-journal-text', 'Boletines', ['ver_boletines', 'nuevo_boletin', 'editar_boletin']) }}
+
+        <div class="grupo">Clientes</div>
+        {{ enlace('ver_clientes', 'bi-building', 'Organizaciones', ['ver_clientes', 'nuevo_cliente', 'editar_cliente']) }}
+        {{ enlace('ver_facturacion', 'bi-receipt', 'Suscripciones', ['ver_facturacion', 'nueva_factura', 'editar_factura', 'detalle_factura', 'comprobante_factura']) }}
+        {{ enlace('ver_solicitudes', 'bi-inbox', 'Solicitudes', ['ver_solicitudes', 'editar_solicitud'], solicitudes_nuevas or None) }}
+
+        <div class="grupo">Análisis</div>
+        {{ enlace('reportes', 'bi-bar-chart-line', 'Reportes', ['reportes']) }}
+
+        {% if es_admin %}
+        <div class="grupo">Administración</div>
+        {{ enlace('ver_usuarios', 'bi-people', 'Usuarios', ['ver_usuarios', 'nuevo_usuario']) }}
+        {{ enlace('ver_bitacora', 'bi-clock-history', 'Bitácora', ['ver_bitacora']) }}
+        {% endif %}
+    </nav>
+
+    <div class="usuario-lateral">
+        <span class="avatar">{{ current_user.iniciales }}</span>
+        <div class="small lh-sm">
+            <strong class="text-white d-block">{{ current_user.usuario }}</strong>
+            <span>{{ current_user.rol }}</span>
+        </div>
+        <a class="ms-auto text-white-50" href="{{ url_for('logout') }}" title="Cerrar sesión"><i class="bi bi-box-arrow-right fs-5"></i></a>
+    </div>
+</aside>

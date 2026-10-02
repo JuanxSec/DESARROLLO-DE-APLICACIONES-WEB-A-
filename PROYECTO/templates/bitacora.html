@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import paginador %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel">
+    <div class="cabecera">
+        <div>
+            <h2><i class="bi bi-clock-history me-2"></i>Bitácora de auditoría</h2>
+            <small class="text-muted">Pista de cada operación: quién, qué, en qué módulo y cuándo ({{ paginacion.total }} eventos)</small>
+        </div>
+        <form method="get" action="{{ url_for('ver_bitacora') }}">
+            <select class="form-select form-select-sm" name="modulo" onchange="this.form.submit()">
+                <option value="">Todos los módulos</option>
+                {% for m in modulos %}<option value="{{ m }}"{{ ' selected' if m == modulo }}>{{ m }}</option>{% endfor %}
+            </select>
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table tabla-panel">
+            <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Detalle</th></tr></thead>
+            <tbody>
+            {% set colores = {'CREAR': 'success', 'EDITAR': 'primary', 'BAJA': 'warning', 'REACTIVAR': 'info', 'ELIMINAR': 'danger', 'LOGIN': 'secondary', 'LOGOUT': 'secondary', 'EXPORTAR': 'dark'} %}
+            {% for r in registros %}
+                <tr>
+                    <td class="small text-nowrap">{{ r.fecha.strftime('%d/%m/%Y %H:%M:%S') if r.fecha and r.fecha.strftime else r.fecha }}</td>
+                    <td>{{ r.usuario }}</td>
+                    <td><span class="badge text-bg-{{ colores.get(r.accion, 'light') }}">{{ r.accion }}</span></td>
+                    <td>{{ r.modulo }}</td>
+                    <td class="small">{{ r.detalle }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Todavía no hay eventos registrados.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="cuerpo pt-0">{{ paginador('ver_bitacora', paginacion, {'modulo': modulo}) }}</div>
+</div>
+{% endblock %}

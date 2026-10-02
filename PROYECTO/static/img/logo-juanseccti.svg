@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="JuansecCTI">
   <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#11998e"/><stop offset="1" stop-color="#0f3057"/></linearGradient></defs>
+    <stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#0b1f3a"/></linearGradient></defs>
   <path d="M24 3 6 10v13c0 11 7.6 19.3 18 22 10.4-2.7 18-11 18-22V10Z" fill="url(#lg)"/>
   <path d="M24 3 6 10v13c0 11 7.6 19.3 18 22Z" fill="#ffffff" opacity=".07"/>
-  <circle cx="24" cy="21" r="5.2" fill="none" stroke="#7fe7d4" stroke-width="2.2"/>
-  <path d="M24 26.2v9" stroke="#7fe7d4" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M15 14.5 19.6 18M33 14.5 28.4 18M15 28.5l4.6-3.5M33 28.5 28.4 25" stroke="#7fe7d4"
+  <circle cx="24" cy="21" r="5.2" fill="none" stroke="#a5f3fc" stroke-width="2.2"/>
+  <path d="M24 26.2v9" stroke="#a5f3fc" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M15 14.5 19.6 18M33 14.5 28.4 18M15 28.5l4.6-3.5M33 28.5 28.4 25" stroke="#a5f3fc"
         stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
-  <circle cx="15" cy="14.5" r="1.8" fill="#7fe7d4"/><circle cx="33" cy="14.5" r="1.8" fill="#7fe7d4"/>
-  <circle cx="15" cy="28.5" r="1.8" fill="#7fe7d4"/><circle cx="33" cy="28.5" r="1.8" fill="#7fe7d4"/>
+  <circle cx="15" cy="14.5" r="1.8" fill="#a5f3fc"/><circle cx="33" cy="14.5" r="1.8" fill="#a5f3fc"/>
+  <circle cx="15" cy="28.5" r="1.8" fill="#a5f3fc"/><circle cx="33" cy="28.5" r="1.8" fill="#a5f3fc"/>
 </svg>

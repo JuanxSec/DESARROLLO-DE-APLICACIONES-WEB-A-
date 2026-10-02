@@ -25,18 +25,24 @@ class ProductoForm(FlaskForm):
         InputRequired(message='Debe seleccionar un estado')
     ])
 
-    precio = DecimalField('Precio (USD)', places=2, validators=[
+    precio = DecimalField('Precio mensual (USD)', places=2, validators=[
         InputRequired(message='El precio es requerido'),
         NumberRange(min=0, max=100000, message='El precio debe estar entre 0 y 100000')
     ])
 
-    stock = IntegerField('Stock', validators=[
-        InputRequired(message='El stock es requerido'),
-        NumberRange(min=0, message='El stock no puede ser negativo')
+    # Cada servicio se presta a un número limitado de organizaciones: al
+    # agregarlo a una suscripción se descuenta un cupo.
+    stock = IntegerField('Cupos disponibles', validators=[
+        InputRequired(message='Los cupos son requeridos'),
+        NumberRange(min=0, max=999, message='Los cupos deben estar entre 0 y 999')
     ])
 
-    id_proveedor = SelectField('Proveedor', coerce=int, validators=[
-        InputRequired(message='Debe seleccionar un proveedor')
+    id_proveedor = SelectField('Fuente principal', coerce=int, validators=[
+        InputRequired(message='Debe seleccionar una fuente')
+    ])
+
+    imagen = SelectField('Imagen del servicio', validators=[
+        DataRequired(message='Debe seleccionar una imagen')
     ])
 
     descripcion = TextAreaField('Descripción', validators=[

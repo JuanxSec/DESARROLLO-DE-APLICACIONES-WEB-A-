@@ -1,22 +1,23 @@
 from wtforms import StringField, TextAreaField, SelectField, SubmitField
-from wtforms.validators import (DataRequired, InputRequired, Length, Email,
-                                Optional, Regexp)
+from wtforms.validators import DataRequired, InputRequired, Length, Email, Optional
 from flask_wtf import FlaskForm
+
+from forms.validadores import TELEFONO_EC
 
 
 class ProveedorForm(FlaskForm):
-    """Formulario del módulo de proveedores, reutilizado para registrar y editar."""
+    """Formulario de fuentes de inteligencia, reutilizado para registrar y editar."""
 
-    nombre = StringField('Nombre del proveedor', validators=[
-        DataRequired(message='El nombre del proveedor es requerido'),
+    nombre = StringField('Nombre de la fuente', validators=[
+        DataRequired(message='El nombre de la fuente es requerido'),
         Length(min=3, max=100, message='El nombre debe tener entre 3 y 100 caracteres')
     ])
 
-    id_tipo = SelectField('Tipo de proveedor', coerce=int, validators=[
-        InputRequired(message='Debe seleccionar un tipo de proveedor')
+    id_tipo = SelectField('Tipo de fuente', coerce=int, validators=[
+        InputRequired(message='Debe seleccionar un tipo de fuente')
     ])
 
-    aporte = TextAreaField('Aporte', validators=[
+    aporte = TextAreaField('Aporte al servicio', validators=[
         DataRequired(message='El aporte es requerido'),
         Length(min=10, max=300, message='El aporte debe tener entre 10 y 300 caracteres')
     ])
@@ -29,7 +30,7 @@ class ProveedorForm(FlaskForm):
 
     telefono = StringField('Teléfono', validators=[
         Optional(),
-        Regexp(r'^[0-9]{7,10}$', message='El teléfono debe contener entre 7 y 10 dígitos')
+        TELEFONO_EC
     ])
 
-    enviar = SubmitField('Guardar proveedor')
+    enviar = SubmitField('Guardar fuente')

@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 
 
 class FacturacionForm(FlaskForm):
-    """Formulario del módulo de facturación, reutilizado para registrar y editar."""
+    """Formulario de suscripciones (facturas), reutilizado para registrar y editar."""
 
     codigo = StringField('Código de factura', validators=[
         DataRequired(message='El código de factura es requerido'),
@@ -13,13 +13,13 @@ class FacturacionForm(FlaskForm):
                message='El código solo admite letras, números y guiones')
     ])
 
-    id_cliente = SelectField('Cliente', coerce=int, validators=[
-        InputRequired(message='Debe seleccionar un cliente')
+    id_cliente = SelectField('Organización', coerce=int, validators=[
+        InputRequired(message='Debe seleccionar una organización')
     ])
 
-    servicio = StringField('Servicio facturado', validators=[
-        DataRequired(message='El servicio es requerido'),
-        Length(min=3, max=100, message='El servicio debe tener entre 3 y 100 caracteres')
+    servicio = StringField('Concepto de la suscripción', validators=[
+        DataRequired(message='El concepto es requerido'),
+        Length(min=3, max=100, message='El concepto debe tener entre 3 y 100 caracteres')
     ])
 
     id_estado = SelectField('Estado', coerce=int, validators=[
@@ -30,4 +30,4 @@ class FacturacionForm(FlaskForm):
         DataRequired(message='La fecha de emisión es requerida')
     ])
 
-    enviar = SubmitField('Guardar factura')
+    enviar = SubmitField('Guardar suscripción')

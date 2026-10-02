@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import barra_listado, acciones, modal_eliminar, paginador, vacio, estado, registro_baja %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel">
+    <div class="cabecera">
+        <div>
+            <h2>Solicitudes de información</h2>
+            <small class="text-muted">Llegan desde el formulario de la página pública y se gestionan aquí</small>
+        </div>
+        {{ barra_listado('ver_solicitudes', ver, q) }}
+    </div>
+
+    <div class="cuerpo py-2 border-bottom d-flex flex-wrap gap-2 align-items-center">
+        <span class="small text-muted">Estado:</span>
+        <a class="btn btn-sm {{ 'btn-dark' if not estado_filtro else 'btn-light' }}" href="{{ url_for('ver_solicitudes', ver=ver, q=q) }}">Todos</a>
+        {% for id, nombre in estados %}
+        <a class="btn btn-sm {{ 'btn-dark' if estado_filtro == id else 'btn-light' }}" href="{{ url_for('ver_solicitudes', ver=ver, q=q, estado=id) }}">{{ nombre }}</a>
+        {% endfor %}
+    </div>
+
+    {% if solicitudes %}
+    <div class="table-responsive">
+        <table class="table tabla-panel">
+            <thead><tr><th>Fecha</th><th>Contacto</th><th>Servicio</th><th>Mensaje</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+            <tbody>
+            {% for s in solicitudes %}
+                <tr>
+                    <td class="small text-nowrap">{{ s.fecha|fecha }}</td>
+                    <td>
+                        <strong>{{ s.organizacion }}</strong>{{ registro_baja(s.activo) }}
+                        <div class="small text-muted">{{ s.nombre }} · {{ s.correo }}{% if s.telefono %} · {{ s.telefono }}{% endif %}</div>
+                    </td>
+                    <td class="small">{{ s.servicio }}</td>
+                    <td class="small" style="max-width:280px">{{ s.mensaje|truncate(90) }}</td>
+                    <td>{{ estado(s.estado) }}</td>
+                    <td class="text-end">
+                        {{ acciones('editar_solicitud', 'baja_solicitud', 'reactivar_solicitud', 'eliminar_solicitud',
+                                    'id_solicitud', s.id_solicitud, s.activo, 'la solicitud de ' ~ s.organizacion) }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="cuerpo pt-0">{{ paginador('ver_solicitudes', paginacion, {'ver': ver, 'q': q}) }}</div>
+    {% else %}
+        {{ vacio('No hay solicitudes en esta vista.', 'bi-inbox') }}
+    {% endif %}
+</div>
+
+{{ modal_eliminar() }}
+{% endblock %}

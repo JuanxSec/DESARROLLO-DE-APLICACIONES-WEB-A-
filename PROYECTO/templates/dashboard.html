@@ -1,97 +1,128 @@
 {% extends "base.html" %}
+{% from "components/campos_formulario.html" import estado %}
+
+{% block modo %}panel{% endblock %}
 
 {% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <div>
+        <h2 class="h4 mb-0">Hola, {{ (current_user.nombre_completo or current_user.usuario).split()[0] }}</h2>
+        <p class="text-muted mb-0">Resumen de la operación de JuansecCTI con datos en tiempo real de la base.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-light btn-sm" href="{{ url_for('reportes') }}"><i class="bi bi-file-earmark-bar-graph me-1"></i>Reportes</a>
+        <a class="btn btn-acento btn-sm" href="{{ url_for('nueva_factura') }}"><i class="bi bi-plus-lg me-1"></i>Nueva suscripción</a>
+    </div>
+</div>
 
-<section class="caja">
-    <h2>Panel de control</h2>
-    <p>
-        Sesión iniciada como <strong>{{ current_user.usuario }}</strong>
-        {% if current_user.nombre_completo %}({{ current_user.nombre_completo }}){% endif %}
-        con el rol <span class="badge bg-dark">{{ current_user.rol }}</span>.
-        Resumen operativo del servicio de ciberinteligencia: catálogo publicado, organizaciones
-        suscritas, fuentes activas y suscripciones registradas.
-    </p>
+<div class="row g-3 mb-4">
+    {% set tarjetas = [
+        ('ver_productos', 'bi-shield-check', resumen.productos, 'Servicios activos'),
+        ('ver_clientes', 'bi-building', resumen.clientes, 'Organizaciones'),
+        ('ver_facturacion', 'bi-receipt', resumen.facturas, 'Suscripciones'),
+        ('ver_proveedores', 'bi-broadcast', resumen.proveedores, 'Fuentes'),
+        ('ver_boletines', 'bi-journal-text', resumen.boletines, 'Boletines publicados'),
+        ('ver_solicitudes', 'bi-inbox', resumen.solicitudes, 'Solicitudes'),
+    ] %}
+    {% for destino, icono, valor, texto in tarjetas %}
+    <div class="col-6 col-md-4 col-xl-2">
+        <a class="indicador" href="{{ url_for(destino) }}">
+            <span class="icono-redondo"><i class="bi {{ icono }}"></i></span>
+            <div><strong>{{ valor }}</strong><small>{{ texto }}</small></div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
 
-    <div class="row mt-4">
-        <article class="col-6 col-md-3 mb-3">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h3 class="card-title display-6">{{ resumen.productos }}</h3>
-                    <p class="card-text">Servicios CTI</p>
-                    <a href="{{ url_for('ver_productos') }}" class="btn btn-primary btn-sm">Administrar</a>
-                </div>
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="tarjeta-panel h-100">
+            <div class="cabecera">
+                <h2><i class="bi bi-graph-up me-2"></i>Ingresos por mes</h2>
+                <span class="fw-bold">Total facturado: ${{ facturado|dinero }}</span>
             </div>
-        </article>
-
-        <article class="col-6 col-md-3 mb-3">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h3 class="card-title display-6">{{ resumen.clientes }}</h3>
-                    <p class="card-text">Organizaciones</p>
-                    <a href="{{ url_for('ver_clientes') }}" class="btn btn-success btn-sm">Administrar</a>
-                </div>
+            <div class="cuerpo">
+                {% if grafico.meses %}
+                <canvas id="graficoIngresos" height="110"
+                        data-meses='{{ grafico.meses|tojson }}' data-totales='{{ grafico.totales|tojson }}'></canvas>
+                {% else %}
+                <p class="text-muted mb-0">Aún no hay suscripciones para graficar.</p>
+                {% endif %}
             </div>
-        </article>
-
-        <article class="col-6 col-md-3 mb-3">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h3 class="card-title display-6">{{ resumen.proveedores }}</h3>
-                    <p class="card-text">Fuentes de inteligencia</p>
-                    <a href="{{ url_for('ver_proveedores') }}" class="btn btn-warning btn-sm">Administrar</a>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="tarjeta-panel h-100">
+            <div class="cabecera"><h2><i class="bi bi-trophy me-2"></i>Servicios más contratados</h2></div>
+            <div class="cuerpo">
+                {% if mas_contratados %}
+                <ol class="list-group list-group-numbered list-group-flush">
+                    {% for fila in mas_contratados %}
+                    <li class="list-group-item d-flex justify-content-between align-items-start px-0">
+                        <div class="ms-2 me-auto">{{ fila.nombre }}<br><small class="text-muted">${{ fila.ingresos|dinero }}</small></div>
+                        <span class="badge text-bg-primary rounded-pill">{{ fila.unidades }}</span>
+                    </li>
+                    {% endfor %}
+                </ol>
+                {% else %}
+                <p class="text-muted mb-0">Sin datos todavía.</p>
+                {% endif %}
+                {% if sin_cupos %}
+                <div class="alert alert-warning small mt-3 mb-0">
+                    <i class="bi bi-exclamation-triangle me-1"></i><strong>Sin cupos:</strong>
+                    {{ sin_cupos|map(attribute='nombre')|join(', ') }}
                 </div>
+                {% endif %}
             </div>
-        </article>
-
-        <article class="col-6 col-md-3 mb-3">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h3 class="card-title display-6">{{ resumen.facturas }}</h3>
-                    <p class="card-text">Suscripciones</p>
-                    <a href="{{ url_for('ver_facturacion') }}" class="btn btn-danger btn-sm">Administrar</a>
-                </div>
-            </div>
-        </article>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="card-title mb-0">Servicios más contratados</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">
-                        Servicios con mayor demanda entre las organizaciones suscritas.</p>
-                    {% if mas_facturados %}
-                    <ul class="list-group list-group-flush">
-                        {% for fila in mas_facturados %}
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>{{ fila.nombre }}</span>
-                            <span class="badge bg-primary">{{ fila.unidades }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
+    <div class="col-xl-7">
+        <div class="tarjeta-panel h-100">
+            <div class="cabecera">
+                <h2><i class="bi bi-inbox me-2"></i>Solicitudes recientes</h2>
+                <a class="small" href="{{ url_for('ver_solicitudes') }}">Ver todas</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table tabla-panel">
+                    <thead><tr><th>Organización</th><th>Servicio</th><th>Fecha</th><th>Estado</th></tr></thead>
+                    <tbody>
+                    {% for s in recientes %}
+                        <tr>
+                            <td><a href="{{ url_for('editar_solicitud', id_solicitud=s.id_solicitud) }}">{{ s.organizacion }}</a><br><small class="text-muted">{{ s.nombre }}</small></td>
+                            <td>{{ s.servicio }}</td>
+                            <td>{{ s.fecha|fecha }}</td>
+                            <td>{{ estado(s.estado) }}</td>
+                        </tr>
                     {% else %}
-                    <p class="text-muted">Todavía no hay servicios contratados.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100 text-center">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <h5 class="card-title">Total contratado</h5>
-                    <p class="display-5 mb-0">{{ "%.2f"|format(facturado) }} USD</p>
-                    <p class="text-muted small mt-2">
-                        Valor acumulado de las suscripciones registradas.</p>
-                </div>
+                        <tr><td colspan="4" class="text-muted text-center py-4">No hay solicitudes.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+    <div class="col-xl-5">
+        <div class="tarjeta-panel h-100">
+            <div class="cabecera">
+                <h2><i class="bi bi-journal-text me-2"></i>Últimos boletines</h2>
+                <a class="small" href="{{ url_for('nuevo_boletin') }}">Publicar</a>
+            </div>
+            <div class="cuerpo">
+                {% for b in boletines %}
+                <div class="d-flex gap-2 mb-3">
+                    <span class="badge text-bg-{{ nivel_color[b.nivel] }} align-self-start">{{ nivel_etiqueta[b.nivel] }}</span>
+                    <div><strong class="small d-block">{{ b.titulo }}</strong><small class="text-muted">{{ b.fecha|fecha }} · {{ b.categoria }}</small></div>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No hay boletines publicados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark mt-3">Cerrar sesión</a>
-</section>
-
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 {% endblock %}
