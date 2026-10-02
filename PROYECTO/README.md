@@ -217,7 +217,7 @@ con PostgreSQL en el despliegue. La prueba es **no destructiva**: crea sus propi
 registros con el prefijo `__prueba_sistema__`, los verifica y los borra al terminar, de
 modo que la base queda como estaba.
 
-Resultado de la última ejecución: **36 de 36 comprobaciones correctas**.
+Resultado de la última ejecución: **43 de 43 comprobaciones correctas**.
 
 ## Correspondencia con los avances de la asignatura
 
@@ -237,8 +237,22 @@ Resultado de la última ejecución: **36 de 36 comprobaciones correctas**.
 | 12 | Persistencia local | `sql/esquema_sqlite.sql` y `data/juanseccti.db` |
 | 13 | Base de datos relacional | `conexion/conexion.py`, `sql/esquema.sql`, CRUD completo en los cuatro módulos |
 | 14 | Sistema de login | Flask-Login, `models.py`, `@login_required`, `current_user`, logout |
-| 15 | CRUD completo de la aplicación | `crear`, `leer`, `actualizar` y `eliminar` en los módulos de servicios, clientes, proveedores y facturación, incluido el detalle de factura |
-| 16 | Pruebas y despliegue local | `pruebas/prueba_sistema.py`, 36 comprobaciones sobre login, CRUD, relación N:N e integridad referencial |
+| 15 | CRUD completo de la aplicación | `crear`, `leer`, `actualizar` y `eliminar` en los módulos de servicios, clientes, proveedores y facturación, incluido el detalle de factura, y baja lógica por cambio de estado |
+| 16 | Pruebas y despliegue local | `pruebas/prueba_sistema.py`, 43 comprobaciones sobre login, CRUD, baja lógica, relación N:N e integridad referencial |
+
+## Baja lógica y borrado definitivo
+
+El sistema implementa las dos formas de retirar un registro:
+
+| Acción | Operación SQL | Efecto |
+|---|---|---|
+| **Dar de baja** | `UPDATE ... SET activo = FALSE WHERE ...` | El registro sale del listado pero se conserva en la base como histórico |
+| **Reactivar** | `UPDATE ... SET activo = TRUE WHERE ...` | Devuelve el registro al listado |
+| **Eliminar** | `DELETE FROM ... WHERE ...` | Borrado definitivo, con confirmación previa |
+
+Cada listado tiene un filtro para ver los registros **activos**, los **dados de baja** o
+**todos**. Las tablas `productos`, `clientes`, `proveedores` y `facturas` incorporan la
+columna `activo`, y los desplegables de los formularios solo ofrecen registros activos.
 
 ## Seguridad
 

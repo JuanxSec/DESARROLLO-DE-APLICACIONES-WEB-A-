@@ -100,6 +100,36 @@
 {% endmacro %}
 
 
+{# Filtro de vista para los listados: activos, dados de baja o todos.
+   Acompaña a la baja lógica que pidió el docente en la Semana 15. #}
+{% macro filtro_vista(endpoint, ver) %}
+<div class="btn-group btn-group-sm mb-3" role="group" aria-label="Filtro de registros">
+    <a class="btn btn-outline-dark{{ ' active' if ver == 'activos' }}"
+       href="{{ url_for(endpoint, ver='activos') }}">Activos</a>
+    <a class="btn btn-outline-dark{{ ' active' if ver == 'baja' }}"
+       href="{{ url_for(endpoint, ver='baja') }}">Dados de baja</a>
+    <a class="btn btn-outline-dark{{ ' active' if ver == 'todos' }}"
+       href="{{ url_for(endpoint, ver='todos') }}">Todos</a>
+</div>
+{% endmacro %}
+
+
+{# Botón de baja lógica (UPDATE) o de reactivación, según el estado del registro. #}
+{% macro boton_baja(endpoint_baja, endpoint_reactivar, campo, id, activo) %}
+{% if activo %}
+<form method="POST" action="{{ url_for(endpoint_baja, **{campo: id}) }}" class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-secondary btn-sm">Dar de baja</button>
+</form>
+{% else %}
+<form method="POST" action="{{ url_for(endpoint_reactivar, **{campo: id}) }}" class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-success btn-sm">Reactivar</button>
+</form>
+{% endif %}
+{% endmacro %}
+
+
 {% macro campos_login(form) %}
     {{ form.hidden_tag() }}
     {{ campo(form.usuario) }}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components/campos_formulario.html" import campos_proveedor %}
+{% from "components/campos_formulario.html" import campos_proveedor, filtro_vista, boton_baja %}
 
 {% block content %}
 
@@ -31,6 +31,8 @@
         <div class="card-body">
             <p class="text-muted">Total de proveedores registrados: <strong>{{ proveedores|length }}</strong></p>
 
+            {{ filtro_vista('ver_proveedores', ver) }}
+
             {% if proveedores %}
             <div class="row">
                 {% for proveedor in proveedores %}
@@ -52,7 +54,8 @@
                         </div>
                         <div class="card-footer d-flex gap-2 justify-content-end">
                             <a href="{{ url_for('editar_proveedor', id_proveedor=proveedor.id_proveedor) }}" class="btn btn-warning btn-sm">Editar</a>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-proveedor-{{ proveedor.id_proveedor }}">Eliminar</button>
+                            {{ boton_baja('baja_proveedor', 'reactivar_proveedor', 'id_proveedor', proveedor.id_proveedor, proveedor.activo) }}
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-proveedor-{{ proveedor.id_proveedor }}">Eliminar</button>
                         </div>
                     </div>
                 </article>

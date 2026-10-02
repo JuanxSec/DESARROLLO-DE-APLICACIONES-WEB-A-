@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components/campos_formulario.html" import campos_producto %}
+{% from "components/campos_formulario.html" import campos_producto, filtro_vista, boton_baja %}
 
 {% block content %}
 
@@ -30,6 +30,8 @@
         </div>
         <div class="card-body">
             <p class="text-muted">Total de servicios registrados: <strong>{{ productos|length }}</strong></p>
+
+            {{ filtro_vista('ver_productos', ver) }}
 
             {% if productos %}
             <div class="table-responsive">
@@ -69,6 +71,7 @@
                             </td>
                             <td class="text-end text-nowrap">
                                 <a href="{{ url_for('editar_producto', id_producto=producto.id_producto) }}" class="btn btn-warning btn-sm">Editar</a>
+                                {{ boton_baja('baja_producto', 'reactivar_producto', 'id_producto', producto.id_producto, producto.activo) }}
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-{{ producto.id_producto }}">Eliminar</button>
                             </td>
                         </tr>

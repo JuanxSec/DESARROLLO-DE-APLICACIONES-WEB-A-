@@ -126,6 +126,44 @@ def recalcular_total(id_factura):
              (fila['total'], id_factura))
 
 
+# ---------------- Baja lógica: el borrado por cambio de estado ----------------
+#
+# Las guías piden la operación DELETE, pero en la Clase Encuentro de la Semana 15 el
+# docente indicó que el botón de eliminar no debe borrar físicamente el registro, sino
+# ejecutar un UPDATE que cambie su estado para conservar el histórico. El sistema
+# implementa las dos operaciones:
+#
+#   Dar de baja   -> UPDATE ... SET activo = FALSE WHERE ...   (el registro se conserva)
+#   Reactivar     -> UPDATE ... SET activo = TRUE  WHERE ...
+#   Eliminar      -> DELETE FROM ... WHERE ...                 (borrado definitivo)
+
+VISTAS = {
+    'activos': 'activo = TRUE',
+    'baja': 'activo = FALSE',
+    'todos': '1 = 1',
+}
+
+
+def vista_pedida():
+    """Lee el filtro ?ver= de la URL y lo valida contra la lista de vistas."""
+    ver = request.args.get('ver', 'activos')
+    return ver if ver in VISTAS else 'activos'
+
+
+def filtro_vista(ver, alias=''):
+    """Devuelve la condición SQL del filtro, con el alias de la tabla si hace falta."""
+    condicion = VISTAS[ver]
+    return condicion if not alias else condicion.replace('activo', alias + '.activo')
+
+
+def cambiar_activo(tabla, columna_id, id_registro, activo):
+    """UPDATE que da de baja o reactiva un registro conservando el histórico."""
+    return ejecutar(
+        'UPDATE ' + tabla + ' SET activo = %s WHERE ' + columna_id + ' = %s',
+        (activo, id_registro)
+    )
+
+
 # ---------------- Catálogos: alimentan los SelectField de los formularios ----------------
 
 def opciones(sql, clave, etiqueta, params=()):
@@ -133,12 +171,14 @@ def opciones(sql, clave, etiqueta, params=()):
 
 
 def opciones_proveedores():
-    return opciones('SELECT id_proveedor, nombre FROM proveedores ORDER BY nombre',
+    return opciones('SELECT id_proveedor, nombre FROM proveedores '
+                    'WHERE activo = TRUE ORDER BY nombre',
                     'id_proveedor', 'nombre')
 
 
 def opciones_clientes():
-    return opciones('SELECT id_cliente, nombre FROM clientes ORDER BY nombre',
+    return opciones('SELECT id_cliente, nombre FROM clientes '
+                    'WHERE activo = TRUE ORDER BY nombre',
                     'id_cliente', 'nombre')
 
 
@@ -181,7 +221,8 @@ def opciones_parroquias():
 
 
 def opciones_productos():
-    return opciones('SELECT id_producto, nombre FROM productos ORDER BY nombre',
+    return opciones('SELECT id_producto, nombre FROM productos '
+                    'WHERE activo = TRUE ORDER BY nombre',
                     'id_producto', 'nombre')
 
 
@@ -322,7 +363,7 @@ def inicio():
     # La portada es pública, así que no debe caerse si la base de datos aún
     # no responde: en ese caso simplemente se muestra sin el contador.
     try:
-        total_productos = consultar('SELECT COUNT(*) AS total FROM productos', uno=True)['total']
+        total_productos = consultar('SELECT COUNT(*) AS total FROM productos WHERE activo = TRUE', uno=True)['total']
     except Exception:
         total_productos = None
     return render_template("index.html", titulo="Inicio", total_productos=total_productos,
@@ -337,15 +378,16 @@ def cargar_opciones_producto(form):
     form.id_proveedor.choices = opciones_proveedores()
 
 
-def listar_productos():
+def listar_productos(ver='activos'):
     """SELECT con JOIN a proveedores, categorías y estados."""
     return consultar(
-        'SELECT p.id_producto, p.nombre, p.precio, p.stock, p.descripcion, '
+        'SELECT p.id_producto, p.nombre, p.precio, p.stock, p.descripcion, p.activo, '
         '       c.nombre AS categoria, e.nombre AS estado, pr.nombre AS proveedor '
         'FROM productos p '
         'INNER JOIN categorias c ON c.id_categoria = p.id_categoria '
         'INNER JOIN estados e ON e.id_estado = p.id_estado '
         'LEFT JOIN proveedores pr ON pr.id_proveedor = p.id_proveedor '
+        'WHERE ' + filtro_vista(ver, 'p') + ' '
         'ORDER BY p.id_producto'
     )
 
@@ -368,8 +410,10 @@ def ver_productos():
         flash(f'Servicio "{form.nombre.data}" agregado correctamente.', 'success')
         return redirect(url_for('ver_productos'))
 
+    ver = vista_pedida()
     return render_template("productos.html", titulo="Servicios CTI",
-                           productos=listar_productos(), form=form, titulo_sitio=titulo_sitio)
+                           productos=listar_productos(ver), form=form, ver=ver,
+                           titulo_sitio=titulo_sitio)
 
 
 @app.route("/productos/editar/<int:id_producto>", methods=['GET', 'POST'])
@@ -400,9 +444,31 @@ def editar_producto(id_producto):
                            producto=producto, titulo_sitio=titulo_sitio)
 
 
+@app.route("/productos/baja/<int:id_producto>", methods=['POST'])
+@login_required
+def baja_producto(id_producto):
+    """Baja lógica: el servicio sale del listado pero se conserva en la base."""
+    if cambiar_activo('productos', 'id_producto', id_producto, False):
+        flash('Servicio dado de baja. El registro se conserva como histórico.', 'warning')
+    else:
+        flash('El servicio no existe.', 'danger')
+    return redirect(url_for('ver_productos'))
+
+
+@app.route("/productos/reactivar/<int:id_producto>", methods=['POST'])
+@login_required
+def reactivar_producto(id_producto):
+    if cambiar_activo('productos', 'id_producto', id_producto, True):
+        flash('Servicio reactivado correctamente.', 'success')
+    else:
+        flash('El servicio no existe.', 'danger')
+    return redirect(url_for('ver_productos', ver='baja'))
+
+
 @app.route("/productos/eliminar/<int:id_producto>", methods=['POST'])
 @login_required
 def eliminar_producto(id_producto):
+    """Borrado definitivo con DELETE, el que piden las guías de la Semana 13."""
     usado = consultar('SELECT COUNT(*) AS t FROM detalle_factura WHERE id_producto = %s',
                       (id_producto,), uno=True)['t']
     if usado:
@@ -424,10 +490,10 @@ def cargar_opciones_cliente(form):
     form.id_parroquia.choices = opciones_parroquias()
 
 
-def listar_clientes():
+def listar_clientes(ver='activos'):
     """SELECT con JOIN a sectores y a las tres tablas de ubicación geográfica."""
     return consultar(
-        'SELECT c.id_cliente, c.nombre, c.servicio, c.correo, c.telefono, '
+        'SELECT c.id_cliente, c.nombre, c.servicio, c.correo, c.telefono, c.activo, '
         '       s.nombre AS sector, pa.nombre AS parroquia, ca.nombre AS canton, '
         '       pr.nombre AS provincia '
         'FROM clientes c '
@@ -435,6 +501,7 @@ def listar_clientes():
         'INNER JOIN parroquias pa ON pa.id_parroquia = c.id_parroquia '
         'INNER JOIN cantones ca ON ca.id_canton = pa.id_canton '
         'INNER JOIN provincias pr ON pr.id_provincia = ca.id_provincia '
+        'WHERE ' + filtro_vista(ver, 'c') + ' '
         'ORDER BY c.id_cliente'
     )
 
@@ -455,9 +522,11 @@ def ver_clientes():
         flash(f'Cliente "{form.nombre.data}" agregado correctamente.', 'success')
         return redirect(url_for('ver_clientes'))
 
-    clientes = listar_clientes()
+    ver = vista_pedida()
+    clientes = listar_clientes(ver)
     return render_template("clientes.html", titulo="Organizaciones", clientes=clientes,
-                           total_clientes=len(clientes), form=form, titulo_sitio=titulo_sitio)
+                           total_clientes=len(clientes), form=form, ver=ver,
+                           titulo_sitio=titulo_sitio)
 
 
 @app.route("/clientes/editar/<int:id_cliente>", methods=['GET', 'POST'])
@@ -488,9 +557,31 @@ def editar_cliente(id_cliente):
                            cliente=cliente, titulo_sitio=titulo_sitio)
 
 
+@app.route("/clientes/baja/<int:id_cliente>", methods=['POST'])
+@login_required
+def baja_cliente(id_cliente):
+    """Baja lógica: la organización sale del listado pero se conserva en la base."""
+    if cambiar_activo('clientes', 'id_cliente', id_cliente, False):
+        flash('Organización dada de baja. El registro se conserva como histórico.', 'warning')
+    else:
+        flash('La organización no existe.', 'danger')
+    return redirect(url_for('ver_clientes'))
+
+
+@app.route("/clientes/reactivar/<int:id_cliente>", methods=['POST'])
+@login_required
+def reactivar_cliente(id_cliente):
+    if cambiar_activo('clientes', 'id_cliente', id_cliente, True):
+        flash('Organización reactivada correctamente.', 'success')
+    else:
+        flash('La organización no existe.', 'danger')
+    return redirect(url_for('ver_clientes', ver='baja'))
+
+
 @app.route("/clientes/eliminar/<int:id_cliente>", methods=['POST'])
 @login_required
 def eliminar_cliente(id_cliente):
+    """Borrado definitivo con DELETE, el que piden las guías de la Semana 13."""
     usado = consultar('SELECT COUNT(*) AS t FROM facturas WHERE id_cliente = %s',
                       (id_cliente,), uno=True)['t']
     if usado:
@@ -507,15 +598,16 @@ def eliminar_cliente(id_cliente):
 
 # ---------------- PROVEEDORES ----------------
 
-def listar_proveedores():
+def listar_proveedores(ver='activos'):
     """SELECT con JOIN al catálogo de tipos y conteo de servicios asociados."""
     return consultar(
-        'SELECT pr.id_proveedor, pr.nombre, pr.aporte, pr.correo, pr.telefono, '
+        'SELECT pr.id_proveedor, pr.nombre, pr.aporte, pr.correo, pr.telefono, pr.activo, '
         '       t.nombre AS tipo, COUNT(p.id_producto) AS total_productos '
         'FROM proveedores pr '
         'INNER JOIN tipos_proveedor t ON t.id_tipo = pr.id_tipo '
         'LEFT JOIN productos p ON p.id_proveedor = pr.id_proveedor '
-        'GROUP BY pr.id_proveedor, pr.nombre, pr.aporte, pr.correo, pr.telefono, t.nombre '
+        'WHERE ' + filtro_vista(ver, 'pr') + ' '
+        'GROUP BY pr.id_proveedor, pr.nombre, pr.aporte, pr.correo, pr.telefono, pr.activo, t.nombre '
         'ORDER BY pr.id_proveedor'
     )
 
@@ -536,8 +628,9 @@ def ver_proveedores():
         flash(f'Proveedor "{form.nombre.data}" agregado correctamente.', 'success')
         return redirect(url_for('ver_proveedores'))
 
+    ver = vista_pedida()
     return render_template("proveedores.html", titulo="Fuentes de inteligencia",
-                           proveedores=listar_proveedores(), form=form,
+                           proveedores=listar_proveedores(ver), form=form, ver=ver,
                            titulo_sitio=titulo_sitio)
 
 
@@ -568,9 +661,31 @@ def editar_proveedor(id_proveedor):
                            proveedor=proveedor, titulo_sitio=titulo_sitio)
 
 
+@app.route("/proveedores/baja/<int:id_proveedor>", methods=['POST'])
+@login_required
+def baja_proveedor(id_proveedor):
+    """Baja lógica: la fuente sale del listado pero se conserva en la base."""
+    if cambiar_activo('proveedores', 'id_proveedor', id_proveedor, False):
+        flash('Fuente dada de baja. El registro se conserva como histórico.', 'warning')
+    else:
+        flash('La fuente no existe.', 'danger')
+    return redirect(url_for('ver_proveedores'))
+
+
+@app.route("/proveedores/reactivar/<int:id_proveedor>", methods=['POST'])
+@login_required
+def reactivar_proveedor(id_proveedor):
+    if cambiar_activo('proveedores', 'id_proveedor', id_proveedor, True):
+        flash('Fuente reactivada correctamente.', 'success')
+    else:
+        flash('La fuente no existe.', 'danger')
+    return redirect(url_for('ver_proveedores', ver='baja'))
+
+
 @app.route("/proveedores/eliminar/<int:id_proveedor>", methods=['POST'])
 @login_required
 def eliminar_proveedor(id_proveedor):
+    """Borrado definitivo con DELETE, el que piden las guías de la Semana 13."""
     filas = ejecutar('DELETE FROM proveedores WHERE id_proveedor = %s', (id_proveedor,))
     if filas:
         flash('Proveedor eliminado correctamente. Los servicios quedaron sin proveedor asignado.', 'warning')
@@ -586,17 +701,18 @@ def cargar_opciones_factura(form):
     form.id_estado.choices = opciones_estados('factura')
 
 
-def listar_facturas():
+def listar_facturas(ver='activos'):
     """SELECT con JOIN a clientes y estados, y conteo de líneas de detalle."""
     return consultar(
-        'SELECT f.id_factura, f.codigo, f.servicio, f.fecha, f.total, '
+        'SELECT f.id_factura, f.codigo, f.servicio, f.fecha, f.total, f.activo, '
         '       c.nombre AS cliente, e.nombre AS estado, '
         '       COUNT(d.id_detalle) AS lineas '
         'FROM facturas f '
         'INNER JOIN clientes c ON c.id_cliente = f.id_cliente '
         'INNER JOIN estados e ON e.id_estado = f.id_estado '
         'LEFT JOIN detalle_factura d ON d.id_factura = f.id_factura '
-        'GROUP BY f.id_factura, f.codigo, f.servicio, f.fecha, f.total, c.nombre, e.nombre '
+        'WHERE ' + filtro_vista(ver, 'f') + ' '
+        'GROUP BY f.id_factura, f.codigo, f.servicio, f.fecha, f.total, f.activo, c.nombre, e.nombre '
         'ORDER BY f.id_factura'
     )
 
@@ -622,9 +738,11 @@ def ver_facturacion():
             flash(f'Factura {form.codigo.data} registrada correctamente.', 'success')
             return redirect(url_for('ver_facturacion'))
 
-    facturas = listar_facturas()
+    ver = vista_pedida()
+    facturas = listar_facturas(ver)
     return render_template("facturacion.html", titulo="Suscripciones", facturas=facturas,
-                           total_facturas=len(facturas), form=form, titulo_sitio=titulo_sitio)
+                           total_facturas=len(facturas), form=form, ver=ver,
+                           titulo_sitio=titulo_sitio)
 
 
 @app.route("/facturacion/editar/<int:id_factura>", methods=['GET', 'POST'])
@@ -654,9 +772,31 @@ def editar_factura(id_factura):
                            factura=factura, titulo_sitio=titulo_sitio)
 
 
+@app.route("/facturacion/baja/<int:id_factura>", methods=['POST'])
+@login_required
+def baja_factura(id_factura):
+    """Baja lógica: lo correcto en facturación, porque una factura no se borra."""
+    if cambiar_activo('facturas', 'id_factura', id_factura, False):
+        flash('Suscripción dada de baja. La factura se conserva como histórico.', 'warning')
+    else:
+        flash('La factura no existe.', 'danger')
+    return redirect(url_for('ver_facturacion'))
+
+
+@app.route("/facturacion/reactivar/<int:id_factura>", methods=['POST'])
+@login_required
+def reactivar_factura(id_factura):
+    if cambiar_activo('facturas', 'id_factura', id_factura, True):
+        flash('Suscripción reactivada correctamente.', 'success')
+    else:
+        flash('La factura no existe.', 'danger')
+    return redirect(url_for('ver_facturacion', ver='baja'))
+
+
 @app.route("/facturacion/eliminar/<int:id_factura>", methods=['POST'])
 @login_required
 def eliminar_factura(id_factura):
+    """Borrado definitivo con DELETE, el que piden las guías de la Semana 13."""
     filas = ejecutar('DELETE FROM facturas WHERE id_factura = %s', (id_factura,))
     if filas:
         flash('Factura eliminada correctamente junto con su detalle.', 'warning')

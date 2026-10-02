@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components/campos_formulario.html" import campos_factura %}
+{% from "components/campos_formulario.html" import campos_factura, filtro_vista, boton_baja %}
 
 {% block content %}
 
@@ -30,6 +30,8 @@
         </div>
         <div class="card-body">
             <p class="text-muted">Total de facturas registradas: <strong>{{ total_facturas }}</strong></p>
+
+            {{ filtro_vista('ver_facturacion', ver) }}
 
             {% if facturas %}
             <div class="table-responsive">
@@ -70,6 +72,7 @@
                             <td class="text-end text-nowrap">
                                 <a href="{{ url_for('detalle_factura', id_factura=factura.id_factura) }}" class="btn btn-info btn-sm">Detalle</a>
                                 <a href="{{ url_for('editar_factura', id_factura=factura.id_factura) }}" class="btn btn-warning btn-sm">Editar</a>
+                                {{ boton_baja('baja_factura', 'reactivar_factura', 'id_factura', factura.id_factura, factura.activo) }}
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-factura-{{ factura.id_factura }}">Eliminar</button>
                             </td>
                         </tr>
