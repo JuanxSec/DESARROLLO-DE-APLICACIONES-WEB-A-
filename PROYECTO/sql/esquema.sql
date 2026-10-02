@@ -1,8 +1,9 @@
 -- ============================================================================
 -- Esquema relacional del Proyecto Integrador JuansecCTI
--- Asignatura: Desarrollo de Aplicaciones Web - Unidad 4 (Semanas 13 y 14)
--- Motor: MySQL 8 / 9
--- Ejecutar:  mysql --host=127.0.0.1 --user=root < sql/esquema.sql
+-- Asignatura: Desarrollo de Aplicaciones Web - Unidad 4 (Semanas 13 a 16)
+-- Motor: MySQL 8 / 9  (motor de referencia de la asignatura)
+-- Ejecutar:  mysql --host=127.0.0.1 --user=root --default-character-set=utf8mb4 < sql/esquema.sql
+--       o:   python init_db.py --reset
 --
 -- El modelo separa las tablas de catalogo (tablas padre) de las tablas de
 -- movimiento (tablas hijas) y utiliza los tres tipos de relacion revisados
@@ -10,6 +11,10 @@
 --   1:1  usuarios  <-> perfiles_usuario
 --   1:N  provincias -> cantones -> parroquias, categorias -> productos, etc.
 --   N:N  facturas  <-> productos  (a traves de detalle_factura)
+--
+-- 18 tablas: 3 de ubicacion, 5 catalogos, 7 de negocio (servicios, fuentes,
+-- organizaciones, suscripciones, detalle, boletines y solicitudes) y 3 de
+-- usuarios y auditoria.
 -- ============================================================================
 
 DROP DATABASE IF EXISTS juanseccti;
@@ -43,7 +48,7 @@ CREATE TABLE parroquias (
 );
 
 -- ---------------------------------------------------------------------------
--- 2. CATALOGOS DEL SISTEMA
+-- 2. CATALOGOS DEL SISTEMA (tablas padre)
 -- ---------------------------------------------------------------------------
 CREATE TABLE sectores (
     id_sector   INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,10 +68,13 @@ CREATE TABLE categorias (
     descripcion  VARCHAR(200) NOT NULL
 );
 
+-- Un solo catalogo de estados sirve a tres modulos; la columna ambito indica a
+-- cual pertenece cada estado.
 CREATE TABLE estados (
     id_estado INT AUTO_INCREMENT PRIMARY KEY,
     nombre    VARCHAR(40) NOT NULL,
-    ambito    ENUM('producto', 'factura') NOT NULL,
+    ambito    VARCHAR(20) NOT NULL,
+    CONSTRAINT ck_estados_ambito CHECK (ambito IN ('producto', 'factura', 'solicitud')),
     CONSTRAINT uq_estados UNIQUE (nombre, ambito)
 );
 
@@ -78,6 +86,9 @@ CREATE TABLE roles (
 
 -- ---------------------------------------------------------------------------
 -- 3. ENTIDADES PRINCIPALES
+--    Todas llevan la columna activo para la baja logica (Clase Encuentro de
+--    la Semana 15: el boton eliminar cambia el estado y conserva el historico)
+--    y la fecha de creacion como pista de auditoria.
 -- ---------------------------------------------------------------------------
 CREATE TABLE proveedores (
     id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,11 +98,14 @@ CREATE TABLE proveedores (
     correo       VARCHAR(120) NULL,
     telefono     VARCHAR(20)  NULL,
     activo       BOOLEAN      NOT NULL DEFAULT TRUE,
+    creado_en    TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_proveedores_tipo
         FOREIGN KEY (id_tipo) REFERENCES tipos_proveedor (id_tipo)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- productos = catalogo de servicios CTI. stock son los cupos disponibles:
+-- cada servicio se presta a un numero limitado de organizaciones por ciclo.
 CREATE TABLE productos (
     id_producto  INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(100)  NOT NULL,
@@ -101,7 +115,10 @@ CREATE TABLE productos (
     stock        INT           NOT NULL DEFAULT 0,
     descripcion  VARCHAR(500)  NOT NULL,
     id_proveedor INT           NULL,
-    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
+    imagen       VARCHAR(120)  NULL,
+    activo       BOOLEAN       NOT NULL DEFAULT TRUE,
+    creado_en    TIMESTAMP     NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_productos_stock CHECK (stock >= 0),
     CONSTRAINT fk_productos_categoria
         FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -113,15 +130,18 @@ CREATE TABLE productos (
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- clientes = organizaciones suscritas.
 CREATE TABLE clientes (
     id_cliente   INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(100) NOT NULL,
+    ruc          VARCHAR(13)  NULL UNIQUE,
     id_sector    INT          NOT NULL,
     id_parroquia INT          NOT NULL,
     servicio     VARCHAR(100) NOT NULL,
     correo       VARCHAR(120) NULL,
     telefono     VARCHAR(20)  NULL,
     activo       BOOLEAN      NOT NULL DEFAULT TRUE,
+    creado_en    TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_clientes_sector
         FOREIGN KEY (id_sector) REFERENCES sectores (id_sector)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -130,6 +150,7 @@ CREATE TABLE clientes (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- facturas = suscripciones contratadas.
 CREATE TABLE facturas (
     id_factura INT AUTO_INCREMENT PRIMARY KEY,
     codigo     VARCHAR(20)   NOT NULL UNIQUE,
@@ -138,7 +159,8 @@ CREATE TABLE facturas (
     servicio   VARCHAR(100)  NOT NULL,
     fecha      DATE          NOT NULL DEFAULT (CURRENT_DATE),
     total      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
+    activo     BOOLEAN       NOT NULL DEFAULT TRUE,
+    creado_en  TIMESTAMP     NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_facturas_cliente
         FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -165,8 +187,49 @@ CREATE TABLE detalle_factura (
     CONSTRAINT uq_detalle UNIQUE (id_factura, id_producto)
 );
 
+-- Boletines de ciberinteligencia que se publican en la pagina principal.
+CREATE TABLE boletines (
+    id_boletin   INT AUTO_INCREMENT PRIMARY KEY,
+    titulo       VARCHAR(150) NOT NULL,
+    resumen      VARCHAR(600) NOT NULL,
+    nivel        VARCHAR(10)  NOT NULL,
+    referencia   VARCHAR(200) NULL,
+    fecha        DATE         NOT NULL DEFAULT (CURRENT_DATE),
+    id_categoria INT          NOT NULL,
+    id_proveedor INT          NULL,
+    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
+    creado_en    TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_boletines_nivel CHECK (nivel IN ('Critico', 'Alto', 'Medio', 'Bajo')),
+    CONSTRAINT fk_boletines_categoria
+        FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_boletines_proveedor
+        FOREIGN KEY (id_proveedor) REFERENCES proveedores (id_proveedor)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Solicitudes de informacion que llegan desde el formulario publico.
+CREATE TABLE solicitudes (
+    id_solicitud  INT AUTO_INCREMENT PRIMARY KEY,
+    nombre        VARCHAR(100) NOT NULL,
+    organizacion  VARCHAR(120) NOT NULL,
+    correo        VARCHAR(120) NOT NULL,
+    telefono      VARCHAR(20)  NULL,
+    id_producto   INT          NOT NULL,
+    id_estado     INT          NOT NULL,
+    mensaje       VARCHAR(600) NOT NULL,
+    fecha         TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+    activo        BOOLEAN      NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_solicitudes_producto
+        FOREIGN KEY (id_producto) REFERENCES productos (id_producto)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_solicitudes_estado
+        FOREIGN KEY (id_estado) REFERENCES estados (id_estado)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 -- ---------------------------------------------------------------------------
--- 4. AUTENTICACION (Semana 14)
+-- 4. AUTENTICACION (Semana 14) Y AUDITORIA
 -- ---------------------------------------------------------------------------
 CREATE TABLE usuarios (
     id       INT AUTO_INCREMENT PRIMARY KEY,
@@ -189,6 +252,20 @@ CREATE TABLE perfiles_usuario (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Pista de auditoria: quien hizo que y cuando.
+CREATE TABLE bitacora (
+    id_bitacora INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario  INT          NULL,
+    usuario     VARCHAR(50)  NOT NULL,
+    accion      VARCHAR(20)  NOT NULL,
+    modulo      VARCHAR(40)  NOT NULL,
+    detalle     VARCHAR(255) NOT NULL,
+    fecha       TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_bitacora_usuario
+        FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
 -- ============================================================================
 -- DATOS INICIALES
 -- ============================================================================
@@ -201,27 +278,29 @@ INSERT INTO cantones (nombre, id_provincia) VALUES
 
 INSERT INTO parroquias (nombre, id_canton) VALUES
     ('Puyo', 1), ('Tarqui', 1), ('Shell', 2),
-    ('Inaquito', 3), ('Tarqui de Guayaquil', 4);
+    ('Iñaquito', 3), ('Tarqui de Guayaquil', 4);
 
 INSERT INTO sectores (nombre, descripcion) VALUES
     ('Financiero',  'Cooperativas, bancos y entidades del sistema financiero.'),
-    ('Educacion',   'Universidades, institutos y unidades educativas.'),
-    ('Tecnologia',  'Empresas de desarrollo de software y servicios TI.'),
-    ('Salud',       'Clinicas, hospitales y centros de salud.'),
-    ('Publico',     'Instituciones y entidades del sector publico.');
+    ('Educación',   'Universidades, institutos y unidades educativas.'),
+    ('Tecnología',  'Empresas de desarrollo de software y servicios TI.'),
+    ('Salud',       'Clínicas, hospitales y centros de salud.'),
+    ('Público',     'Instituciones y entidades del sector público.');
 
 INSERT INTO tipos_proveedor (nombre, descripcion) VALUES
-    ('Informacion publica', 'Fuentes OSINT y portales abiertos de noticias.'),
-    ('Investigacion',       'Comunidades y laboratorios de investigacion en seguridad.'),
-    ('Documentacion',       'Boletines oficiales y avisos de fabricantes.'),
+    ('Información pública', 'Fuentes OSINT y portales abiertos de noticias.'),
+    ('Investigación',       'Comunidades y laboratorios de investigación en seguridad.'),
+    ('Documentación',       'Boletines oficiales y avisos de fabricantes.'),
     ('Plataforma',          'Plataformas comerciales de inteligencia de amenazas.');
 
 INSERT INTO categorias (nombre, descripcion) VALUES
-    ('Boletin',      'Boletines periodicos de ciberinteligencia.'),
-    ('Alerta',       'Alertas puntuales sobre vulnerabilidades criticas.'),
-    ('Noticias',     'Resumenes de noticias de ciberseguridad.'),
-    ('Informe',      'Informes tecnicos y analisis de amenazas.'),
-    ('Capacitacion', 'Charlas y material de concienciacion para el personal.');
+    ('Boletín',      'Boletines periódicos de ciberinteligencia.'),
+    ('Alerta',       'Alertas puntuales sobre vulnerabilidades críticas.'),
+    ('Noticias',     'Resúmenes de noticias de ciberseguridad.'),
+    ('Informe',      'Informes técnicos y análisis de amenazas.'),
+    ('Capacitación', 'Charlas y material de concienciación para el personal.'),
+    ('Monitoreo',    'Vigilancia continua de la dark web, la marca y la superficie expuesta.'),
+    ('Respuesta',    'Búsqueda proactiva de amenazas y apoyo ante incidentes.');
 
 INSERT INTO estados (nombre, ambito) VALUES
     ('Disponible', 'producto'),
@@ -231,43 +310,75 @@ INSERT INTO estados (nombre, ambito) VALUES
     ('Emitida',    'factura'),
     ('Pendiente',  'factura'),
     ('Pagado',     'factura'),
-    ('Anulada',    'factura');
+    ('Anulada',    'factura'),
+    ('Nueva',      'solicitud'),
+    ('En gestión', 'solicitud'),
+    ('Atendida',   'solicitud');
 
 INSERT INTO roles (nombre, descripcion) VALUES
-    ('Administrador', 'Acceso completo a los modulos de administracion.'),
-    ('Analista',      'Registra y consulta boletines, alertas e informes.'),
-    ('Consulta',      'Solo puede revisar la informacion publicada.');
+    ('Administrador', 'Acceso completo, incluida la gestión de usuarios y la bitácora.'),
+    ('Analista',      'Registra y consulta servicios, boletines, organizaciones y suscripciones.'),
+    ('Consulta',      'Solo puede revisar la información publicada.');
 
 INSERT INTO proveedores (nombre, id_tipo, aporte, correo, telefono) VALUES
-    ('Fuentes OSINT',            1, 'Apoyo para recopilar noticias y alertas de ciberseguridad.',    'contacto@osint.example',     '032885000'),
-    ('Comunidades de seguridad', 2, 'Referencias sobre amenazas y buenas practicas.',                'info@comunidad.example',     '032885001'),
-    ('Boletines oficiales',      3, 'Informacion tecnica sobre vulnerabilidades y actualizaciones.', 'avisos@boletin.example',     '032885002'),
-    ('Plataforma de amenazas',   4, 'Indicadores de compromiso y reportes de campanas activas.',     'soporte@plataforma.example', '032885003');
+    ('Fuentes OSINT',            1, 'Recopilación de noticias, avisos y alertas abiertas de ciberseguridad.',  'contacto@osint.example',     '032885000'),
+    ('Comunidades de seguridad', 2, 'Referencias sobre amenazas, actores y buenas prácticas de defensa.',      'info@comunidad.example',     '032885001'),
+    ('Boletines oficiales',      3, 'Información técnica sobre vulnerabilidades y parches de fabricantes.',    'avisos@boletin.example',     '032885002'),
+    ('Plataforma de amenazas',   4, 'Indicadores de compromiso y reportes de campañas activas en la región.',  'soporte@plataforma.example', '032885003');
 
-INSERT INTO productos (nombre, id_categoria, id_estado, precio, stock, descripcion, id_proveedor) VALUES
-    ('Boletin CTI semanal',              1, 1,  45.00, 15, 'Resumen semanal de amenazas, vulnerabilidades y recomendaciones de seguridad.', 1),
-    ('Alerta de vulnerabilidad',         2, 2,  30.00,  8, 'Informacion sobre vulnerabilidades criticas que pueden afectar a empresas.',    3),
-    ('Reporte de noticias de seguridad', 3, 4,  20.00,  0, 'Noticias relevantes de ciberseguridad explicadas de forma sencilla.',          2),
-    ('Informe mensual de amenazas',      4, 1,  90.00,  5, 'Analisis mensual de campanas, actores y tecnicas observadas en la region.',    4),
-    ('Taller de concienciacion',         5, 2, 120.00,  3, 'Sesion practica de concienciacion en seguridad para el personal del cliente.', 2);
+INSERT INTO productos (nombre, id_categoria, id_estado, precio, stock, descripcion, id_proveedor, imagen) VALUES
+    ('Boletín CTI semanal',                 1, 1,  45.00, 15, 'Resumen semanal de amenazas, vulnerabilidades y recomendaciones accionables para el equipo de TI.', 1, 'servicio-boletin.jpg'),
+    ('Alertas de vulnerabilidades críticas', 2, 2,  30.00,  8, 'Aviso temprano cuando un fallo crítico afecta a la tecnología que usa la organización, con pasos de mitigación.', 3, 'servicio-alerta.jpg'),
+    ('Reporte de noticias de seguridad',    3, 4,  20.00,  0, 'Noticias relevantes de ciberseguridad explicadas en lenguaje sencillo para la gerencia.', 2, 'servicio-noticias.jpg'),
+    ('Informe mensual de amenazas',         4, 1,  90.00,  5, 'Análisis mensual de campañas, actores y técnicas observadas en Ecuador y la región.', 4, 'servicio-informe.jpg'),
+    ('Taller de concienciación',            5, 2, 120.00,  3, 'Sesión práctica para que el personal reconozca el phishing y la ingeniería social.', 2, 'servicio-capacitacion.jpg'),
+    ('Monitoreo de la dark web',            6, 1, 150.00,  6, 'Vigilancia de foros, mercados y filtraciones donde aparezcan credenciales o datos de la organización.', 4, 'servicio-darkweb.jpg'),
+    ('Protección de marca y dominios',      6, 1, 110.00,  4, 'Detección de dominios parecidos, perfiles falsos y sitios de phishing que suplantan a la marca.', 1, 'servicio-marca.jpg'),
+    ('Superficie de ataque externa',        6, 2, 130.00,  5, 'Inventario de activos expuestos en internet y priorización de los que presentan riesgo.', 4, 'servicio-infraestructura.jpg'),
+    ('Búsqueda proactiva de amenazas',      7, 1, 200.00,  2, 'Threat hunting guiado por indicadores de compromiso para encontrar intrusiones que pasan desapercibidas.', 4, 'servicio-threat-hunting.jpg'),
+    ('Apoyo en respuesta a incidentes',     7, 2, 250.00,  2, 'Acompañamiento técnico para contener, analizar y documentar un incidente de seguridad.', 2, 'servicio-incidentes.jpg');
 
-INSERT INTO clientes (nombre, id_sector, id_parroquia, servicio, correo, telefono) VALUES
-    ('Empresa demostrativa A',      1, 1, 'Boletines CTI',             'contacto@empresaa.example', '032880010'),
-    ('Entidad demostrativa B',      2, 2, 'Noticias de seguridad',     'info@entidadb.example',     '032880011'),
-    ('Organizacion demostrativa C', 3, 4, 'Alertas de vulnerabilidad', 'soporte@orgc.example',      '022880012'),
-    ('Cooperativa demostrativa D',  1, 3, 'Informe mensual',           'sistemas@coopd.example',    '032880013');
+INSERT INTO clientes (nombre, ruc, id_sector, id_parroquia, servicio, correo, telefono) VALUES
+    ('Cooperativa Amazonía Segura',   '1690012345001', 1, 1, 'Boletín CTI semanal',            'sistemas@coopamazonia.example', '032880010'),
+    ('Instituto Tecnológico del Puyo', '1690023456001', 2, 2, 'Reporte de noticias de seguridad', 'ti@itpuyo.example',            '032880011'),
+    ('Software Andino',               '1790034567001', 3, 4, 'Alertas de vulnerabilidades críticas', 'seguridad@andino.example',  '022880012'),
+    ('Clínica Shell Salud',           '1690045678001', 4, 3, 'Informe mensual de amenazas',    'soporte@clinicashell.example', '032880013');
 
 INSERT INTO facturas (codigo, id_cliente, id_estado, servicio, fecha, total) VALUES
-    ('FAC-001', 1, 7, 'Boletin CTI semanal',      '2026-09-01', 90.00),
-    ('FAC-002', 2, 6, 'Noticias de seguridad',    '2026-09-05', 20.00),
-    ('FAC-003', 3, 5, 'Alerta de vulnerabilidad', '2026-09-10', 60.00),
-    ('FAC-004', 4, 6, 'Informe mensual',          '2026-09-15', 90.00);
+    ('FAC-001', 1, 7, 'Boletín CTI semanal',                  '2026-09-01',  90.00),
+    ('FAC-002', 2, 6, 'Reporte de noticias de seguridad',     '2026-09-05',  20.00),
+    ('FAC-003', 3, 5, 'Alertas de vulnerabilidades críticas', '2026-09-10',  60.00),
+    ('FAC-004', 4, 6, 'Informe mensual de amenazas',          '2026-09-15', 240.00);
 
 INSERT INTO detalle_factura (id_factura, id_producto, cantidad, precio_unitario) VALUES
-    (1, 1, 2, 45.00),
-    (2, 3, 1, 20.00),
-    (3, 2, 2, 30.00),
-    (4, 4, 1, 90.00);
+    (1, 1, 2,  45.00),
+    (2, 3, 1,  20.00),
+    (3, 2, 2,  30.00),
+    (4, 4, 1,  90.00),
+    (4, 6, 1, 150.00);
+
+INSERT INTO boletines (titulo, resumen, nivel, referencia, fecha, id_categoria, id_proveedor) VALUES
+    ('Phishing que suplanta a entidades financieras del país',
+     'Se observan correos y mensajes SMS que imitan a cooperativas y bancos para robar credenciales de banca en línea. Recomendación: activar doble factor, revisar el dominio del remitente y reportar los enlaces sospechosos.',
+     'Alto', 'Campaña observada en Ecuador', '2026-09-28', 1, 1),
+    ('Vulnerabilidad crítica en VPN SSL de uso empresarial',
+     'Los fabricantes de soluciones VPN publicaron parches para fallos que permiten ejecutar código sin autenticación. Se recomienda actualizar de inmediato y revisar los registros de acceso remoto.',
+     'Critico', 'Avisos de seguridad de fabricantes', '2026-09-24', 2, 3),
+    ('Credenciales corporativas a la venta en foros clandestinos',
+     'Los ladrones de información (infostealers) siguen alimentando mercados de la dark web con accesos a correo y VPN. Se aconseja forzar el cambio de contraseñas expuestas y monitorear inicios de sesión inusuales.',
+     'Alto', 'Monitoreo de la dark web', '2026-09-19', 6, 4),
+    ('Ransomware dirigido a instituciones educativas',
+     'Grupos de ransomware aprovechan cuentas sin doble factor y servidores expuestos durante los periodos de matrícula. Mantener copias de seguridad fuera de línea y segmentar la red administrativa.',
+     'Medio', 'Informe mensual de amenazas', '2026-09-12', 4, 2),
+    ('Buenas prácticas de contraseñas para el personal',
+     'Recordatorio para la concienciación interna: frases de paso largas, gestor de contraseñas y doble factor en todas las cuentas críticas.',
+     'Bajo', 'Material de capacitación', '2026-09-05', 5, 2);
+
+INSERT INTO solicitudes (nombre, organizacion, correo, telefono, id_producto, id_estado, mensaje) VALUES
+    ('María Paredes', 'Cooperativa Río Pastaza', 'mparedes@riopastaza.example', '0991234567', 6, 9,
+     'Queremos saber si nuestras credenciales aparecen en filtraciones recientes y el costo del monitoreo mensual.'),
+    ('Luis Andrade', 'Municipio de Mera', 'landrade@mera.example', '0987654321', 5, 10,
+     'Solicitamos un taller de concienciación para 30 funcionarios del área administrativa.');
 
 -- Los usuarios se registran desde la ruta /registro de la aplicacion: la
 -- contrasena se transforma con generate_password_hash() antes del INSERT, por
