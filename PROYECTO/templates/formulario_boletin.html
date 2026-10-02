@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_boletin %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel" style="max-width: 980px">
+    <div class="cabecera">
+        <h2>
+            {% if boletin %}<i class="bi bi-pencil-square me-2"></i>Editar boletín <span class="text-muted">#{{ boletin.id_boletin }}</span>
+            {% else %}<i class="bi bi-plus-square me-2"></i>Nuevo boletín{% endif %}
+        </h2>
+        <a class="btn btn-light btn-sm" href="{{ url_for('ver_boletines') }}"><i class="bi bi-arrow-left me-1"></i>Volver al listado</a>
+    </div>
+    <div class="cuerpo">
+        <form method="POST" novalidate data-validacion-viva
+              action="{{ url_for('editar_boletin', id_boletin=boletin.id_boletin) if boletin else url_for('nuevo_boletin') }}">
+            {{ campos_boletin(form) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a href="{{ url_for('ver_boletines') }}" class="btn btn-light">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

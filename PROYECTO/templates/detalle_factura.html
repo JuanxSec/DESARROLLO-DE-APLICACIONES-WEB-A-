@@ -1,93 +1,66 @@
 {% extends "base.html" %}
-{% from "components/campos_formulario.html" import campos_detalle %}
+{% from "components/campos_formulario.html" import campos_detalle, estado %}
+
+{% block modo %}panel{% endblock %}
 
 {% block content %}
-
-<section class="caja">
-    <h2>Detalle de la factura {{ factura.codigo }}</h2>
-    <p>
-        Esta pantalla gestiona la tabla intermedia <code>detalle_factura</code>, que
-        resuelve la relación muchos a muchos entre facturas y servicios: una factura
-        puede incluir varios servicios y un mismo servicio puede aparecer en varias
-        facturas. El total de la factura se recalcula con un <code>UPDATE</code> cada vez
-        que cambia el detalle.
-    </p>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3"><strong>Cliente:</strong> {{ factura.cliente }}</div>
-                <div class="col-md-3"><strong>Servicio:</strong> {{ factura.servicio }}</div>
-                <div class="col-md-2"><strong>Fecha:</strong> {{ factura.fecha }}</div>
-                <div class="col-md-2"><strong>Estado:</strong> {{ factura.estado }}</div>
-                <div class="col-md-2 text-md-end"><strong>Total:</strong> {{ "%.2f"|format(factura.total) }}</div>
-            </div>
-        </div>
+<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+    <a class="btn btn-light btn-sm" href="{{ url_for('ver_facturacion') }}"><i class="bi bi-arrow-left me-1"></i>Suscripciones</a>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('editar_factura', id_factura=factura.id_factura) }}"><i class="bi bi-pencil me-1"></i>Editar cabecera</a>
+        <a class="btn btn-outline-dark btn-sm" href="{{ url_for('comprobante_factura', id_factura=factura.id_factura) }}"><i class="bi bi-printer me-1"></i>Comprobante</a>
+        <a class="btn btn-dark btn-sm" href="{{ url_for('pdf_factura', id_factura=factura.id_factura) }}"><i class="bi bi-filetype-pdf me-1"></i>PDF</a>
     </div>
+</div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">Agregar servicio al detalle</h5>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('detalle_factura', id_factura=factura.id_factura) }}" novalidate>
-                {{ campos_detalle(form) }}
-                {{ form.enviar(class="btn btn-primary") }}
-            </form>
-        </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="indicador"><div><small>Código</small><strong>{{ factura.codigo }}</strong></div></div></div>
+    <div class="col-md-4"><div class="indicador"><div><small>Organización</small><strong class="fs-6">{{ factura.cliente }}</strong><small>{{ factura.ubicacion }}</small></div></div></div>
+    <div class="col-md-2"><div class="indicador"><div><small>Estado</small><div class="mt-1">{{ estado(factura.estado) }}</div><small>{{ factura.fecha|fecha }}</small></div></div></div>
+    <div class="col-md-3"><div class="indicador"><div><small>Total</small><strong>${{ factura.total|dinero }}</strong></div></div></div>
+</div>
+
+<div class="tarjeta-panel mb-4">
+    <div class="cabecera"><h2><i class="bi bi-plus-circle me-2"></i>Agregar un servicio a la suscripción</h2></div>
+    <div class="cuerpo pb-0">
+        <form method="POST" action="{{ url_for('detalle_factura', id_factura=factura.id_factura) }}" novalidate>
+            {{ campos_detalle(form) }}
+        </form>
+        <p class="small text-muted"><i class="bi bi-info-circle me-1"></i>Al agregar un servicio se descuentan sus cupos; si se pide más de lo disponible, la operación se rechaza. Al quitar una línea, los cupos vuelven al catálogo.</p>
     </div>
+</div>
 
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">Líneas del detalle</h5>
-        </div>
-        <div class="card-body">
-            {% if lineas %}
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Servicio</th>
-                            <th class="text-end">Cantidad</th>
-                            <th class="text-end">Precio unitario</th>
-                            <th class="text-end">Subtotal</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for linea in lineas %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ linea.producto }}</td>
-                            <td class="text-end">{{ linea.cantidad }}</td>
-                            <td class="text-end">{{ "%.2f"|format(linea.precio_unitario) }}</td>
-                            <td class="text-end">{{ "%.2f"|format(linea.subtotal) }}</td>
-                            <td class="text-end">
-                                <form method="POST" action="{{ url_for('eliminar_detalle', id_factura=factura.id_factura, id_detalle=linea.id_detalle) }}">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-danger btn-sm">Quitar</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="4" class="text-end">Total de la factura</th>
-                            <th class="text-end">{{ "%.2f"|format(factura.total) }}</th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            {% else %}
-                <p class="text-muted">La factura todavía no tiene servicios en su detalle.</p>
-            {% endif %}
-
-            <a href="{{ url_for('ver_facturacion') }}" class="btn btn-secondary">Volver a facturación</a>
-        </div>
+<div class="tarjeta-panel">
+    <div class="cabecera"><h2><i class="bi bi-list-check me-2"></i>Detalle de servicios</h2></div>
+    {% if lineas %}
+    <div class="table-responsive">
+        <table class="table tabla-panel">
+            <thead><tr><th>#</th><th>Servicio</th><th>Categoría</th><th class="text-end">Cantidad</th><th class="text-end">Precio unitario</th><th class="text-end">Subtotal</th><th class="text-end">Acción</th></tr></thead>
+            <tbody>
+            {% for linea in lineas %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><strong>{{ linea.producto }}</strong></td>
+                    <td><span class="chip-categoria">{{ linea.categoria }}</span></td>
+                    <td class="text-end">{{ linea.cantidad }}</td>
+                    <td class="text-end">${{ linea.precio_unitario|dinero }}</td>
+                    <td class="text-end fw-semibold">${{ linea.subtotal|dinero }}</td>
+                    <td class="text-end">
+                        <form method="POST" action="{{ url_for('eliminar_detalle', id_factura=factura.id_factura, id_detalle=linea.id_detalle) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar del detalle"><i class="bi bi-x-lg"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr><th colspan="5" class="text-end">Total de la suscripción</th><th class="text-end fs-5">${{ factura.total|dinero }}</th><th></th></tr>
+            </tfoot>
+        </table>
     </div>
-</section>
-
+    {% else %}
+    <div class="vacio"><i class="bi bi-cart d-block mb-2"></i>La suscripción todavía no tiene servicios. Agregue el primero con el formulario de arriba.</div>
+    {% endif %}
+</div>
 {% endblock %}

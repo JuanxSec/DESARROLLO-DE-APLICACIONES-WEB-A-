@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel mb-4">
+    <div class="cabecera">
+        <div>
+            <h2><i class="bi bi-bar-chart-line me-2"></i>Reporte de servicios contratados</h2>
+            <small class="text-muted">JOIN de suscripciones, detalle, servicios y categorías (no incluye anuladas ni dadas de baja)</small>
+        </div>
+        <form class="d-flex flex-wrap gap-2 align-items-end" method="get" action="{{ url_for('reportes') }}">
+            <div><label class="form-label small mb-0" for="desde">Desde</label><input class="form-control form-control-sm" type="date" id="desde" name="desde" value="{{ desde.isoformat() }}"></div>
+            <div><label class="form-label small mb-0" for="hasta">Hasta</label><input class="form-control form-control-sm" type="date" id="hasta" name="hasta" value="{{ hasta.isoformat() }}"></div>
+            <button class="btn btn-acento btn-sm" type="submit"><i class="bi bi-funnel me-1"></i>Aplicar</button>
+        </form>
+    </div>
+    <div class="cuerpo d-flex flex-wrap gap-2 align-items-center">
+        <span class="small text-muted me-2">Exportar:</span>
+        <a class="btn btn-outline-success btn-sm" href="{{ url_for('exportar_reporte', formato='csv', desde=desde.isoformat(), hasta=hasta.isoformat()) }}"><i class="bi bi-filetype-csv me-1"></i>CSV (Excel)</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('exportar_reporte', formato='json', desde=desde.isoformat(), hasta=hasta.isoformat()) }}"><i class="bi bi-filetype-json me-1"></i>JSON</a>
+        <a class="btn btn-outline-danger btn-sm" href="{{ url_for('exportar_reporte', formato='pdf', desde=desde.isoformat(), hasta=hasta.isoformat()) }}"><i class="bi bi-filetype-pdf me-1"></i>PDF</a>
+        <button class="btn btn-outline-dark btn-sm" type="button" data-imprimir><i class="bi bi-printer me-1"></i>Imprimir</button>
+        <span class="ms-auto fw-bold fs-5">Total del periodo: ${{ total|dinero }}</span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="tarjeta-panel h-100">
+            <div class="cabecera"><h2>Por servicio</h2></div>
+            {% if por_servicio %}
+            <div class="table-responsive">
+                <table class="table tabla-panel">
+                    <thead><tr><th>Servicio</th><th>Categoría</th><th class="text-center">Suscripciones</th><th class="text-center">Cupos</th><th class="text-end">Ingresos</th></tr></thead>
+                    <tbody>
+                    {% for fila in por_servicio %}
+                        <tr>
+                            <td><strong>{{ fila.servicio }}</strong></td>
+                            <td><span class="chip-categoria">{{ fila.categoria }}</span></td>
+                            <td class="text-center">{{ fila.suscripciones }}</td>
+                            <td class="text-center">{{ fila.cupos }}</td>
+                            <td class="text-end">${{ fila.ingresos|dinero }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot><tr><th colspan="4" class="text-end">Total</th><th class="text-end">${{ total|dinero }}</th></tr></tfoot>
+                </table>
+            </div>
+            {% else %}
+            <div class="vacio"><i class="bi bi-bar-chart d-block mb-2"></i>No hay suscripciones en el periodo seleccionado.</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="tarjeta-panel mb-4">
+            <div class="cabecera"><h2>Por organización</h2></div>
+            <div class="table-responsive">
+                <table class="table tabla-panel">
+                    <thead><tr><th>Organización</th><th class="text-center">Suscripciones</th><th class="text-end">Ingresos</th></tr></thead>
+                    <tbody>
+                    {% for fila in por_organizacion %}
+                        <tr><td>{{ fila.organizacion }}</td><td class="text-center">{{ fila.suscripciones }}</td><td class="text-end">${{ fila.ingresos|dinero }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="3" class="text-center text-muted">Sin datos.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tarjeta-panel">
+            <div class="cabecera"><h2>Por mes</h2></div>
+            <div class="cuerpo">
+                {% for fila in por_mes %}
+                {% set porcentaje = ((fila.ingresos|float) / (total|float) * 100) if total else 0 %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small"><span>{{ fila.mes }}</span><span>${{ fila.ingresos|dinero }}</span></div>
+                    <div class="progress" role="progressbar" style="height:8px"><div class="progress-bar" style="width: {{ '%.0f'|format(porcentaje|float) }}%"></div></div>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Sin datos.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

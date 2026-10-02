@@ -1,30 +1,26 @@
 {% extends "base.html" %}
 {% from "components/campos_formulario.html" import campos_cliente %}
 
+{% block modo %}panel{% endblock %}
+
 {% block content %}
-
-<section class="caja">
-    <h2>Editar cliente</h2>
-    <p>
-        Modificando el registro <strong>ID {{ cliente.id_cliente }}</strong>.
-        Se reutiliza el mismo formulario del registro y los cambios se guardan con
-        <code>UPDATE ... WHERE id_cliente = {{ cliente.id_cliente }}</code>.
-    </p>
-
-    <div class="card">
-        <div class="card-header bg-warning">
-            <h5 class="card-title mb-0">{{ cliente.nombre }}</h5>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('editar_cliente', id_cliente=cliente.id_cliente) }}" novalidate>
-                {{ campos_cliente(form) }}
-                <div class="d-flex gap-2">
-                    {{ form.enviar(class="btn btn-warning") }}
-                    <a href="{{ url_for('ver_clientes') }}" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
-        </div>
+<div class="tarjeta-panel" style="max-width: 980px">
+    <div class="cabecera">
+        <h2>
+            {% if cliente %}<i class="bi bi-pencil-square me-2"></i>Editar organización <span class="text-muted">#{{ cliente.id_cliente }}</span>
+            {% else %}<i class="bi bi-plus-square me-2"></i>Nueva organización{% endif %}
+        </h2>
+        <a class="btn btn-light btn-sm" href="{{ url_for('ver_clientes') }}"><i class="bi bi-arrow-left me-1"></i>Volver al listado</a>
     </div>
-</section>
-
+    <div class="cuerpo">
+        <form method="POST" novalidate data-validacion-viva
+              action="{{ url_for('editar_cliente', id_cliente=cliente.id_cliente) if cliente else url_for('nuevo_cliente') }}">
+            {{ campos_cliente(form) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a href="{{ url_for('ver_clientes') }}" class="btn btn-light">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

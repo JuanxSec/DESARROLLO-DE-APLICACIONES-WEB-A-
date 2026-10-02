@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campos_solicitud %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel" style="max-width: 900px">
+    <div class="cabecera">
+        <h2><i class="bi bi-inbox me-2"></i>Gestionar solicitud <span class="text-muted">#{{ solicitud.id_solicitud }}</span></h2>
+        <a class="btn btn-light btn-sm" href="{{ url_for('ver_solicitudes') }}"><i class="bi bi-arrow-left me-1"></i>Volver al listado</a>
+    </div>
+    <div class="cuerpo">
+        <p class="small text-muted">Recibida el {{ solicitud.fecha|fecha }}. Cambie el estado a «En gestión» cuando un analista la tome y a «Atendida» al enviar la propuesta.</p>
+        <form method="POST" novalidate data-validacion-viva action="{{ url_for('editar_solicitud', id_solicitud=solicitud.id_solicitud) }}">
+            {{ campos_solicitud(form, con_estado=True) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a href="mailto:{{ solicitud.correo }}?subject=JuansecCTI%20-%20Respuesta%20a%20su%20solicitud" class="btn btn-outline-primary"><i class="bi bi-reply me-1"></i>Responder por correo</a>
+                <a href="{{ url_for('ver_solicitudes') }}" class="btn btn-light">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

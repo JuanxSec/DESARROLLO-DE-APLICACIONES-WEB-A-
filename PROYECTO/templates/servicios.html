@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="seccion" style="padding-top: 8rem">
+    <div class="container">
+        <div class="encabezado-seccion">
+            <span class="etiqueta-seccion">Catálogo</span>
+            <h1 class="display-6">Servicios de ciberinteligencia</h1>
+            <p class="text-muted">Precios mensuales por organización. Los cupos se actualizan en tiempo real desde nuestro sistema.</p>
+        </div>
+
+        <form class="row g-2 justify-content-center mb-4" method="get" action="{{ url_for('catalogo_servicios') }}">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Buscar un servicio">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="categoria" onchange="this.form.submit()">
+                    <option value="">Todas las categorías</option>
+                    {% for id, nombre in categorias %}
+                    <option value="{{ id }}"{{ ' selected' if categoria == id }}>{{ nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid"><button class="btn btn-acento" type="submit">Filtrar</button></div>
+        </form>
+
+        <p class="text-muted small text-center">{{ servicios|length }} servicio{{ 's' if servicios|length != 1 }} encontrado{{ 's' if servicios|length != 1 }}</p>
+
+        <div class="row g-4">
+            {% for servicio in servicios %}
+            <div class="col-md-6 col-lg-4">
+                <article class="tarjeta-servicio">
+                    <div class="contenedor-imagen">
+                        <img src="{{ url_for('static', filename='img/' ~ (servicio.imagen or 'servicio-boletin.jpg')) }}" alt="{{ servicio.nombre }}" loading="lazy">
+                        <span class="precio-flotante">${{ servicio.precio|dinero }} <small>/ mes</small></span>
+                    </div>
+                    <div class="cuerpo">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="chip-categoria"><i class="bi bi-tag"></i>{{ servicio.categoria }}</span>
+                            {% if servicio.stock > 0 %}
+                                <span class="estado estado-ok">{{ servicio.stock }} cupos</span>
+                            {% else %}
+                                <span class="estado estado-peligro">Agotado</span>
+                            {% endif %}
+                        </div>
+                        <h2 class="h5 mt-2">{{ servicio.nombre }}</h2>
+                        <p>{{ servicio.descripcion }}</p>
+                        <a class="btn btn-outline-primary btn-sm{{ ' disabled' if servicio.stock == 0 }}" href="{{ url_for('solicitar', servicio=servicio.id_producto) }}">
+                            <i class="bi bi-envelope me-1"></i>{{ 'Solicitar información' if servicio.stock > 0 else 'Sin cupos este ciclo' }}
+                        </a>
+                    </div>
+                </article>
+            </div>
+            {% else %}
+            <div class="col-12 text-center text-muted py-5">
+                <i class="bi bi-search fs-1 d-block mb-2"></i>No hay servicios que coincidan con la búsqueda.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

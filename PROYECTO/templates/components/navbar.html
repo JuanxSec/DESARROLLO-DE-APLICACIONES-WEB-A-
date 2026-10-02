@@ -1,43 +1,40 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+{# Componente reutilizable: barra de navegación de las páginas públicas. #}
+{% set ep = request.endpoint %}
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-publica{{ ' navbar-solida' if ep != 'inicio' }}" id="navbarPublica">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ url_for('inicio') }}"><img src="{{ url_for('static', filename='img/logo-juanseccti.svg') }}" width="26" height="26" class="me-2 align-text-bottom" alt="">{{ titulo_sitio }}</a>
+        <a class="marca" href="{{ url_for('inicio') }}">
+            <img src="{{ url_for('static', filename='img/logo-juanseccti.svg') }}" width="34" height="34" alt="Logo de JuansecCTI">
+            Juansec<span>CTI</span>
+        </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico" aria-label="Abrir menú">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('inicio') }}">Inicio</a></li>
-
-                {% if current_user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Panel</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_productos') }}">Servicios CTI</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_clientes') }}">Organizaciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_proveedores') }}">Fuentes</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_facturacion') }}">Suscripciones</a></li>
-                {% endif %}
+        <div class="collapse navbar-collapse" id="menuPublico">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link{{ ' active' if ep == 'inicio' }}" href="{{ url_for('inicio') }}#inicio">Inicio</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Nosotros</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('inicio') }}#quienes-somos">Quiénes somos</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('inicio') }}#mision-vision">Misión y visión</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('inicio') }}#ciclo">Cómo trabajamos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link{{ ' active' if ep == 'catalogo_servicios' }}" href="{{ url_for('catalogo_servicios') }}">Servicios</a></li>
+                <li class="nav-item"><a class="nav-link{{ ' active' if ep == 'boletines_publicados' }}" href="{{ url_for('boletines_publicados') }}">Boletines</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('inicio') }}#contacto">Contacto</a></li>
             </ul>
 
-            <ul class="navbar-nav ms-auto">
+            <div class="d-flex gap-2 mt-2 mt-lg-0">
                 {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <span class="navbar-text me-3">
-                        Sesión: <strong class="text-white">{{ current_user.usuario }}</strong>
-                    </span>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">Cerrar sesión</a>
-                </li>
+                    <a class="btn btn-acento btn-sm px-3" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-1"></i>Ir al panel</a>
                 {% else %}
-                <li class="nav-item">
-                    <a class="btn btn-outline-light btn-sm me-2" href="{{ url_for('login') }}">Iniciar sesión</a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-light btn-sm" href="{{ url_for('registro') }}">Registrarse</a>
-                </li>
+                    <a class="btn btn-contorno-claro btn-sm px-3" href="{{ url_for('login') }}"><i class="bi bi-box-arrow-in-right me-1"></i>Ingresar al sistema</a>
+                    <a class="btn btn-acento btn-sm px-3" href="{{ url_for('solicitar') }}"><i class="bi bi-send me-1"></i>Solicitar información</a>
                 {% endif %}
-            </ul>
+            </div>
         </div>
     </div>
 </nav>

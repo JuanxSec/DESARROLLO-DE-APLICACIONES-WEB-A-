@@ -1,37 +1,33 @@
 {% extends "base.html" %}
 {% from "components/campos_formulario.html" import campos_usuario %}
 
+{#- El registro público usa el diseño de acceso; el alta de usuarios que hace
+    un administrador se muestra dentro del panel y permite elegir el rol. -#}
+{% block modo %}{{ 'acceso' if publico else 'panel' }}{% endblock %}
+
 {% block content %}
-
-<section class="caja">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">Registro de usuario</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">
-                        La contraseña se almacena protegida mediante <code>generate_password_hash()</code>,
-                        nunca en texto plano. Los datos personales se guardan en la tabla
-                        <code>perfiles_usuario</code>, relacionada uno a uno con <code>usuarios</code>.
-                    </p>
-
-                    <form method="POST" action="{{ url_for('registro') }}" novalidate>
-                        {{ campos_usuario(form) }}
-                        {{ form.enviar(class="btn btn-success w-100") }}
-                    </form>
-
-                    <hr>
-
-                    <p class="mb-0 text-center">
-                        ¿Ya tiene una cuenta?
-                        <a href="{{ url_for('login') }}">Iniciar sesión</a>
-                    </p>
-                </div>
+{% if publico %}
+<a class="small text-decoration-none" href="{{ url_for('inicio') }}"><i class="bi bi-arrow-left me-1"></i>Volver al sitio</a>
+<h1 class="h2 mt-4 mb-1">Crear cuenta</h1>
+<p class="text-muted mb-4">La cuenta se crea con el rol <strong>Analista</strong>. La contraseña se guarda cifrada con <code>generate_password_hash()</code>.</p>
+<form method="POST" action="{{ url_for('registro') }}" novalidate data-validacion-viva>
+    {{ campos_usuario(form, publico=True) }}
+    {{ form.enviar(class="btn btn-acento w-100 py-2") }}
+</form>
+<hr class="my-4">
+<p class="text-center mb-0">¿Ya tiene una cuenta? <a href="{{ url_for('login') }}">Ingresar</a></p>
+{% else %}
+<div class="tarjeta-panel" style="max-width: 820px">
+    <div class="cabecera"><h2><i class="bi bi-person-plus me-2"></i>Nuevo usuario</h2></div>
+    <div class="cuerpo">
+        <form method="POST" action="{{ url_for('nuevo_usuario') }}" novalidate data-validacion-viva>
+            {{ campos_usuario(form, publico=False) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a class="btn btn-light" href="{{ url_for('ver_usuarios') }}">Cancelar</a>
             </div>
-        </div>
+        </form>
     </div>
-</section>
-
+</div>
+{% endif %}
 {% endblock %}

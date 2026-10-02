@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="seccion" style="padding-top: 8rem">
+    <div class="container" style="max-width: 860px">
+        <span class="etiqueta-seccion">Legal</span>
+        <h1 class="display-6 mb-4">Términos de uso y política de privacidad</h1>
+        <p class="text-muted">Última actualización: 1 de octubre de 2026. JuansecCTI es un proyecto académico de la Universidad Estatal Amazónica; los datos de clientes que aparecen en el sistema son demostrativos.</p>
+
+        <h2 class="h5 mt-4">1. Uso del sistema</h2>
+        <p>Las cuentas son personales. Cada usuario es responsable de las acciones que realiza con su cuenta, que quedan registradas en la bitácora del sistema con fecha y hora.</p>
+
+        <h2 class="h5 mt-4">2. Datos que recopilamos</h2>
+        <p>Del formulario de contacto guardamos nombre, organización, correo, teléfono (opcional) y el mensaje. De los usuarios internos guardamos nombre, correo y rol. Las contraseñas se almacenan únicamente como un resumen criptográfico (hash) y nunca en texto plano.</p>
+
+        <h2 class="h5 mt-4">3. Finalidad</h2>
+        <p>Usamos la información solo para responder solicitudes, prestar los servicios contratados y emitir los comprobantes de suscripción. No vendemos ni compartimos datos con terceros.</p>
+
+        <h2 class="h5 mt-4">4. Conservación</h2>
+        <p>Los registros que se retiran del sistema se dan de baja en lugar de borrarse, para mantener el historial que exigen las auditorías. Puede pedir la eliminación definitiva de sus datos escribiendo a contacto@juanseccti.example.</p>
+
+        <h2 class="h5 mt-4">5. Derechos</h2>
+        <p>De acuerdo con la Ley Orgánica de Protección de Datos Personales del Ecuador, puede solicitar el acceso, la rectificación o la eliminación de su información en cualquier momento.</p>
+
+        <a class="btn btn-acento mt-3" href="{{ url_for('inicio') }}"><i class="bi bi-arrow-left me-1"></i>Volver al inicio</a>
+    </div>
+</section>
+{% endblock %}

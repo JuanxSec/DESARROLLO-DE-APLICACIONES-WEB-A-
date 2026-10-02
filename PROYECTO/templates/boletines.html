@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import barra_listado, acciones, modal_eliminar, paginador, vacio, registro_baja %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel">
+    <div class="cabecera">
+        <div>
+            <h2>Boletines</h2>
+            <small class="text-muted">{{ paginacion.total }} registro{{ 's' if paginacion.total != 1 }} · los activos se publican en la página principal</small>
+        </div>
+        {{ barra_listado('ver_boletines', ver, q, nuevo='nuevo_boletin', texto_nuevo='Nuevo boletín') }}
+    </div>
+
+    {% if boletines %}
+    <div class="table-responsive">
+        <table class="table tabla-panel">
+            <thead><tr><th>Fecha</th><th>Título</th><th>Nivel</th><th>Categoría</th><th>Fuente</th><th class="text-end">Acciones</th></tr></thead>
+            <tbody>
+            {% for boletin in boletines %}
+                <tr>
+                    <td class="small text-nowrap">{{ boletin.fecha|fecha }}</td>
+                    <td>
+                        <strong>{{ boletin.titulo }}</strong>{{ registro_baja(boletin.activo) }}
+                        <div class="small text-muted">{{ boletin.resumen|truncate(90) }}</div>
+                    </td>
+                    <td><span class="badge text-bg-{{ nivel_color[boletin.nivel] }}">{{ nivel_etiqueta[boletin.nivel] }}</span></td>
+                    <td><span class="chip-categoria">{{ boletin.categoria }}</span></td>
+                    <td class="small">{{ boletin.fuente or 'Sin fuente' }}</td>
+                    <td class="text-end">
+                        {{ acciones('editar_boletin', 'baja_boletin', 'reactivar_boletin', 'eliminar_boletin',
+                                    'id_boletin', boletin.id_boletin, boletin.activo, 'el boletín «' ~ boletin.titulo ~ '»') }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="cuerpo pt-0">{{ paginador('ver_boletines', paginacion, {'ver': ver, 'q': q}) }}</div>
+    {% else %}
+        {{ vacio('No hay boletines en esta vista.', 'bi-journal') }}
+    {% endif %}
+</div>
+
+{{ modal_eliminar() }}
+{% endblock %}

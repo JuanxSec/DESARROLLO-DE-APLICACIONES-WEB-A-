@@ -2,426 +2,488 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="JuansecCTI, proyecto personal sobre boletines y noticias de ciberinteligencia.">
-    <meta name="keywords" content="CTI, ciberinteligencia, ciberseguridad, boletines, noticias, empresas">
-    <meta name="author" content="Juan Ramírez">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JuansecCTI</title>
+    <meta name="description" content="JuansecCTI: servicios de ciberinteligencia de amenazas (CTI) para empresas e instituciones del Ecuador.">
+    <meta name="keywords" content="CTI, ciberinteligencia, inteligencia de amenazas, boletines, dark web, ciberseguridad, Ecuador">
+    <meta name="author" content="Juan Ramírez">
+    <title>JuansecCTI | Ciberinteligencia de amenazas</title>
+    <link rel="icon" href="static/img/logo-juanseccti.svg" type="image/svg+xml">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5, iconos y tipografías desde CDN (Semana 4) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Hoja de estilos propia, compartida con la aplicación Flask -->
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 
 <body>
+    <!--
+        Versión estática del proyecto (Semanas 2 a 8), publicada en GitHub Pages.
+        La aplicación completa con base de datos, login y CRUD está en Render:
+        https://desarrollo-de-aplicaciones-web-a.onrender.com
+    -->
 
-    <header class="text-center">
+    <!-- ============================ NAVEGACIÓN ============================ -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-publica" id="navbarPublica">
         <div class="container">
-            <h1 id="tituloPrincipal">JuansecCTI</h1>
-            <p id="textoBienvenida">Boletines y noticias de ciberinteligencia para empresas y entidades.</p>
+            <a class="marca" href="#inicio">
+                <img src="static/img/logo-juanseccti.svg" width="34" height="34" alt="Logo de JuansecCTI">
+                Juansec<span>CTI</span>
+            </a>
 
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <button id="botonBienvenida" class="btn btn-light mt-3">Cambiar mensaje</button>
-                <button class="btn btn-outline-light mt-3" data-bs-toggle="modal" data-bs-target="#modalDetalle">
-                    Ver objetivo
-                </button>
-                <a class="btn btn-success mt-3" href="https://desarrollo-de-aplicaciones-web-a.onrender.com" target="_blank" rel="noopener">
-                    Acceder al sistema
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#"><img src="static/img/logo-juanseccti.svg" width="26" height="26" class="me-2 align-text-bottom" alt="">JuansecCTI</a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico" aria-label="Abrir menú">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="menu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+            <div class="collapse navbar-collapse" id="menuPublico">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#inicio">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#quienes-somos">Quiénes Somos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#boletines-dinamicos">Contenido dinámico</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#registro">Registro CTI</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#sistema">Sistema</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#boletines">Boletines</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                 </ul>
+                <div class="d-flex gap-2 mt-2 mt-lg-0">
+                    <a class="btn btn-acento btn-sm px-3" href="https://desarrollo-de-aplicaciones-web-a.onrender.com/login" target="_blank" rel="noopener">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar al sistema
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container contenido mt-4">
+    <!-- ============================== INICIO ============================== -->
+    <header class="hero" id="inicio">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="hero-insignia"><span class="punto-vivo"></span>Cyber Threat Intelligence · Ecuador</span>
+                    <h1>JuansecCTI: inteligencia de amenazas para <span class="resaltado">anticiparse al ataque</span></h1>
+                    <h2 class="subtitulo-hero mt-3">Boletines, alertas, monitoreo de la dark web y respuesta a incidentes para empresas e instituciones.</h2>
+                    <p class="lead mt-3 d-none" id="textoBienvenida"></p>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a class="btn btn-acento btn-lg px-4" href="#servicios"><i class="bi bi-grid me-2"></i>Ver servicios</a>
+                        <button class="btn btn-contorno-claro btn-lg px-4" type="button" id="botonBienvenida"><i class="bi bi-info-circle me-2"></i>¿Qué hacemos?</button>
+                        <button class="btn btn-contorno-claro btn-lg px-4" type="button" data-bs-toggle="modal" data-bs-target="#modalObjetivo"><i class="bi bi-bullseye me-2"></i>Objetivo</button>
+                    </div>
+                    <h3 class="autor-hero mt-4 mb-0">Desarrollado por Juan Ramírez · Proyecto Integrador de Desarrollo de Aplicaciones Web</h3>
+                </div>
 
-        <section id="inicio" class="caja text-center">
-            <h2>Inicio</h2>
-            <p>
-                JuansecCTI es un proyecto personal enfocado en compartir boletines, noticias y alertas de ciberinteligencia.
-                Su objetivo es presentar información útil sobre ciberseguridad de una forma sencilla, clara y fácil de
-                entender para empresas, entidades y personas interesadas en proteger sus activos digitales.
-            </p>
-
-            <div class="alert alert-info mt-3" role="alert">
-                Proyecto actualizado con Bootstrap, JavaScript, validaciones y componentes interactivos.
+                <div class="col-lg-5">
+                    <div class="panel-alertas">
+                        <strong class="text-white d-block mb-2"><i class="bi bi-activity me-2 text-info"></i>Últimos boletines</strong>
+                        <div class="alerta-item">
+                            <span class="badge text-bg-danger">Crítico</span>
+                            <div><p class="fw-semibold">Vulnerabilidad crítica en VPN de acceso remoto</p><small class="text-white-50">Vulnerabilidad · parche disponible</small></div>
+                        </div>
+                        <div class="alerta-item">
+                            <span class="badge text-bg-warning">Alto</span>
+                            <div><p class="fw-semibold">Campaña de phishing contra cooperativas de ahorro</p><small class="text-white-50">Alerta temprana · sector financiero</small></div>
+                        </div>
+                        <div class="alerta-item">
+                            <span class="badge text-bg-info">Medio</span>
+                            <div><p class="fw-semibold">Credenciales corporativas filtradas en foros</p><small class="text-white-50">Dark web · en revisión</small></div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+    </header>
 
-            <a href="#boletines-dinamicos" class="btn btn-primary">Ver contenido dinámico</a>
-        </section>
-
-        <section id="quienes-somos" class="caja">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h2>Quiénes Somos</h2>
-                    <p>
-                        JuansecCTI es un proyecto creado con el objetivo de informar sobre temas importantes de ciberinteligencia
-                        y ciberseguridad. El sitio busca recopilar noticias, boletines y alertas que puedan aportar valor a empresas
-                        y entidades que necesitan conocer los riesgos digitales actuales. La idea principal es explicar amenazas,
-                        vulnerabilidades, filtraciones de información y recomendaciones de seguridad de una manera sencilla.
-                    </p>
-                </div>
-
-                <div class="col-md-6">
-                    <img src="static/img/portada-cti.svg" class="img-fluid rounded" alt="Panel de monitoreo de amenazas con boletines, alertas e informes">
-                </div>
+    <!-- ========================= CONTENIDO PRINCIPAL ========================= -->
+    <main>
+        <div class="container">
+            <div class="cifras">
+                <div class="cifra"><strong>10</strong><span>servicios CTI</span></div>
+                <div class="cifra"><strong>24/7</strong><span>alertas críticas</span></div>
+                <div class="cifra"><strong>4</strong><span>etapas del ciclo</span></div>
+                <div class="cifra"><strong>&lt;24 h</strong><span>tiempo de respuesta</span></div>
             </div>
-        </section>
+        </div>
 
-        <section id="servicios" class="caja">
-            <h2 class="text-center mb-4">Servicios o Productos</h2>
-
-            <div class="row">
-                <article class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h3 class="card-title h5">Boletines CTI</h3>
-                            <p class="card-text">
-                                Resúmenes sobre amenazas digitales, campañas maliciosas y riesgos relevantes para empresas.
-                            </p>
-                            <button class="btn btn-primary btn-sm" onclick="abrirModalSimple('Boletines CTI', 'Los boletines CTI presentan información resumida sobre amenazas, vulnerabilidades y recomendaciones de seguridad.')">
-                                Leer más
-                            </button>
-                        </div>
+        <!-- ---------------------------- QUIÉNES SOMOS ---------------------------- -->
+        <section class="seccion" id="quienes-somos">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-5">
+                        <img class="imagen-redondeada" src="static/img/equipo-cti.jpg"
+                             alt="Equipo de analistas revisando información de amenazas en una reunión" loading="lazy">
                     </div>
-                </article>
-
-                <article class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h3 class="card-title h5">Noticias de seguridad</h3>
-                            <p class="card-text">
-                                Noticias importantes de ciberseguridad explicadas de manera sencilla y enfocadas en aportar valor.
-                            </p>
-                            <button class="btn btn-success btn-sm" onclick="abrirModalSimple('Noticias de seguridad', 'Esta sección resume noticias relevantes para que empresas y entidades conozcan los riesgos digitales actuales.')">
-                                Leer más
-                            </button>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h3 class="card-title h5">Recomendaciones</h3>
-                            <p class="card-text">
-                                Consejos básicos para que empresas y entidades puedan reducir riesgos digitales.
-                            </p>
-                            <button class="btn btn-warning btn-sm" onclick="abrirModalSimple('Recomendaciones', 'Las recomendaciones ayudan a fortalecer la protección digital y mejorar la prevención ante amenazas comunes.')">
-                                Leer más
-                            </button>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section id="boletines-dinamicos" class="caja">
-            <h2>Boletines destacados</h2>
-            <p>
-                Esta sección muestra contenido dinámico renderizado con JavaScript usando datos almacenados en un arreglo de objetos.
-            </p>
-
-            <div id="mensajeBoletines" class="mt-3"></div>
-
-            <div id="spinnerCarga" class="text-center my-4">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2">Cargando boletines...</p>
-            </div>
-
-            <div id="contenedorBoletines" class="row mt-3"></div>
-
-            <h3 class="h5 mt-4">Resumen en tabla Bootstrap</h3>
-
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Título</th>
-                            <th>Categoría</th>
-                            <th>Prioridad</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaBoletines"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <template id="plantillaBoletin">
-            <article class="col-md-6 mb-3">
-                <div class="card h-100 plantilla-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h3 class="card-title h5" data-campo="titulo"></h3>
-                            <span class="badge" data-campo="estado"></span>
-                        </div>
-
-                        <p class="card-text">
-                            <strong>Categoría:</strong>
-                            <span data-campo="categoria"></span>
-                        </p>
-
-                        <p class="card-text">
-                            <strong>Prioridad:</strong>
-                            <span data-campo="prioridad"></span>
-                        </p>
-
-                        <p class="card-text" data-campo="descripcion"></p>
-
-                        <button class="btn btn-primary btn-sm" type="button" data-accion="detalle">
-                            Ver detalle
-                        </button>
-                    </div>
-                </div>
-            </article>
-        </template>
-
-        <section id="registro" class="caja">
-            <h2>Registro de solicitudes CTI</h2>
-
-            <p>
-                Registre una solicitud relacionada con boletines, noticias o alertas de ciberinteligencia.
-                Los campos serán validados antes de registrar la información.
-            </p>
-
-            <form id="formularioRegistro" novalidate>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="nombreRegistro" class="form-label">Nombre</label>
-                        <input type="text" id="nombreRegistro" class="form-control" placeholder="Ejemplo: Boletín de vulnerabilidades">
-                        <div id="mensajeNombre" class="mensaje-validacion"></div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="categoriaRegistro" class="form-label">Categoría o tipo</label>
-                        <select id="categoriaRegistro" class="form-select">
-                            <option value="">Seleccione una opción</option>
-                            <option value="Boletín CTI">Boletín CTI</option>
-                            <option value="Noticia de seguridad">Noticia de seguridad</option>
-                            <option value="Alerta de vulnerabilidad">Alerta de vulnerabilidad</option>
-                            <option value="Recomendación">Recomendación</option>
-                        </select>
-                        <div id="mensajeCategoria" class="mensaje-validacion"></div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="descripcionRegistro" class="form-label">Descripción</label>
-                    <textarea id="descripcionRegistro" class="form-control" rows="3" placeholder="Describe brevemente la solicitud o registro"></textarea>
-                    <div id="mensajeDescripcion" class="mensaje-validacion"></div>
-                </div>
-
-                <button type="submit" class="btn btn-success">
-                    Registrar información
-                </button>
-            </form>
-
-            <div id="mensajeFormulario" class="mt-3"></div>
-
-            <h3 class="h5 mt-4">
-                Registros creados:
-                <span id="totalRegistros">0</span>
-            </h3>
-
-            <div id="mensajeRegistros" class="mt-3"></div>
-
-            <div id="listaRegistros" class="row mt-3"></div>
-        </section>
-
-        <template id="plantillaRegistro">
-            <article class="col-md-6 mb-3">
-                <div class="card registro-card h-100">
-                    <div class="card-body">
-                        <h3 class="card-title h5" data-campo="nombre"></h3>
-
-                        <p class="card-text">
-                            <strong>Categoría:</strong>
-                            <span data-campo="categoria"></span>
-                        </p>
-
-                        <p class="card-text" data-campo="descripcion"></p>
-
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-primary btn-sm" type="button" data-accion="detalle">
-                                Detalle
-                            </button>
-
-                            <button class="btn btn-danger btn-sm" type="button" data-accion="eliminar">
-                                Eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        </template>
-
-        <section id="video" class="caja">
-            <h2>Video relacionado</h2>
-
-            <p>
-                El siguiente video está relacionado con la ciberseguridad y la importancia de proteger la información.
-            </p>
-
-            <iframe src="https://www.youtube.com/embed/zCnJehJovEo" title="Video sobre ciberseguridad" allowfullscreen></iframe>
-        </section>
-
-        <section id="sistema" class="caja">
-            <h2>Sistema completo</h2>
-            <p>
-                Esta página es la parte pública del proyecto y se publica en GitHub Pages, que
-                sirve únicamente contenido estático. La aplicación completa está construida con
-                Flask y una base de datos relacional, e incluye inicio de sesión, panel de
-                control y la gestión de servicios, clientes, proveedores y facturación. Por eso
-                se despliega aparte, en un servidor que sí puede ejecutar el backend.
-            </p>
-
-            <div class="row g-3 mt-2">
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Aplicación en producción</h5>
-                            <p class="card-text">
-                                Sistema funcionando, con login y las operaciones de crear, leer,
-                                actualizar y eliminar sobre la base de datos.
-                            </p>
-                            <a class="btn btn-success" href="https://desarrollo-de-aplicaciones-web-a.onrender.com" target="_blank" rel="noopener">Abrir la aplicación</a>
-                            <p class="text-muted small mb-0 mt-2">
-                                El servicio se suspende tras un rato sin uso, así que la primera
-                                carga puede tardar hasta un minuto.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Código fuente</h5>
-                            <p class="card-text">
-                                Repositorio con el código de las dieciséis semanas, el modelo de
-                                la base de datos, las evidencias y las pruebas del sistema.
-                            </p>
-                            <a class="btn btn-dark" href="https://github.com/JuanxSec/DESARROLLO-DE-APLICACIONES-WEB-A-/tree/main/PROYECTO" target="_blank" rel="noopener">Ver el repositorio</a>
+                    <div class="col-lg-7">
+                        <span class="etiqueta-seccion">Quiénes somos</span>
+                        <h2 class="display-6 mb-3">Un equipo que vigila lo que su organización no alcanza a ver</h2>
+                        <article>
+                            <p class="texto-capital">JuansecCTI nació en Puyo como un proyecto de la carrera de Tecnologías de la Información de la Universidad Estatal Amazónica, con una idea sencilla: las pequeñas y medianas organizaciones del país también son blanco de ataques, pero rara vez cuentan con un equipo dedicado a investigar amenazas. Nuestro trabajo consiste en recopilar información de fuentes abiertas, comunidades de investigación, avisos de fabricantes y plataformas especializadas, analizarla con el contexto de cada cliente y entregarla como boletines y alertas que se pueden aplicar el mismo día.</p>
+                            <p>Acompañamos a cooperativas, instituciones educativas, empresas de software y centros de salud. A cada organización le explicamos qué vulnerabilidades la afectan, si sus credenciales circulan en la dark web, quién está suplantando su marca y cómo reaccionar cuando ocurre un incidente.</p>
+                        </article>
+                        <div class="row g-3 mt-2">
+                            <div class="col-sm-6"><div class="dato-chip"><small>Ubicación</small><strong><i class="bi bi-geo-alt text-danger me-1"></i>Puyo, Pastaza · Ecuador</strong></div></div>
+                            <div class="col-sm-6"><div class="dato-chip"><small>Modalidad</small><strong><i class="bi bi-globe2 text-info me-1"></i>Atención 100 % en línea</strong></div></div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="contacto" class="caja">
-            <h2>Contacto</h2>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Correo electrónico:</strong> <a href="mailto:jp.ramirezb@uea.edu.ec">jp.ramirezb@uea.edu.ec</a></p>
-                    <p><strong>Teléfono:</strong> +593 000 000 000</p>
-                    <p><strong>Dirección:</strong> Ecuador</p>
+        <!-- --------------------------- MISIÓN Y VISIÓN --------------------------- -->
+        <section class="seccion seccion-clara" id="mision-vision">
+            <div class="container">
+                <div class="encabezado-seccion">
+                    <span class="etiqueta-seccion">Nuestro propósito</span>
+                    <h2 class="display-6">Misión, visión y valores</h2>
+                    <p>Lo que hacemos cada día y hacia dónde vamos como equipo.</p>
                 </div>
-
-                <div class="col-md-6">
-                    <p><strong>Redes sociales:</strong></p>
-                    <ul>
-                        <li><a href="https://github.com/JuanxSec" target="_blank">GitHub</a></li>
-                        <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
-                        <li><a href="https://x.com/" target="_blank">X / Twitter</a></li>
-                    </ul>
-
-                    <p class="mt-3">
-                        <a class="btn btn-outline-dark btn-sm" href="https://maps.google.com/?q=Universidad+Estatal+Amazonica" target="_blank">Ver ubicación</a>
-                        <a class="btn btn-dark btn-sm" href="mailto:jp.ramirezb@uea.edu.ec">Escribir un correo</a>
-                    </p>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="tarjeta-mv">
+                            <span class="icono-redondo"><i class="bi bi-bullseye"></i></span>
+                            <h3 class="h5">Misión</h3>
+                            <p class="mb-0">Entregar inteligencia de amenazas clara, oportuna y accionable para que las organizaciones del Ecuador reduzcan su riesgo digital sin necesidad de un equipo propio de investigación.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tarjeta-mv">
+                            <span class="icono-redondo"><i class="bi bi-eye"></i></span>
+                            <h3 class="h5">Visión</h3>
+                            <p class="mb-0">Ser hasta 2030 el referente nacional en ciberinteligencia para pequeñas y medianas organizaciones, reconocido por la calidad de sus análisis y la cercanía con cada cliente.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tarjeta-mv">
+                            <span class="icono-redondo"><i class="bi bi-heart-pulse"></i></span>
+                            <h3 class="h5">Valores</h3>
+                            <p class="mb-0">Confidencialidad absoluta de la información del cliente, rigor técnico en cada fuente, lenguaje sencillo y respuesta rápida cuando más se necesita.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <h3 class="h5 mt-4">Escríbenos</h3>
-            <p class="text-muted">
-                Complete el formulario para enviarnos una consulta. Los campos se validan
-                antes de registrar el mensaje.
-            </p>
-
-            <form id="formularioContacto" class="row g-3" novalidate>
-                <div class="col-md-6">
-                    <label class="form-label" for="contactoNombre">Nombre</label>
-                    <input type="text" class="form-control" id="contactoNombre" placeholder="Nombre y apellido">
-                    <div class="mensaje-validacion" id="mensajeContactoNombre"></div>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label" for="contactoCorreo">Correo electrónico</label>
-                    <input type="email" class="form-control" id="contactoCorreo" placeholder="nombre@correo.com">
-                    <div class="mensaje-validacion" id="mensajeContactoCorreo"></div>
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label" for="contactoAsunto">Asunto</label>
-                    <input type="text" class="form-control" id="contactoAsunto" placeholder="Motivo de la consulta">
-                    <div class="mensaje-validacion" id="mensajeContactoAsunto"></div>
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label" for="contactoMensaje">Mensaje</label>
-                    <textarea class="form-control" id="contactoMensaje" rows="4" placeholder="Escriba aquí su mensaje"></textarea>
-                    <div class="mensaje-validacion" id="mensajeContactoMensaje"></div>
-                </div>
-
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Enviar mensaje</button>
-                </div>
-
-                <div class="col-12">
-                    <div id="mensajeContacto"></div>
-                </div>
-            </form>
         </section>
 
-        <aside class="caja">
-            <h2>Información complementaria</h2>
+        <!-- ------------------------------ SERVICIOS ------------------------------ -->
+        <section class="seccion" id="servicios">
+            <div class="container">
+                <div class="encabezado-seccion">
+                    <span class="etiqueta-seccion">Servicios CTI</span>
+                    <h2 class="display-6">Servicios principales de ciberinteligencia</h2>
+                    <p>Cada servicio tiene cupos limitados por ciclo para garantizar la calidad del análisis.</p>
+                </div>
 
-            <p>
-                JuansecCTI publicará contenido semanal relacionado con boletines, noticias y recomendaciones de seguridad.
-                El proyecto está pensado para apoyar el aprendizaje académico y mostrar información útil sobre amenazas digitales.
-            </p>
+                <!-- Tarjetas de Bootstrap dentro de la grilla (Semanas 4 y 8) -->
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-boletin.jpg" alt="Boletín CTI semanal" loading="lazy">
+                                <span class="precio-flotante">$45.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Boletines</span>
+                                <h3>Boletín CTI semanal</h3>
+                                <p>Resumen de amenazas, vulnerabilidades y campañas activas que afectan a su sector, con recomendaciones concretas.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Boletín CTI semanal', 'Cada lunes recibe un documento con las amenazas de la semana, su nivel de riesgo y qué hacer en su organización.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-alerta.jpg" alt="Alertas tempranas" loading="lazy">
+                                <span class="precio-flotante">$30.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Alertas</span>
+                                <h3>Alertas de vulnerabilidades críticas</h3>
+                                <p>Avisos inmediatos cuando aparece una vulnerabilidad crítica o una campaña dirigida a su tecnología.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Alertas de vulnerabilidades críticas', 'Notificación por correo en menos de dos horas cuando se detecta una amenaza crítica relacionada con su infraestructura.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-darkweb.jpg" alt="Monitoreo de la dark web" loading="lazy">
+                                <span class="precio-flotante">$150.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Monitoreo</span>
+                                <h3>Monitoreo de la dark web</h3>
+                                <p>Búsqueda de credenciales, bases de datos y menciones de su organización en foros y mercados clandestinos.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Monitoreo de la dark web', 'Revisamos foros, mercados y canales de mensajería en busca de datos de su organización y le avisamos con evidencia.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-marca.jpg" alt="Protección de marca" loading="lazy">
+                                <span class="precio-flotante">$110.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Monitoreo</span>
+                                <h3>Protección de marca y dominios</h3>
+                                <p>Detección de dominios falsos, perfiles que suplantan su marca y sitios de phishing con su logotipo.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Protección de marca y dominios', 'Vigilamos registros de dominios y redes sociales para detectar suplantaciones y gestionar su baja.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-threat-hunting.jpg" alt="Búsqueda proactiva de amenazas" loading="lazy">
+                                <span class="precio-flotante">$200.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Análisis</span>
+                                <h3>Búsqueda proactiva de amenazas</h3>
+                                <p>Búsqueda proactiva de indicadores de compromiso en sus registros antes de que el ataque se materialice.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Búsqueda proactiva de amenazas', 'Un analista revisa sus registros con hipótesis basadas en las campañas activas y le entrega un informe de hallazgos.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <article class="tarjeta-servicio">
+                            <div class="contenedor-imagen">
+                                <img src="static/img/servicio-incidentes.jpg" alt="Respuesta a incidentes" loading="lazy">
+                                <span class="precio-flotante">$250.00 <small>/ mes</small></span>
+                            </div>
+                            <div class="cuerpo">
+                                <span class="chip-categoria"><i class="bi bi-tag"></i>Respuesta</span>
+                                <h3>Apoyo en respuesta a incidentes</h3>
+                                <p>Acompañamiento para contener, investigar y recuperarse de un incidente de seguridad.</p>
+                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="abrirModalSimple('Apoyo en respuesta a incidentes', 'Guiamos a su equipo desde la contención hasta el informe final con lecciones aprendidas.')">Ver detalle</button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
 
-            <p><strong>Horario de actualización:</strong> publicaciones semanales.</p>
-            <p><strong>Promoción:</strong> acceso gratuito a boletines informativos del proyecto.</p>
-        </aside>
+                <!-- Lista de servicios con ul/li (Semana 3) -->
+                <div class="row mt-5 g-4">
+                    <div class="col-lg-7">
+                        <h3 class="h4">Todo lo que cubre una suscripción</h3>
+                        <ul class="lista-servicios mt-3">
+                            <li>Fuentes de inteligencia de amenazas (feeds e indicadores)</li>
+                            <li>Monitoreo de la dark web y filtraciones</li>
+                            <li>Protección de marca y dominios</li>
+                            <li>Inteligencia de vulnerabilidades</li>
+                            <li>Superficie de ataque externa</li>
+                            <li>Búsqueda proactiva de amenazas</li>
+                            <li>Apoyo en respuesta a incidentes</li>
+                            <li>Boletines y capacitación del personal</li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5">
+                        <!-- Formulario dinámico: registrar, mostrar, contar y eliminar (Semanas 5 y 6) -->
+                        <div class="bloque-contacto">
+                            <h3 class="h5">Simule una suscripción</h3>
+                            <form id="formularioRegistro" novalidate>
+                                <div class="mb-2">
+                                    <label class="form-label" for="nombreRegistro">Organización</label>
+                                    <input class="form-control" type="text" id="nombreRegistro" placeholder="Ej.: Cooperativa Amazonía">
+                                    <div id="mensajeNombre" class="mensaje-validacion"></div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="categoriaRegistro">Servicio</label>
+                                    <select class="form-select" id="categoriaRegistro">
+                                        <option value="">Seleccione un servicio</option>
+                                        <option>Boletín CTI semanal</option>
+                                        <option>Alertas de vulnerabilidades críticas</option>
+                                        <option>Monitoreo de la dark web</option>
+                                        <option>Protección de marca y dominios</option>
+                                        <option>Búsqueda proactiva de amenazas</option>
+                                        <option>Apoyo en respuesta a incidentes</option>
+                                    </select>
+                                    <div id="mensajeCategoria" class="mensaje-validacion"></div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="descripcionRegistro">Necesidad</label>
+                                    <textarea class="form-control" id="descripcionRegistro" rows="2" placeholder="Qué desea proteger"></textarea>
+                                    <div id="mensajeDescripcion" class="mensaje-validacion"></div>
+                                </div>
+                                <button class="btn btn-acento btn-sm" type="submit"><i class="bi bi-plus-lg me-1"></i>Registrar</button>
+                            </form>
+                            <div id="mensajeFormulario"></div>
+                            <p class="mt-3 mb-2 small">Suscripciones registradas: <strong id="totalRegistros">0</strong></p>
+                            <div id="mensajeRegistros"></div>
+                            <div id="listaRegistros"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <!-- ------------------------- CICLO DE INTELIGENCIA ------------------------- -->
+        <section class="seccion seccion-oscura" id="ciclo">
+            <div class="container">
+                <div class="encabezado-seccion">
+                    <span class="etiqueta-seccion">Cómo trabajamos</span>
+                    <h2 class="display-6">El ciclo de inteligencia</h2>
+                    <p class="text-white-50">Cuatro etapas que se repiten todos los días para que la información llegue a tiempo.</p>
+                </div>
+                <div class="ciclo">
+                    <div class="paso"><span class="icono-redondo"><i class="bi bi-search"></i></span><h3 class="h5">RECOLECCIÓN</h3><p class="mb-0">Fuentes abiertas, comunidades de investigación, avisos de fabricantes y foros.</p></div>
+                    <div class="paso"><span class="icono-redondo"><i class="bi bi-funnel"></i></span><h3 class="h5">PROCESAMIENTO</h3><p class="mb-0">Se depuran duplicados y se normalizan los indicadores.</p></div>
+                    <div class="paso"><span class="icono-redondo"><i class="bi bi-diagram-3"></i></span><h3 class="h5">ANÁLISIS</h3><p class="mb-0">Se cruza la información con la tecnología y el sector de cada cliente.</p></div>
+                    <div class="paso"><span class="icono-redondo"><i class="bi bi-send-check"></i></span><h3 class="h5">DIFUSIÓN</h3><p class="mb-0">Boletines y alertas en lenguaje claro, con acciones concretas.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ------------------------------ BOLETINES ------------------------------ -->
+        <!-- El contenido se genera desde el arreglo boletinesCTI de script.js (Semana 7) -->
+        <section class="seccion seccion-clara" id="boletines">
+            <div class="container">
+                <div class="encabezado-seccion">
+                    <span class="etiqueta-seccion">Boletines</span>
+                    <h2 class="display-6">Lo último que hemos publicado</h2>
+                    <p>Las tarjetas muestran los boletines publicados; la tabla resume todos, incluidos los que siguen en revisión.</p>
+                </div>
+
+                <div class="text-center my-3">
+                    <div class="spinner-border text-primary d-none" role="status" id="spinnerCarga">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <div id="mensajeBoletines"></div>
+                <div class="row g-4" id="contenedorBoletines"></div>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover align-middle bg-white">
+                        <thead><tr><th>Título</th><th>Categoría</th><th>Prioridad</th><th>Estado</th></tr></thead>
+                        <tbody id="tablaBoletines"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- -------------------------------- VIDEO -------------------------------- -->
+        <section class="seccion" id="video">
+            <div class="container">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <span class="etiqueta-seccion">Para entender la CTI</span>
+                        <h2 class="h3 mb-3">¿Qué es (y qué no es) la inteligencia de amenazas?</h2>
+                        <div class="video-responsivo">
+                            <iframe src="https://www.youtube-nocookie.com/embed/gn8d-26Bq3M" title="Inteligencia de amenazas: qué es y qué no es"
+                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <small class="text-muted d-block mt-2">Video de referencia del canal «Palabra de hacker» en YouTube.</small>
+                    </div>
+                    <div class="col-lg-4">
+                        <aside class="aviso-lateral">
+                            <h3 class="h5"><i class="bi bi-clock me-2 texto-acento"></i>Horario de atención</h3>
+                            <p class="mb-2">Lunes a viernes de 08:00 a 17:00. Las alertas críticas se envían a cualquier hora.</p>
+                            <hr>
+                            <h3 class="h5"><i class="bi bi-gift me-2 texto-acento"></i>Primer mes de boletines</h3>
+                            <p class="mb-0">Las organizaciones educativas reciben el Boletín CTI semanal sin costo durante el primer mes.</p>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ------------------------------- CONTACTO ------------------------------- -->
+        <section class="seccion seccion-clara" id="contacto">
+            <div class="container">
+                <div class="encabezado-seccion">
+                    <span class="etiqueta-seccion">Contacto</span>
+                    <h2 class="display-6">Cuéntenos qué necesita proteger</h2>
+                    <p>Un analista le responde en menos de 24 horas.</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="bloque-contacto">
+                            <!-- Formulario de contacto: nombre, correo, asunto y mensaje (Semana 4) -->
+                            <form id="formularioContacto" novalidate>
+                                <div id="mensajeContacto"></div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="contactoNombre">Nombre</label>
+                                        <input class="form-control" type="text" id="contactoNombre" placeholder="Su nombre completo">
+                                        <div id="mensajeContactoNombre" class="mensaje-validacion"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="contactoCorreo">Correo electrónico</label>
+                                        <input class="form-control" type="email" id="contactoCorreo" placeholder="nombre@empresa.com">
+                                        <div id="mensajeContactoCorreo" class="mensaje-validacion"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="contactoAsunto">Asunto</label>
+                                    <input class="form-control" type="text" id="contactoAsunto" placeholder="Ej.: Cotización de monitoreo">
+                                    <div id="mensajeContactoAsunto" class="mensaje-validacion"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="contactoMensaje">Mensaje</label>
+                                    <textarea class="form-control" id="contactoMensaje" rows="4" placeholder="Describa brevemente su necesidad"></textarea>
+                                    <div id="mensajeContactoMensaje" class="mensaje-validacion"></div>
+                                </div>
+                                <button class="btn btn-acento px-4" type="submit"><i class="bi bi-send me-2"></i>Enviar mensaje</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="dato-contacto"><i class="bi bi-envelope"></i><div><strong>Correo</strong><br><a href="mailto:contacto@juanseccti.example">contacto@juanseccti.example</a></div></div>
+                        <div class="dato-contacto"><i class="bi bi-telephone"></i><div><strong>Teléfono</strong><br>032 885 000 · 099 123 4567</div></div>
+                        <div class="dato-contacto"><i class="bi bi-geo-alt"></i><div><strong>Dirección</strong><br>Paso lateral km 2 1/2 vía Napo, Puyo - Pastaza</div></div>
+                        <div class="redes mb-3">
+                            <a href="https://www.facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="https://www.linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                            <a href="https://github.com/JuanxSec" target="_blank" rel="noopener" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                        </div>
+                        <iframe class="mapa" title="Ubicación de JuansecCTI en Puyo"
+                                src="https://www.google.com/maps?q=Universidad%20Estatal%20Amaz%C3%B3nica%2C%20Puyo&output=embed"
+                                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <div class="modal fade" id="modalDetalle" tabindex="-1">
+    <!-- ============================ PIE DE PÁGINA ============================ -->
+    <footer class="pie">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <a class="marca mb-3" href="#inicio">
+                        <img src="static/img/logo-juanseccti.svg" width="30" height="30" alt="">
+                        Juansec<span>CTI</span>
+                    </a>
+                    <p>Servicios de ciberinteligencia de amenazas para empresas e instituciones del Ecuador. Información accionable, en lenguaje claro y a tiempo.</p>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <h5>Proyecto</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://desarrollo-de-aplicaciones-web-a.onrender.com" target="_blank" rel="noopener">Aplicación en Render</a></li>
+                        <li><a href="https://github.com/JuanxSec/DESARROLLO-DE-APLICACIONES-WEB-A-/tree/main/PROYECTO" target="_blank" rel="noopener">Código en GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-4">
+                    <h5>Contacto</h5>
+                    <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Puyo, Pastaza - Ecuador</p>
+                    <p class="mb-1"><i class="bi bi-envelope me-2"></i>contacto@juanseccti.example</p>
+                    <p class="mb-0"><i class="bi bi-clock me-2"></i>Lunes a viernes, 08:00 a 17:00</p>
+                </div>
+            </div>
+            <div class="linea-final d-flex flex-wrap justify-content-between gap-2">
+                <span>&copy; 2026 JuansecCTI. Todos los derechos reservados.</span>
+                <span>Desarrollado por Juan Ramírez · Desarrollo de Aplicaciones Web · Universidad Estatal Amazónica</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ------------------- Modales de Bootstrap (Semana 8) ------------------- -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalTitulo" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="modalTitulo">Objetivo de JuansecCTI</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Detalle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-
-                <div class="modal-body" id="modalCuerpo">
-                    JuansecCTI busca compartir información clara sobre ciberinteligencia, boletines, noticias y recomendaciones de seguridad para empresas y entidades.
-                </div>
-
+                <div class="modal-body" id="modalCuerpo"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
@@ -429,18 +491,25 @@
         </div>
     </div>
 
-    <footer>
-        <p>Juan Ramírez | Desarrollo de Aplicaciones Web | 2026</p>
-        <p>Proyecto Integrador U4 - Semana 16: Pruebas y despliegue de la aplicación web</p>
-        <p class="mb-0">
-            <a class="text-white" href="https://desarrollo-de-aplicaciones-web-a.onrender.com" target="_blank" rel="noopener">Aplicación</a>
-            &nbsp;|&nbsp;
-            <a class="text-white" href="https://github.com/JuanxSec/DESARROLLO-DE-APLICACIONES-WEB-A-/tree/main/PROYECTO" target="_blank" rel="noopener">Repositorio</a>
-        </p>
-    </footer>
+    <div class="modal fade" id="modalObjetivo" tabindex="-1" aria-labelledby="tituloObjetivo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloObjetivo">Objetivo del proyecto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Ofrecer a las organizaciones del Ecuador un portal de servicios de ciberinteligencia de amenazas y, en el sistema interno, gestionar servicios, organizaciones, fuentes, suscripciones, boletines y solicitudes.</p>
+                    <p class="mb-0">Esta página es la versión estática; el sistema completo con base de datos está en Render.</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-acento" href="https://desarrollo-de-aplicaciones-web-a.onrender.com" target="_blank" rel="noopener">Abrir el sistema</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/script.js"></script>
-
 </body>
 </html>

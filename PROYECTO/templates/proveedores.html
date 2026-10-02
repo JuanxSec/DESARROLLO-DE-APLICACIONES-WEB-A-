@@ -1,95 +1,49 @@
 {% extends "base.html" %}
-{% from "components/campos_formulario.html" import campos_proveedor, filtro_vista, boton_baja %}
+{% from "components/campos_formulario.html" import barra_listado, acciones, modal_eliminar, paginador, vacio, registro_baja %}
+
+{% block modo %}panel{% endblock %}
 
 {% block content %}
-
-<section class="caja">
-    <h2>Proveedores</h2>
-    <p>
-        En este módulo se gestionan las fuentes de información que alimentan los boletines
-        y alertas de JuansecCTI. Cada proveedor pertenece a un tipo definido en la tabla de
-        catálogo <code>tipos_proveedor</code> y se muestra junto al número de servicios
-        que aporta.
-    </p>
-
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">Agregar nuevo proveedor</h5>
+<div class="tarjeta-panel">
+    <div class="cabecera">
+        <div>
+            <h2>Fuentes de inteligencia</h2>
+            <small class="text-muted">{{ paginacion.total }} registro{{ 's' if paginacion.total != 1 }} · JOIN con tipos de fuente y conteo de servicios que alimentan</small>
         </div>
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('ver_proveedores') }}" novalidate>
-                {{ campos_proveedor(form) }}
-                {{ form.enviar(class="btn btn-primary") }}
-            </form>
-        </div>
+        {{ barra_listado('ver_proveedores', ver, q, nuevo='nuevo_proveedor', texto_nuevo='Nueva fuente') }}
     </div>
 
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">Proveedores registrados</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">Total de proveedores registrados: <strong>{{ proveedores|length }}</strong></p>
-
-            {{ filtro_vista('ver_proveedores', ver) }}
-
-            {% if proveedores %}
-            <div class="row">
-                {% for proveedor in proveedores %}
-                <article class="col-md-6 col-lg-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h3 class="card-title h5">{{ proveedor.nombre }}</h3>
-                            <p class="mb-1"><strong>Tipo:</strong> {{ proveedor.tipo }}</p>
-                            <p class="small">{{ proveedor.aporte }}</p>
-                            <p class="small text-muted mb-2">
-                                {% if proveedor.correo %}{{ proveedor.correo }}<br>{% endif %}
-                                {% if proveedor.telefono %}{{ proveedor.telefono }}{% endif %}
-                            </p>
-                            {% if proveedor.total_productos > 0 %}
-                                <span class="badge bg-primary">{{ proveedor.total_productos }} servicio(s) asociados</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Sin servicios asociados</span>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer d-flex gap-2 justify-content-end">
-                            <a href="{{ url_for('editar_proveedor', id_proveedor=proveedor.id_proveedor) }}" class="btn btn-warning btn-sm">Editar</a>
-                            {{ boton_baja('baja_proveedor', 'reactivar_proveedor', 'id_proveedor', proveedor.id_proveedor, proveedor.activo) }}
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminar-proveedor-{{ proveedor.id_proveedor }}">Eliminar</button>
-                        </div>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-
+    {% if proveedores %}
+    <div class="table-responsive">
+        <table class="table tabla-panel">
+            <thead>
+                <tr><th>ID</th><th>Fuente</th><th>Tipo</th><th>Aporte</th><th>Contacto</th><th class="text-center">Servicios</th><th class="text-end">Acciones</th></tr>
+            </thead>
+            <tbody>
             {% for proveedor in proveedores %}
-            <div class="modal fade" id="eliminar-proveedor-{{ proveedor.id_proveedor }}" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title">Confirmar eliminación</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            ¿Desea eliminar definitivamente al proveedor <strong>{{ proveedor.nombre }}</strong> (ID {{ proveedor.id_proveedor }})?
-                            Los servicios asociados quedarán sin proveedor asignado.
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <form method="POST" action="{{ url_for('eliminar_proveedor', id_proveedor=proveedor.id_proveedor) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <tr>
+                    <td class="text-muted">{{ proveedor.id_proveedor }}</td>
+                    <td><strong>{{ proveedor.nombre }}</strong>{{ registro_baja(proveedor.activo) }}</td>
+                    <td><span class="chip-categoria">{{ proveedor.tipo }}</span></td>
+                    <td class="small" style="max-width:320px">{{ proveedor.aporte }}</td>
+                    <td class="small">
+                        {% if proveedor.correo %}{{ proveedor.correo }}<br>{% endif %}{{ proveedor.telefono or '' }}
+                    </td>
+                    <td class="text-center"><span class="badge text-bg-light border">{{ proveedor.total_productos }}</span></td>
+                    <td class="text-end">
+                        {{ acciones('editar_proveedor', 'baja_proveedor', 'reactivar_proveedor', 'eliminar_proveedor',
+                                    'id_proveedor', proveedor.id_proveedor, proveedor.activo, proveedor.nombre) }}
+                    </td>
+                </tr>
             {% endfor %}
-            {% else %}
-                <p class="text-muted">No hay proveedores registrados aún.</p>
-            {% endif %}
-        </div>
+            </tbody>
+        </table>
     </div>
-</section>
+    <div class="cuerpo pt-0">{{ paginador('ver_proveedores', paginacion, {'ver': ver, 'q': q}) }}</div>
+    {% else %}
+        {{ vacio('No hay fuentes en esta vista.', 'bi-broadcast') }}
+    {% endif %}
+</div>
 
+{{ modal_eliminar() }}
 {% endblock %}

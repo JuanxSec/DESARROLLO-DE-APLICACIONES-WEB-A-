@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import estado %}
+
+{% block modo %}panel{% endblock %}
+
+{#- Comprobante imprimible: al imprimir, la hoja de estilos oculta el menú y
+    los botones (@media print), así que se puede guardar también como PDF. -#}
+{% block content %}
+<div class="d-flex gap-2 justify-content-end no-imprimir" style="max-width:820px;margin:0 auto">
+    <a class="btn btn-light btn-sm" href="{{ url_for('detalle_factura', id_factura=factura.id_factura) }}"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+    <a class="btn btn-dark btn-sm" href="{{ url_for('pdf_factura', id_factura=factura.id_factura) }}"><i class="bi bi-filetype-pdf me-1"></i>Descargar PDF</a>
+    <button class="btn btn-acento btn-sm" type="button" data-imprimir><i class="bi bi-printer me-1"></i>Imprimir</button>
+</div>
+
+<div class="comprobante">
+    <div class="encabezado">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <img src="{{ url_for('static', filename='img/logo-juanseccti.svg') }}" width="42" height="42" alt="">
+                <strong class="fs-4" style="font-family:'Space Grotesk',sans-serif">JuansecCTI</strong>
+            </div>
+            <div class="small text-muted">Servicios de ciberinteligencia de amenazas<br>Puyo, Pastaza · contacto@juanseccti.example · 032 885 000</div>
+        </div>
+        <div class="text-md-end">
+            <div class="text-uppercase small text-muted">Comprobante de suscripción</div>
+            <div class="fs-3 fw-bold">{{ factura.codigo }}</div>
+            <div class="small">Fecha de emisión: {{ factura.fecha|fecha }}</div>
+            <div class="mt-1">{{ estado(factura.estado) }}</div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-sm-7">
+            <div class="small text-muted text-uppercase">Cliente</div>
+            <strong>{{ factura.cliente }}</strong><br>
+            {% if factura.ruc %}RUC {{ factura.ruc }}<br>{% endif %}
+            <span class="small">{{ factura.ubicacion }}</span><br>
+            <span class="small">{{ factura.correo or '' }} {{ factura.telefono or '' }}</span>
+        </div>
+        <div class="col-sm-5 text-sm-end">
+            <div class="small text-muted text-uppercase">Concepto</div>
+            {{ factura.servicio }}
+        </div>
+    </div>
+
+    <table class="table">
+        <thead><tr><th>#</th><th>Servicio</th><th class="text-end">Cant.</th><th class="text-end">P. unitario</th><th class="text-end">Subtotal</th></tr></thead>
+        <tbody>
+        {% for linea in lineas %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ linea.producto }}<br><small class="text-muted">{{ linea.categoria }}</small></td>
+                <td class="text-end">{{ linea.cantidad }}</td>
+                <td class="text-end">${{ linea.precio_unitario|dinero }}</td>
+                <td class="text-end">${{ linea.subtotal|dinero }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Sin servicios registrados.</td></tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><th colspan="4" class="text-end">Total (USD)</th><th class="text-end fs-5">${{ factura.total|dinero }}</th></tr>
+        </tfoot>
+    </table>
+
+    <p class="small text-muted mb-0 mt-4">Documento generado el {{ emitido.strftime('%d/%m/%Y %H:%M') }} por {{ current_user.usuario }}. Comprobante interno sin validez tributaria; la factura electrónica se emite por el sistema del SRI.</p>
+</div>
+{% endblock %}
