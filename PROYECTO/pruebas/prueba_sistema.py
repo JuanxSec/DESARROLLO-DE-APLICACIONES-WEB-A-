@@ -67,6 +67,7 @@ def limpiar():
         for id_solicitud in creado["solicitud"]:
             aplicacion.ejecutar("DELETE FROM solicitudes WHERE id_solicitud = %s", (id_solicitud,))
         aplicacion.ejecutar("DELETE FROM solicitudes WHERE organizacion LIKE %s", (MARCA + "%",))
+        aplicacion.ejecutar("DELETE FROM sectores WHERE nombre LIKE %s", (MARCA + "%",))
         for id_boletin in creado["boletin"]:
             aplicacion.ejecutar("DELETE FROM boletines WHERE id_boletin = %s", (id_boletin,))
         for id_factura in creado["factura"]:
@@ -347,6 +348,30 @@ def main():
     antes = contar("productos")
     c.post("/productos/eliminar/" + str(prod["id_producto"]))
     check("No deja borrar un servicio incluido en una suscripción", contar("productos") == antes)
+
+    print("\n--- Catálogos: tablas padre (categorías, sectores, tipos de fuente) ---")
+    for clave in ["categorias", "sectores", "tipos-fuente"]:
+        pagina(c, "/catalogos/" + clave)
+    check("Catálogo inexistente responde 404", c.get("/catalogos/no-existe").status_code == 404)
+    antes = contar("sectores")
+    c.post("/catalogos/sectores/nuevo", data={"nombre": "Sector 123", "descripcion": "Nombre con números."})
+    check("Rechaza un nombre de catálogo con números", contar("sectores") == antes)
+    c.post("/catalogos/sectores/nuevo", data={"nombre": MARCA + " Sector",
+                                              "descripcion": "Sector temporal creado por la prueba."})
+    sec = uno("SELECT id_sector FROM sectores WHERE nombre = %s", (MARCA + " Sector",))
+    check("CREATE en catálogo (sectores)", sec is not None)
+    c.post("/catalogos/sectores/nuevo", data={"nombre": MARCA + " Sector",
+                                              "descripcion": "Intento de registro duplicado."})
+    check("No admite nombres repetidos en el catálogo", contar("sectores") == antes + 1)
+    c.post("/catalogos/sectores/editar/" + str(sec["id_sector"]),
+           data={"nombre": MARCA + " Sector", "descripcion": "Descripción editada por la prueba."})
+    check("UPDATE en catálogo", uno("SELECT descripcion FROM sectores WHERE id_sector = %s",
+                                    (sec["id_sector"],))["descripcion"].startswith("Descripción editada"))
+    antes = contar("sectores")
+    c.post("/catalogos/sectores/eliminar/" + str(sector))
+    check("No deja borrar un sector que usan organizaciones", contar("sectores") == antes)
+    c.post("/catalogos/sectores/eliminar/" + str(sec["id_sector"]))
+    check("DELETE en catálogo", contar("sectores") == antes - 1)
 
     print("\n--- Baja lógica por cambio de estado (Semana 15) ---")
     antes = contar("productos")

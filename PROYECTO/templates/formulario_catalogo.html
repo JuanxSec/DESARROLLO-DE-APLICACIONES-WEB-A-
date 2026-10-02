@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "components/campos_formulario.html" import campo %}
+
+{% block modo %}panel{% endblock %}
+
+{% block content %}
+<div class="tarjeta-panel" style="max-width: 760px">
+    <div class="cabecera">
+        <h2>
+            {% if registro %}<i class="bi bi-pencil-square me-2"></i>Editar {{ cat.singular }} <span class="text-muted">#{{ registro.id }}</span>
+            {% else %}<i class="bi bi-plus-square me-2"></i>Nuevo registro: {{ cat.singular }}{% endif %}
+        </h2>
+        <a class="btn btn-light btn-sm" href="{{ url_for('ver_catalogos', clave=clave) }}"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+    </div>
+    <div class="cuerpo">
+        <form method="POST" novalidate data-validacion-viva
+              action="{{ url_for('editar_catalogo', clave=clave, id_registro=registro.id) if registro else url_for('nuevo_catalogo', clave=clave) }}">
+            {{ form.hidden_tag() }}
+            {{ campo(form.nombre, extra={'data-validar': 'letras', 'maxlength': '60'}) }}
+            {{ campo(form.descripcion, rows="3", extra={'data-contador': '200'}) }}
+            <div class="d-flex gap-2">
+                {{ form.enviar(class="btn btn-acento") }}
+                <a href="{{ url_for('ver_catalogos', clave=clave) }}" class="btn btn-light">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

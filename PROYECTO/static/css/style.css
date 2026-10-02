@@ -1133,3 +1133,32 @@ aside.aviso-lateral {
         max-width: none;
     }
 }
+
+/* Franja de herramientas de desarrollo (Semana 2) */
+.seccion-herramientas { padding: 3.5rem 0; background: var(--blanco); border-top: 1px solid var(--borde); }
+.herramientas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+}
+.herramientas li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.2rem;
+    padding: 1.1rem 0.8rem;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.herramientas li:hover { transform: translateY(-3px); border-color: var(--acento); }
+.herramientas i { font-size: 1.7rem; color: var(--acento); }
+.herramientas strong { font-size: 0.92rem; }
+.herramientas span { font-size: 0.8rem; color: var(--texto-suave, #64748b); }
+@media (max-width: 767.98px) {
+    .herramientas { grid-template-columns: repeat(2, 1fr); }
+}
