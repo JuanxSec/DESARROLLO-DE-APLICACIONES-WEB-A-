@@ -14,6 +14,15 @@
         Boletines semanales, alertas de vulnerabilidad e informes de amenazas para organizaciones del Ecuador.
     </div>
 
+    {% if total_productos is not none %}
+    <p class="text-muted">
+        Actualmente el catálogo tiene
+        <strong>{{ total_productos }}</strong>
+        servicio{{ 's' if total_productos != 1 }} registrado{{ 's' if total_productos != 1 }}
+        en la base de datos.
+    </p>
+    {% endif %}
+
     <a href="{{ url_for('ver_productos') }}" class="btn btn-primary">Ver servicios CTI</a>
 </section>
 

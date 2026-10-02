@@ -208,6 +208,41 @@ def main():
     c.post("/productos/eliminar/" + str(prod["id_producto"]), follow_redirects=True)
     check("No deja borrar un servicio incluido en una factura", contar("productos") == antes)
 
+    print("\n--- Baja logica por cambio de estado (Semana 15) ---")
+    # El docente pidio que el boton de eliminar haga un UPDATE de estado y no un
+    # DELETE fisico, para conservar el historico. Se comprueba que el registro
+    # desaparece del listado de activos pero sigue existiendo en la base de datos.
+    antes = contar("productos")
+    c.post("/productos/baja/" + str(prod["id_producto"]), follow_redirects=True)
+    fila = uno("SELECT activo FROM productos WHERE id_producto = %s", (prod["id_producto"],))
+    check("Dar de baja un servicio hace UPDATE, no DELETE",
+          contar("productos") == antes and fila is not None and not fila["activo"])
+
+    html = c.get("/productos").get_data(as_text=True)
+    check("El servicio dado de baja sale del listado de activos",
+          (MARCA + " servicio editado").upper() not in html)
+
+    html = c.get("/productos?ver=baja").get_data(as_text=True)
+    check("El servicio dado de baja aparece en el filtro 'Dados de baja'",
+          (MARCA + " servicio editado").upper() in html)
+
+    c.post("/productos/reactivar/" + str(prod["id_producto"]), follow_redirects=True)
+    fila = uno("SELECT activo FROM productos WHERE id_producto = %s", (prod["id_producto"],))
+    check("Reactivar devuelve el servicio al listado", bool(fila and fila["activo"]))
+
+    for modulo, ruta, tabla, campo, ident in (
+        ("cliente", "clientes", "clientes", "id_cliente", cli["id_cliente"]),
+        ("proveedor", "proveedores", "proveedores", "id_proveedor", prov["id_proveedor"]),
+        ("factura", "facturacion", "facturas", "id_factura", fact["id_factura"]),
+    ):
+        antes = contar(tabla)
+        c.post("/" + ruta + "/baja/" + str(ident), follow_redirects=True)
+        fila = uno("SELECT activo FROM " + tabla + " WHERE " + campo + " = %s", (ident,))
+        ok_baja = contar(tabla) == antes and fila is not None and not fila["activo"]
+        c.post("/" + ruta + "/reactivar/" + str(ident), follow_redirects=True)
+        fila = uno("SELECT activo FROM " + tabla + " WHERE " + campo + " = %s", (ident,))
+        check("Baja y reactivacion de " + modulo, ok_baja and bool(fila and fila["activo"]))
+
     print("\n--- DELETE (Semana 15) ---")
     det = uno("SELECT id_detalle FROM detalle_factura WHERE id_factura = %s", (fact["id_factura"],))
     antes = contar("detalle_factura")

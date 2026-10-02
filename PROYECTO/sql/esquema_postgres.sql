@@ -87,6 +87,7 @@ CREATE TABLE proveedores (
     aporte       VARCHAR(300) NOT NULL,
     correo       VARCHAR(120) NULL,
     telefono     VARCHAR(20)  NULL,
+    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_proveedores_tipo
         FOREIGN KEY (id_tipo) REFERENCES tipos_proveedor (id_tipo)
         ON DELETE RESTRICT ON UPDATE CASCADE
@@ -101,6 +102,7 @@ CREATE TABLE productos (
     stock        INT           NOT NULL DEFAULT 0,
     descripcion  VARCHAR(500)  NOT NULL,
     id_proveedor INT           NULL,
+    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_productos_categoria
         FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -120,6 +122,7 @@ CREATE TABLE clientes (
     servicio     VARCHAR(100) NOT NULL,
     correo       VARCHAR(120) NULL,
     telefono     VARCHAR(20)  NULL,
+    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_clientes_sector
         FOREIGN KEY (id_sector) REFERENCES sectores (id_sector)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -136,6 +139,7 @@ CREATE TABLE facturas (
     servicio   VARCHAR(100)  NOT NULL,
     fecha      DATE          NOT NULL DEFAULT CURRENT_DATE,
     total      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    activo       BOOLEAN      NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_facturas_cliente
         FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente)
         ON DELETE RESTRICT ON UPDATE CASCADE,
