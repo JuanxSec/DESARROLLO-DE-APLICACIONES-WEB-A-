@@ -5,259 +5,216 @@
 **Docente:** Ing. Walter Rodrigo Nuñez Zamora
 **Universidad Estatal Amazónica - Período 2026**
 
-JuansecCTI es una aplicación web para la gestión de **servicios de ciberinteligencia
-(CTI)**: boletines, alertas de vulnerabilidad, noticias de seguridad, informes de
-amenazas y capacitaciones. La parte pública presenta la información del proyecto y la
-parte administrativa, protegida con inicio de sesión, permite gestionar los servicios,
-los clientes, los proveedores de información y la facturación.
+JuansecCTI es una empresa (ficticia, con fines académicos) que presta **servicios de
+ciberinteligencia de amenazas (Cyber Threat Intelligence, CTI)** a organizaciones del
+Ecuador: boletines, alertas de vulnerabilidades, monitoreo de la dark web, protección de
+marca, superficie de ataque externa, búsqueda proactiva de amenazas y apoyo en incidentes.
+
+El proyecto tiene dos caras:
+
+- **Sitio público**: portada con quiénes somos, misión y visión, servicios con imagen y
+  cupos disponibles, ciclo de inteligencia, boletines publicados, video, contacto con
+  mapa y un formulario de solicitud que se guarda en la base de datos.
+- **Sistema interno** (con inicio de sesión): panel de control con indicadores y gráfico,
+  CRUD de servicios, fuentes de inteligencia, boletines, organizaciones, suscripciones con
+  su detalle y control de cupos, gestión de solicitudes, reportes exportables, usuarios
+  con roles y bitácora de auditoría.
 
 ## Enlaces de la entrega
 
 - Repositorio: <https://github.com/JuanxSec/DESARROLLO-DE-APLICACIONES-WEB-A-/tree/main/PROYECTO>
 - Aplicación en producción (Render): <https://desarrollo-de-aplicaciones-web-a.onrender.com>
-- GitHub Pages (frontend estático): <https://juanxsec.github.io/DESARROLLO-DE-APLICACIONES-WEB-A-/PROYECTO/index.html>
+- GitHub Pages (versión estática, semanas 2 a 8): <https://juanxsec.github.io/DESARROLLO-DE-APLICACIONES-WEB-A-/PROYECTO/index.html>
 
-GitHub Pages publica únicamente la página informativa `index.html` de la raíz, que es
-contenido estático. La aplicación completa, con el backend Flask, la base de datos MySQL
-y el sistema de login, está desplegada en Render y también puede ejecutarse en local.
+GitHub Pages solo sirve contenido estático, por eso publica `index.html` (la versión de
+las semanas 2 a 8, con su HTML, CSS y JavaScript). La aplicación completa con Flask, base
+de datos y login está desplegada en Render y también se ejecuta en local.
+
+## Funcionalidades
+
+| Módulo | Qué permite |
+|---|---|
+| Sitio público | Portada, catálogo de servicios con filtro por categoría y búsqueda, boletines publicados, términos y privacidad, formulario de solicitud |
+| Autenticación | Registro con contraseña segura, login con usuario o correo, "mantener sesión", logout, roles Administrador / Analista / Consulta |
+| Panel de control | Indicadores en tiempo real, ingresos por mes (Chart.js), servicios más contratados, avisos de servicios sin cupos, solicitudes recientes |
+| Servicios CTI | CRUD con imagen, categoría, fuente, precio y **cupos disponibles** (stock) |
+| Fuentes | CRUD de las fuentes de inteligencia (proveedores) |
+| Boletines | CRUD; los activos se publican automáticamente en el sitio público |
+| Organizaciones | CRUD con validación de RUC ecuatoriano, teléfono y nombre solo con letras |
+| Suscripciones | Cabecera + detalle (relación N:N), descuento y devolución de cupos, comprobante imprimible y PDF |
+| Solicitudes | Las enviadas desde el sitio público se gestionan por estado (Nueva, En gestión, Atendida) |
+| Reportes | Por servicio, organización y mes, con filtro de fechas y exportación a CSV, JSON y PDF |
+| Usuarios y bitácora | Solo Administrador: alta de usuarios, cambio de rol, eliminación y registro de cada operación |
+
+Todos los listados tienen búsqueda, paginación, filtro de activos / dados de baja /
+todos, **baja lógica**, reactivación y eliminación definitiva con confirmación en modal.
 
 ## Estructura del proyecto
 
 ```
 PROYECTO/
-├── app.py                      Rutas, lógica y consultas SQL
+├── app.py                      Rutas, lógica, consultas SQL y migración al arrancar
 ├── models.py                   Clase Usuario para Flask-Login
 ├── init_db.py                  Carga el esquema en la base configurada
-│
-├── pruebas/
-│   └── prueba_sistema.py       Pruebas del sistema (Semana 16)
-├── requirements.txt            Dependencias del proyecto
-├── .python-version             Versión de Python usada en el despliegue
+├── index.html                  Versión estática publicada en GitHub Pages
+├── requirements.txt            Dependencias con versión fija
+├── .python-version             Versión de Python del despliegue
 ├── .env.example                Plantilla de variables de entorno
-├── index.html                  Página informativa publicada en GitHub Pages
 │
-├── conexion/
-│   ├── __init__.py
-│   └── conexion.py             Conexión centralizada con MySQL
-│
+├── conexion/conexion.py        Conexión única para MySQL, PostgreSQL y SQLite
 ├── sql/
-│   ├── esquema.sql             Modelo relacional MySQL (15 tablas)
-│   ├── esquema_postgres.sql    El mismo modelo para PostgreSQL (despliegue)
-│   └── esquema_sqlite.sql      Persistencia local SQLite (Semana 12)
-│
-├── data/
-│   └── juanseccti.db           Base local SQLite (Semana 12)
-│
-├── forms/                      Formularios Flask-WTF / WTForms
-│   ├── __init__.py
-│   ├── producto_form.py
-│   ├── cliente_form.py
-│   ├── proveedor_form.py
-│   ├── facturacion_form.py
-│   ├── detalle_form.py
-│   ├── login_form.py
-│   └── usuario_form.py
+│   ├── esquema.sql             Modelo relacional MySQL (18 tablas + datos)
+│   ├── esquema_postgres.sql    El mismo modelo para PostgreSQL (Render)
+│   └── esquema_sqlite.sql      El mismo modelo para SQLite (Semana 12)
+├── data/juanseccti.db          Base local SQLite
+├── forms/                      Formularios Flask-WTF y validadores propios
+├── pruebas/prueba_sistema.py   Pruebas del sistema (Semana 16)
 │
 ├── templates/
-│   ├── base.html               Plantilla principal (herencia Jinja2)
-│   ├── index.html              Inicio del sistema
-│   ├── login.html
-│   ├── registro.html
-│   ├── dashboard.html
-│   ├── productos.html          + formulario_producto.html
-│   ├── clientes.html           + formulario_cliente.html
-│   ├── proveedores.html        + formulario_proveedor.html
-│   ├── facturacion.html        + formulario_facturacion.html
-│   ├── detalle_factura.html    Relación muchos a muchos
-│   └── components/
-│       ├── navbar.html
-│       ├── footer.html
-│       └── campos_formulario.html
+│   ├── base.html               Plantilla principal: modos público, acceso y panel
+│   ├── components/             navbar, footer, sidebar y macros de formularios
+│   ├── index.html, servicios.html, boletines_publicos.html, solicitar.html,
+│   │   terminos.html, error.html                    Sitio público
+│   ├── login.html, registro.html                     Acceso
+│   └── dashboard.html, productos.html, clientes.html, proveedores.html,
+│       facturacion.html, detalle_factura.html, comprobante.html,
+│       boletines.html, solicitudes.html, reportes.html, usuarios.html,
+│       bitacora.html y sus formulario_*.html         Sistema interno
 │
 └── static/
-    ├── css/style.css
-    ├── js/script.js
-    └── img/                    Identidad visual propia, en SVG
-        ├── logo-juanseccti.svg
-        ├── portada-cti.svg
-        └── servicio-*.svg      Un icono por linea de servicio
+    ├── css/style.css           Estilos propios (variables, grid, flex, media queries, impresión)
+    ├── js/script.js            DOM, eventos, validaciones y componentes
+    └── img/                    Logo propio (SVG) y fotografías
 ```
-
-## Identidad visual
-
-Las imagenes del proyecto son SVG creados para el, sin dependencias de terceros ni
-material con licencia ajena. La portada representa un panel de monitoreo de amenazas y
-hay un icono por cada linea de servicio: boletin, alerta, noticias, informe y
-capacitacion. Al ser vectoriales se ven nitidas en cualquier tamano y pesan poco.
 
 ## Modelo relacional
 
-La base de datos `juanseccti` tiene **15 tablas** y **14 claves foráneas**, separando
-las tablas de catálogo (tablas padre) de las tablas de movimiento:
+La base de datos `juanseccti` tiene **18 tablas**:
 
 | Grupo | Tablas |
 |---|---|
 | Ubicación geográfica | `provincias` → `cantones` → `parroquias` |
 | Catálogos | `sectores`, `tipos_proveedor`, `categorias`, `estados`, `roles` |
-| Entidades | `proveedores`, `productos`, `clientes`, `facturas` |
+| Negocio | `proveedores`, `productos`, `clientes`, `facturas`, `boletines`, `solicitudes` |
 | Relación N:N | `detalle_factura` (facturas ↔ productos) |
-| Autenticación | `usuarios`, `perfiles_usuario` (relación 1:1) |
+| Usuarios y auditoría | `usuarios`, `perfiles_usuario` (relación 1:1), `bitacora` |
 
-Tipos de relación implementados:
+- **1:1**: `usuarios` ↔ `perfiles_usuario`
+- **1:N**: `provincias` → `cantones` → `parroquias`, `categorias` → `productos`,
+  `clientes` → `facturas`, `proveedores` → `boletines`, `productos` → `solicitudes`, entre otras
+- **N:N**: `facturas` ↔ `productos` a través de `detalle_factura`
 
-- **1:1** — `usuarios` ↔ `perfiles_usuario`
-- **1:N** — `provincias` → `cantones` → `parroquias`, `categorias` → `productos`,
-  `clientes` → `facturas`, entre otras
-- **N:N** — `facturas` ↔ `productos` a través de `detalle_factura`
+Restricciones destacadas: `CHECK (stock >= 0)`, `CHECK` del nivel de riesgo del boletín,
+RUC `UNIQUE`, claves foráneas con `ON UPDATE CASCADE` y columna `activo` para la baja lógica.
 
-## Cómo ejecutar el proyecto
+## Cómo ejecutar el proyecto en local
 
 ```bash
-# 1. Entorno virtual
+# 1. Entorno virtual y dependencias
 python -m venv venv
 venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 
-# 2. Crear la base de datos MySQL
-mysql --host=127.0.0.1 --user=root -p < sql/esquema.sql
+# 2. Configuración: copie .env.example como .env y complete los datos
+#    (DB_ENGINE=mysql para MySQL o DB_ENGINE=sqlite para usar data/juanseccti.db)
 
-# 3. Credenciales por variable de entorno (no se suben al repositorio)
-set MYSQL_USER=root
-set MYSQL_PASSWORD=tu_password
-set SECRET_KEY=una_clave_larga
+# 3. Crear la base de datos (MySQL)
+mysql --host=127.0.0.1 --user=root -p < sql/esquema.sql
+#    o bien, con cualquier motor:
+python init_db.py
 
 # 4. Ejecutar
 python app.py
 ```
 
 La aplicación queda disponible en <http://127.0.0.1:5000>. La ruta `/test_db` comprueba
-la conexión y lista las tablas creadas.
-
-El primer paso es registrar un usuario en `/registro`; la contraseña se guarda con
-`generate_password_hash()` y nunca en texto plano.
+la conexión y lista las tablas. La **primera cuenta** que se registre en `/registro`
+queda como Administrador; las siguientes nacen como Analista y el administrador puede
+cambiarles el rol desde **Usuarios**.
 
 ## Despliegue en producción (Render)
 
-La aplicación se publica como servicio web en Render a partir de la rama `main` de este
-repositorio. Cada vez que se sube un commit, Render vuelve a construir y desplegar.
-
-Configuración del servicio:
+El servicio web se construye desde la rama `main` en cada commit.
 
 | Parámetro | Valor |
 |---|---|
 | Root Directory | `PROYECTO` |
 | Build Command | `pip install -r requirements.txt` |
 | Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT` |
-| Versión de Python | la fijada en `.python-version` |
-
-Variables de entorno que debe tener el servicio:
 
 | Variable | Para qué sirve |
 |---|---|
 | `SECRET_KEY` | Firma la sesión y los tokens CSRF |
-| `DB_ENGINE` | `postgres` en Render, `mysql` en local |
-| `DATABASE_URL` | Cadena de conexión, la inyecta el propio servicio de base de datos |
-| `AUTO_INIT_DB` | `1` para que el esquema se cargue en el primer arranque |
+| `DB_ENGINE` | `postgres` en Render |
+| `DATABASE_URL` | Cadena de conexión que entrega la base PostgreSQL de Render |
+| `AUTO_INIT_DB` | `1` para cargar el esquema si la base está vacía |
 
-### Los dos motores de base de datos
+Además, al arrancar, `migrar_base()` actualiza de forma idempotente una base creada con
+una versión anterior del proyecto (columnas nuevas, tablas `boletines`, `solicitudes` y
+`bitacora`, nuevas categorías y estados), sin borrar los datos existentes.
 
-El proyecto trabaja con MySQL y con PostgreSQL, y `DB_ENGINE` decide cuál se usa:
+### Tres motores, un mismo código
 
-- **MySQL** es el motor de la asignatura, el que documenta `sql/esquema.sql` y el que se
-  usa al desarrollar en local. Es el valor por defecto.
-- **PostgreSQL** es el motor del despliegue, porque es el que Render ofrece gestionado.
-  El mismo modelo está en `sql/esquema_postgres.sql`, con las 15 tablas, las mismas
-  claves foráneas y los mismos datos. Las únicas diferencias son `SERIAL` en vez de
-  `AUTO_INCREMENT`, una restricción `CHECK` en vez de `ENUM`, y la sintaxis del
-  `DEFAULT` de la fecha.
+`DB_ENGINE` elige el motor y `conexion/conexion.py` adapta las diferencias, de modo que
+las funciones `consultar()`, `ejecutar()` e `insertar()` de `app.py` no cambian:
 
-El resto de la aplicación no cambia. Las funciones `consultar()`, `ejecutar()` e
-`insertar()` de `app.py` siguen escritas igual, y `conexion/conexion.py` traduce la
-interfaz cuando el motor es PostgreSQL. El caso a destacar es `lastrowid`, que psycopg no
-expone: en PostgreSQL el identificador recién generado se obtiene con `lastval()`.
-
-La base de datos no vive dentro del servicio web, así que la información persiste aunque
-el servicio se reinicie.
-
-### Carga del esquema
-
-El esquema lo carga `init_db.py`, que elige el archivo según `DB_ENGINE`. El script existe
-porque `sql/esquema.sql` está escrito para un MySQL propio: empieza con `DROP DATABASE` y
-`CREATE DATABASE`, y en un servidor gestionado la base ya viene creada y el usuario no
-tiene permiso para borrarla.
-
-En Render no hace falta ejecutarlo a mano. Con `AUTO_INIT_DB=1` la propia aplicación lo
-llama al arrancar, y como el script solo actúa cuando no hay tablas, los reinicios
-posteriores no tocan los datos. En local se ejecuta directamente:
-
-```bash
-# Copie .env.example como .env y complete los datos de conexión.
-python init_db.py           # carga las 15 tablas y los datos de catálogo
-python init_db.py --reset   # borra lo existente y vuelve a cargar
-```
-
-Al terminar, el script lista cada tabla con su número de registros, de modo que sirve
-también como comprobación de que la carga fue correcta. La ruta `/test_db` hace lo mismo
-desde la aplicación ya desplegada.
+- **MySQL**: motor de la asignatura y de desarrollo local (valor por defecto).
+- **PostgreSQL**: motor del despliegue en Render; el identificador nuevo se obtiene con `lastval()`.
+- **SQLite**: persistencia local en `data/juanseccti.db`; los `%s` se traducen a `?` y
+  las fechas y decimales se convierten a los tipos de Python.
 
 ## Pruebas del sistema
-
-`pruebas/prueba_sistema.py` recorre la aplicación completa y comprueba que funciona:
-catálogos cargados, registro con contraseña en hash, perfil asociado, protección de las
-rutas privadas, lectura de las seis pantallas internas, las cuatro operaciones CRUD en
-los cuatro módulos, la relación muchos a muchos del detalle de factura con su recálculo
-de total, la integridad referencial y el cierre de sesión.
 
 ```bash
 python pruebas/prueba_sistema.py
 ```
 
-Usa la misma configuración que la aplicación, así que sirve igual con MySQL en local que
-con PostgreSQL en el despliegue. La prueba es **no destructiva**: crea sus propios
-registros con el prefijo `__prueba_sistema__`, los verifica y los borra al terminar, de
-modo que la base queda como estaba.
+`pruebas/prueba_sistema.py` recorre la aplicación de punta a punta: páginas públicas y su
+estructura (h1, h2, autor, nav, article, aside, footer, video, contacto), formulario de
+solicitud, protección de las diez rutas privadas, registro con contraseña segura y hash,
+login con usuario y con correo, restricción por rol, lectura de todas las pantallas,
+validaciones del servidor (nombre con números, RUC inválido), CREATE, UPDATE, baja
+lógica, reactivación y DELETE en los seis módulos, detalle con descuento y devolución de
+cupos, comprobante en PDF, reportes en CSV, JSON y PDF, integridad referencial, usuarios,
+bitácora y cierre de sesión.
 
-Resultado de la última ejecución: **43 de 43 comprobaciones correctas**.
+La prueba es **no destructiva**: crea sus propios registros, los verifica y los borra al
+terminar. Resultado de la última ejecución: **128 de 128 comprobaciones correctas** con
+MySQL y **128 de 128** con SQLite.
 
 ## Correspondencia con los avances de la asignatura
 
 | Semana | Avance | Dónde se evidencia |
 |---|---|---|
-| 1 | Cliente-servidor, HTTP y HTTPS | Contenido teórico de la semana; el proyecto aplica el modelo cliente-servidor y se publica sobre HTTPS en Render |
-| 2 | Herramientas y primera página HTML | `index.html` |
-| 3 | HTML5 y etiquetas semánticas | `index.html` (`header`, `nav`, `main`, `section`, `article`, `aside`, `footer`) |
-| 4 | CSS3, responsivo y Bootstrap | `static/css/style.css` (incluye media query), Bootstrap por CDN |
-| 5 | JavaScript, DOM y eventos | `static/js/script.js` (`createElement`, `appendChild`, `addEventListener`, `preventDefault`) |
-| 6 | Validaciones dinámicas | Validaciones en `input`, `blur` y `submit` con `is-valid` / `is-invalid` |
-| 7 | Plantillas y contenido dinámico | Secciones reutilizables y renderizado desde arreglos de objetos |
-| 8 | Mejora de interfaces con Bootstrap | Navbar, grid, cards, tabla, alertas, modal y spinner |
-| 9 | Proyecto Flask y rutas | `app.py`, `templates/`, `static/`, `base.html` |
-| 10 | Contenido dinámico con Jinja2 | Variables, `for`, `if`, filtros y `components/` |
-| 11 | Formularios con Flask-WTF | Carpeta `forms/`, validadores, `validate_on_submit()`, CSRF |
-| 12 | Persistencia local | `sql/esquema_sqlite.sql` y `data/juanseccti.db` |
-| 13 | Base de datos relacional | `conexion/conexion.py`, `sql/esquema.sql`, CRUD completo en los cuatro módulos |
-| 14 | Sistema de login | Flask-Login, `models.py`, `@login_required`, `current_user`, logout |
-| 15 | CRUD completo de la aplicación | `crear`, `leer`, `actualizar` y `eliminar` en los módulos de servicios, clientes, proveedores y facturación, incluido el detalle de factura, y baja lógica por cambio de estado |
-| 16 | Pruebas y despliegue local | `pruebas/prueba_sistema.py`, 43 comprobaciones sobre login, CRUD, baja lógica, relación N:N e integridad referencial |
-
-## Baja lógica y borrado definitivo
-
-El sistema implementa las dos formas de retirar un registro:
-
-| Acción | Operación SQL | Efecto |
-|---|---|---|
-| **Dar de baja** | `UPDATE ... SET activo = FALSE WHERE ...` | El registro sale del listado pero se conserva en la base como histórico |
-| **Reactivar** | `UPDATE ... SET activo = TRUE WHERE ...` | Devuelve el registro al listado |
-| **Eliminar** | `DELETE FROM ... WHERE ...` | Borrado definitivo, con confirmación previa |
-
-Cada listado tiene un filtro para ver los registros **activos**, los **dados de baja** o
-**todos**. Las tablas `productos`, `clientes`, `proveedores` y `facturas` incorporan la
-columna `activo`, y los desplegables de los formularios solo ofrecen registros activos.
+| 1 | Cliente-servidor, HTTP y HTTPS | La aplicación sigue el modelo cliente-servidor y se publica sobre HTTPS en Render |
+| 2 | Herramientas y primera página HTML | `index.html`: `h1` del proyecto, `h2` del propósito y `h3` con el autor |
+| 3 | HTML5 semántico | `header`, `nav`, `main`, `section`, `article`, `aside`, `footer`, lista `ul/li`, video de YouTube |
+| 4 | CSS3, responsivo y Bootstrap | `style.css` (variables, grid, flex, selectores avanzados, media queries), Bootstrap 5 por CDN, formulario de contacto |
+| 5 | JavaScript, DOM y eventos | `script.js`: `createElement`, `appendChild`, `addEventListener`, `preventDefault`, registro con conteo y eliminación |
+| 6 | Validaciones dinámicas | Eventos `input`, `blur` y `submit`, clases `is-valid` / `is-invalid`, alertas de éxito y error |
+| 7 | Plantillas y contenido dinámico | Arreglo `boletinesCTI` recorrido con bucle y condición; secciones comentadas en `base.html` |
+| 8 | Interfaces con Bootstrap | Navbar, grid, cards, tabla, alertas, modal, spinner, carrusel, dropdown y tooltips |
+| 9 | Proyecto Flask y rutas | `app.py`, `templates/`, `static/`, una ruta por módulo |
+| 10 | Jinja2 | Herencia de `base.html`, bloques, `include`, macros, filtros propios, `for`, `if` |
+| 11 | Flask-WTF | Carpeta `forms/`, validadores propios, `validate_on_submit()`, CSRF |
+| 12 | Persistencia local | `DB_ENGINE=sqlite`, `sql/esquema_sqlite.sql`, `data/juanseccti.db` |
+| 13 | Base de datos relacional | `sql/esquema.sql` con 18 tablas, consultas parametrizadas con `JOIN` |
+| 14 | Login | Flask-Login, Werkzeug, `@login_required`, roles, logout |
+| 15 | CRUD completo | Seis módulos con alta, consulta, edición, baja lógica y eliminación; reportes exportables |
+| 16 | Pruebas y entrega | `pruebas/prueba_sistema.py` (128 comprobaciones), README, script SQL, despliegue en Render |
 
 ## Seguridad
 
-- Todas las consultas SQL son parametrizadas; nunca se concatenan valores del formulario.
-- `UPDATE` y `DELETE` siempre usan la cláusula `WHERE` con el identificador del registro.
-- Las contraseñas se almacenan con hash (`generate_password_hash` / `check_password_hash`).
-- Los formularios incluyen `form.hidden_tag()` y la aplicación tiene `SECRET_KEY` y `CSRFProtect`.
-- Las credenciales de la base de datos se leen de variables de entorno.
+- Consultas SQL parametrizadas; `UPDATE` y `DELETE` siempre con `WHERE` por identificador.
+- Contraseñas con hash (`generate_password_hash` / `check_password_hash`) y política de
+  contraseña segura (8 caracteres con mayúscula, minúscula, número y carácter especial).
+- `CSRFProtect` en todos los formularios y `SECRET_KEY` por variable de entorno.
+- Redirección segura tras el login (solo rutas internas en `next`).
+- Rutas de usuarios y bitácora restringidas al rol Administrador.
+- Credenciales de la base de datos fuera del repositorio (`.env` en `.gitignore`).
+
+## Créditos de imágenes
+
+El logotipo es un SVG propio. Las fotografías provienen de [Unsplash](https://unsplash.com)
+y se usan bajo la [licencia de Unsplash](https://unsplash.com/license), que permite su uso
+libre sin atribución obligatoria. El video embebido pertenece a su autor en YouTube.
