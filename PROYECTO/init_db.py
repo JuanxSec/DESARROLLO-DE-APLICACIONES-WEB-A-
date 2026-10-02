@@ -5,6 +5,7 @@ variable de entorno DB_ENGINE:
 
     DB_ENGINE=mysql      ->  sql/esquema.sql           (motor de la asignatura)
     DB_ENGINE=postgres   ->  sql/esquema_postgres.sql  (despliegue en Render)
+    DB_ENGINE=sqlite     ->  sql/esquema_sqlite.sql    (persistencia local, Semana 12)
 
 En MySQL el script descarta además las tres sentencias de nivel de base de
 datos (DROP DATABASE, CREATE DATABASE y USE), porque un servidor gestionado
@@ -24,6 +25,7 @@ import re
 import sys
 
 BASE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BASE)
 
 
 def cargar_dotenv():
@@ -46,11 +48,17 @@ def motor():
 
 
 def archivo_esquema():
-    nombre = 'esquema_postgres.sql' if motor() == 'postgres' else 'esquema.sql'
+    nombre = {'postgres': 'esquema_postgres.sql',
+              'sqlite': 'esquema_sqlite.sql'}.get(motor(), 'esquema.sql')
     return os.path.join(BASE, 'sql', nombre)
 
 
 def conectar():
+    if motor() == 'sqlite':
+        from conexion.conexion import conectar_sqlite, ruta_sqlite
+        os.makedirs(os.path.dirname(ruta_sqlite()), exist_ok=True)
+        return conectar_sqlite()
+
     if motor() == 'postgres':
         import psycopg
         url = os.environ.get('DATABASE_URL', '')
@@ -96,7 +104,10 @@ def sentencias_del_esquema():
 
 
 def tablas_existentes(cursor):
-    if motor() == 'postgres':
+    if motor() == 'sqlite':
+        cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table' "
+                       "AND name NOT LIKE 'sqlite_%' ORDER BY name")
+    elif motor() == 'postgres':
         cursor.execute("SELECT table_name FROM information_schema.tables "
                        "WHERE table_schema = 'public' ORDER BY table_name")
     else:
@@ -109,6 +120,13 @@ def vaciar(cursor, tablas):
     if motor() == 'postgres':
         for tabla in tablas:
             cursor.execute('DROP TABLE IF EXISTS "' + tabla + '" CASCADE')
+        return
+
+    if motor() == 'sqlite':
+        cursor.execute('PRAGMA foreign_keys = OFF')
+        for tabla in tablas:
+            cursor.execute('DROP TABLE IF EXISTS "' + tabla + '"')
+        cursor.execute('PRAGMA foreign_keys = ON')
         return
 
     cursor.execute('SET FOREIGN_KEY_CHECKS = 0')
