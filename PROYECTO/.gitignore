@@ -4,8 +4,15 @@ __pycache__/
 venv/
 env/
 
-# La base local data/juanseccti.db si se versiona: es la evidencia de la
+# Archivos temporales del editor y del sistema operativo
+.vscode/
+*.log
+Thumbs.db
+.DS_Store
+
+# La base local data/juanseccti.db sí se versiona: es la evidencia de la
 # persistencia con SQLite trabajada en la Semana 12 (Avance 12/16).
+data/*.db-journal
 
 # Capturas de evidencia semanal (retiradas del repositorio)
 Evidencia_Codigo_Semana*.png
