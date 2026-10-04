@@ -24,9 +24,7 @@ def load_user(user_id):
 def registro():
     form = UsuarioForm()
     form.id_rol.choices = opciones_roles()
-    # En el registro público el rol no se elige: se asigna el de Analista.
-    # La única excepción es la primera cuenta del sistema, que queda como
-    # Administrador para que alguien pueda gestionar usuarios y bitácora.
+    # Rol Analista por defecto; la primera cuenta queda como Administrador.
     id_analista = id_por_nombre('roles', 'id_rol', 'Analista')
     if contar('SELECT COUNT(*) AS t FROM usuarios') == 0:
         id_analista = id_por_nombre('roles', 'id_rol', 'Administrador')

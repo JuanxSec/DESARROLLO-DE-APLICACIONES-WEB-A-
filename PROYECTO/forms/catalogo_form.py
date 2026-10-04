@@ -6,11 +6,7 @@ from forms.validadores import SOLO_LETRAS
 
 
 class CatalogoForm(FlaskForm):
-    """Formulario común a las tablas de catálogo (categorías, sectores y tipos de fuente).
-
-    Las tres tablas tienen la misma estructura: un nombre único y una descripción,
-    por eso un solo formulario sirve para registrar y editar cualquiera de ellas.
-    """
+    """Formulario de los catálogos: categorías, sectores y tipos de fuente."""
 
     nombre = StringField('Nombre', validators=[
         DataRequired(message='El nombre es requerido'),

@@ -1,23 +1,6 @@
-"""Carga el esquema relacional en la base de datos configurada.
+"""Carga el esquema SQL en la base configurada.
 
-Funciona con los dos motores del proyecto y elige el archivo correcto según la
-variable de entorno DB_ENGINE:
-
-    DB_ENGINE=mysql      ->  sql/esquema.sql           (motor de la asignatura)
-    DB_ENGINE=postgres   ->  sql/esquema_postgres.sql  (despliegue en Render)
-    DB_ENGINE=sqlite     ->  sql/esquema_sqlite.sql    (persistencia local, Semana 12)
-
-En MySQL el script descarta además las tres sentencias de nivel de base de
-datos (DROP DATABASE, CREATE DATABASE y USE), porque un servidor gestionado
-entrega la base ya creada y el usuario no tiene permiso para borrarla.
-
-Uso:
-
-    python init_db.py            # carga el esquema en una base vacía
-    python init_db.py --reset    # borra las tablas existentes y vuelve a cargar
-
-Las credenciales se leen de las variables de entorno o del archivo .env que
-esté junto a este script. Nunca se escriben dentro del código.
+Uso: python init_db.py [--reset]
 """
 
 import os

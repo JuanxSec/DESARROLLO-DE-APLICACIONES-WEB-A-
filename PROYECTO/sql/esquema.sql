@@ -1,29 +1,11 @@
--- ============================================================================
--- Esquema relacional del Proyecto Integrador JuansecCTI
--- Asignatura: Desarrollo de Aplicaciones Web - Unidad 4 (Semanas 13 a 16)
--- Motor: MySQL 8 / 9  (motor de referencia de la asignatura)
--- Ejecutar:  mysql --host=127.0.0.1 --user=root --default-character-set=utf8mb4 < sql/esquema.sql
---       o:   python init_db.py --reset
---
--- El modelo separa las tablas de catalogo (tablas padre) de las tablas de
--- movimiento (tablas hijas) y utiliza los tres tipos de relacion revisados
--- en clase:
---   1:1  usuarios  <-> perfiles_usuario
---   1:N  provincias -> cantones -> parroquias, categorias -> productos, etc.
---   N:N  facturas  <-> productos  (a traves de detalle_factura)
---
--- 18 tablas: 3 de ubicacion, 5 catalogos, 7 de negocio (servicios, fuentes,
--- organizaciones, suscripciones, detalle, boletines y solicitudes) y 3 de
--- usuarios y auditoria.
--- ============================================================================
+-- Base de datos del proyecto JuansecCTI (MySQL)
+-- Ejecutar: python init_db.py --reset
 
 DROP DATABASE IF EXISTS juanseccti;
 CREATE DATABASE juanseccti CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE juanseccti;
 
--- ---------------------------------------------------------------------------
--- 1. UBICACION GEOGRAFICA (provincia -> canton -> parroquia)
--- ---------------------------------------------------------------------------
+-- 1. Ubicacion: provincias, cantones y parroquias
 CREATE TABLE provincias (
     id_provincia INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(80) NOT NULL UNIQUE
@@ -47,9 +29,7 @@ CREATE TABLE parroquias (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- ---------------------------------------------------------------------------
--- 2. CATALOGOS DEL SISTEMA (tablas padre)
--- ---------------------------------------------------------------------------
+-- 2. Catalogos
 CREATE TABLE sectores (
     id_sector   INT AUTO_INCREMENT PRIMARY KEY,
     nombre      VARCHAR(60)  NOT NULL UNIQUE,
@@ -84,12 +64,7 @@ CREATE TABLE roles (
     descripcion VARCHAR(200) NOT NULL
 );
 
--- ---------------------------------------------------------------------------
--- 3. ENTIDADES PRINCIPALES
---    Todas llevan la columna activo para la baja logica (Clase Encuentro de
---    la Semana 15: el boton eliminar cambia el estado y conserva el historico)
---    y la fecha de creacion como pista de auditoria.
--- ---------------------------------------------------------------------------
+-- 3. Tablas principales (activo sirve para la baja logica)
 CREATE TABLE proveedores (
     id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(100) NOT NULL,
@@ -169,9 +144,7 @@ CREATE TABLE facturas (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- Tabla intermedia: resuelve la relacion muchos a muchos entre facturas y
--- productos. Una factura puede incluir varios servicios y un mismo servicio
--- puede aparecer en varias facturas.
+-- Tabla intermedia de la relacion muchos a muchos entre facturas y productos.
 CREATE TABLE detalle_factura (
     id_detalle      INT AUTO_INCREMENT PRIMARY KEY,
     id_factura      INT           NOT NULL,
@@ -228,9 +201,7 @@ CREATE TABLE solicitudes (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- ---------------------------------------------------------------------------
--- 4. AUTENTICACION (Semana 14) Y AUDITORIA
--- ---------------------------------------------------------------------------
+-- 4. Usuarios y auditoria
 CREATE TABLE usuarios (
     id       INT AUTO_INCREMENT PRIMARY KEY,
     usuario  VARCHAR(50)  UNIQUE NOT NULL,
@@ -266,9 +237,7 @@ CREATE TABLE bitacora (
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- ============================================================================
--- DATOS INICIALES
--- ============================================================================
+-- Datos iniciales
 
 INSERT INTO provincias (nombre) VALUES
     ('Pastaza'), ('Pichincha'), ('Guayas');
@@ -380,6 +349,4 @@ INSERT INTO solicitudes (nombre, organizacion, correo, telefono, id_producto, id
     ('Luis Andrade', 'Municipio de Mera', 'landrade@mera.example', '0987654321', 5, 10,
      'Solicitamos un taller de concienciación para 30 funcionarios del área administrativa.');
 
--- Los usuarios se registran desde la ruta /registro de la aplicacion: la
--- contrasena se transforma con generate_password_hash() antes del INSERT, por
--- eso aqui no se insertan credenciales en texto plano.
+-- Los usuarios se crean desde /registro con la contrasena en hash.

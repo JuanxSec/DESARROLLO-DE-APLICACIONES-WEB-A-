@@ -1,19 +1,4 @@
-{#- ---------------------------------------------------------------------------
-    Plantilla principal del sistema (Semanas 9 y 10).
-
-    Todas las páginas heredan de este archivo con {% extends "base.html" %} y
-    escriben su contenido en el bloque "content". El bloque "modo" elige uno de
-    los tres diseños:
-
-      publico  : barra de navegación, contenido y pie de página (portada,
-                 catálogo, boletines, solicitudes).
-      acceso   : pantalla dividida con imagen (login y registro).
-      panel    : menú lateral, barra superior y área de trabajo (módulos
-                 internos protegidos con @login_required).
-
-    El contenido se define una sola vez y se coloca con self.content() en el
-    diseño que corresponda.
---------------------------------------------------------------------------- -#}
+{#- Plantilla base (Semanas 9 y 10): el bloque "modo" elige el diseño público, de acceso o de panel. -#}
 {%- set modo = self.modo()|trim -%}
 <!DOCTYPE html>
 <html lang="es">
@@ -53,7 +38,7 @@
 {% endmacro %}
 
 {% if modo == 'panel' %}
-    <!-- ===================== DISEÑO PANEL: menú lateral + área de trabajo ===================== -->
+    <!-- Diseño panel: menú lateral + área de trabajo -->
     <div class="panel">
         {% include "components/sidebar.html" %}
         <div class="velo" id="veloMenu"></div>
@@ -98,7 +83,7 @@
     </div>
 
 {% elif modo == 'acceso' %}
-    <!-- ===================== DISEÑO ACCESO: login y registro ===================== -->
+    <!-- Diseño acceso: login y registro -->
     <div class="pagina-acceso">
         <div class="acceso-imagen">
             <a class="marca" href="{{ url_for('inicio') }}">
@@ -120,7 +105,7 @@
     </div>
 
 {% else %}
-    <!-- ===================== DISEÑO PÚBLICO: navegación, contenido y pie ===================== -->
+    <!-- Diseño público: navegación, contenido y pie -->
     <!-- Encabezado y navegación -->
     {% include "components/navbar.html" %}
 

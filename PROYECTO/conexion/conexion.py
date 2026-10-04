@@ -1,20 +1,7 @@
-"""Conexión centralizada con la base de datos.
+"""Conexión con la base de datos: MySQL, PostgreSQL (Render) o SQLite.
 
-El proyecto trabaja con tres motores y la variable de entorno DB_ENGINE decide
-cuál se usa:
-
-  * ``mysql``    (valor por defecto) es el motor de la asignatura, el que
-    documenta sql/esquema.sql y el que se usa al desarrollar en local.
-  * ``postgres`` es el motor del despliegue en Render, que ofrece PostgreSQL
-    gestionado y entrega la cadena de conexión en DATABASE_URL.
-  * ``sqlite``   es la persistencia local de la Semana 12: un único archivo
-    data/juanseccti.db que no necesita servidor.
-
-El resto de la aplicación no se entera de la diferencia: las funciones
-consultar(), ejecutar() e insertar() de app.py siguen pidiendo un cursor con
-``cursor(dictionary=True)`` y leyendo ``rowcount`` y ``lastrowid``, y escriben
-las consultas con el marcador %s. Las clases de más abajo traducen esa interfaz
-para PostgreSQL y SQLite.
+El motor se elige con DB_ENGINE. Las clases de abajo adaptan PostgreSQL y
+SQLite para que el resto del código los use igual que mysql-connector.
 """
 
 import os
@@ -30,7 +17,7 @@ def motor():
     return (current_app.config.get('DB_ENGINE') or 'mysql').lower()
 
 
-# --------------------------------- PostgreSQL ---------------------------------
+# PostgreSQL
 
 class _CursorPostgres:
     """Da al cursor de psycopg la misma interfaz que el de mysql-connector."""
@@ -41,8 +28,7 @@ class _CursorPostgres:
         self._cursor = conn.cursor(row_factory=dict_row) if dictionary else conn.cursor()
 
     def execute(self, sql, params=()):
-        # psycopg intenta interpolar aunque la secuencia venga vacía, así que
-        # las consultas sin parámetros se envían tal cual.
+        # Sin parámetros se envía tal cual para que psycopg no interprete los %.
         if params:
             return self._cursor.execute(sql, params)
         return self._cursor.execute(sql)
@@ -59,12 +45,7 @@ class _CursorPostgres:
 
     @property
     def lastrowid(self):
-        """Equivalente de lastrowid en PostgreSQL.
-
-        psycopg no expone ese atributo. El identificador recién generado se
-        obtiene con lastval(), que devuelve el último valor que produjo una
-        secuencia en esta misma conexión y sigue siendo válido tras el commit.
-        """
+        """psycopg no tiene lastrowid; se usa lastval() de la misma conexión."""
         with self._conn.cursor() as aux:
             aux.execute('SELECT lastval()')
             return aux.fetchone()[0]
@@ -89,10 +70,8 @@ class _ConexionPostgres:
         self._conn.close()
 
 
-# ----------------------------------- SQLite -----------------------------------
-
-# sqlite3 guarda fechas y booleanos como texto o enteros. Estos conversores
-# devuelven los tipos de Python que esperan los formularios y las plantillas.
+# SQLite
+# Conversores para que SQLite devuelva fechas y booleanos de Python.
 sqlite3.register_adapter(date, lambda valor: valor.isoformat())
 sqlite3.register_adapter(datetime, lambda valor: valor.isoformat(' '))
 # Los DecimalField de WTForms entregan Decimal, que sqlite3 no sabe guardar.
@@ -161,8 +140,6 @@ def conectar_sqlite():
     conn.execute('PRAGMA foreign_keys = ON')
     return conn
 
-
-# --------------------------------- Conexión -----------------------------------
 
 def get_db_connection():
     """Crea y retorna una conexión al motor configurado."""

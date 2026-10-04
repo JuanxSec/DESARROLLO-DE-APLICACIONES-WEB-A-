@@ -1,18 +1,6 @@
-/* ===========================================================================
-   JuansecCTI - Hoja de estilos propia (CSS3)
-   Complementa a Bootstrap 5: Bootstrap da la rejilla y los componentes, y este
-   archivo define la identidad visual (colores, tipografía, tarjetas, menú
-   lateral del panel) y el comportamiento responsivo.
+/* Estilos propios de JuansecCTI, complementan a Bootstrap 5 */
 
-   Contenido:
-     1. Variables y base          6. Panel de administración
-     2. Navegación pública        7. Tablas, formularios y estados
-     3. Portada (hero)            8. Comprobante imprimible
-     4. Secciones públicas        9. Media queries (móvil, tablet, escritorio)
-     5. Tarjetas de servicios     10. Impresión
-   =========================================================================== */
-
-/* ------------------------------ 1. Variables ------------------------------ */
+/* 1. Variables */
 :root {
     --marino: #0b1f3a;
     --marino-2: #12305a;
@@ -124,7 +112,7 @@ a {
 .texto-acento { color: var(--acento); }
 .fondo-marino { background-color: var(--marino); }
 
-/* ------------------------- 2. Navegación pública ------------------------- */
+/* 2. Navegación pública */
 .navbar-publica {
     background: transparent;
     transition: var(--transicion);
@@ -165,7 +153,7 @@ a {
 .marca span { color: var(--acento-2); }
 .marca:hover { color: var(--blanco); }
 
-/* ------------------------------ 3. Portada ------------------------------- */
+/* 3. Portada */
 .hero {
     position: relative;
     min-height: 92vh;
@@ -305,7 +293,7 @@ a {
     font-size: 0.9rem;
 }
 
-/* --------------------------- 4. Secciones públicas --------------------------- */
+/* 4. Secciones públicas */
 .seccion {
     padding: 5.5rem 0;
 }
@@ -451,7 +439,7 @@ a {
     font-weight: 700;
 }
 
-/* ------------------------- 5. Tarjetas de servicios ------------------------- */
+/* 5. Tarjetas de servicios */
 .tarjeta-servicio {
     border: 1px solid var(--borde);
     border-radius: var(--radio);
@@ -742,7 +730,7 @@ aside.aviso-lateral {
     transition: var(--transicion);
 }
 
-/* ------------------------ 6. Panel de administración ------------------------ */
+/* 6. Panel de administración */
 .panel {
     display: flex;
     min-height: 100vh;
@@ -920,7 +908,7 @@ aside.aviso-lateral {
     display: none;
 }
 
-/* ---------------------- 7. Tablas, formularios y estados ---------------------- */
+/* 7. Tablas, formularios y estados */
 .table {
     margin-bottom: 0;
     vertical-align: middle;
@@ -1022,7 +1010,7 @@ aside.aviso-lateral {
     border-color: var(--marino);
 }
 
-/* --------------------------- 8. Comprobante --------------------------- */
+/* 8. Comprobante */
 .comprobante {
     max-width: 820px;
     margin: 2rem auto;
@@ -1041,7 +1029,7 @@ aside.aviso-lateral {
     margin-bottom: 1.5rem;
 }
 
-/* -------------------------- 9. Media queries -------------------------- */
+/* 9. Media queries */
 
 /* Móviles: hasta 600 px. */
 @media (max-width: 600px) {
@@ -1115,7 +1103,7 @@ aside.aviso-lateral {
     .seccion .container { max-width: 1200px; }
 }
 
-/* ----------------------------- 10. Impresión ----------------------------- */
+/* 10. Impresión */
 @media print {
     .no-imprimir,
     .lateral,

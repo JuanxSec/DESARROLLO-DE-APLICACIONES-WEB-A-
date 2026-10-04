@@ -5,12 +5,7 @@ from flask_wtf import FlaskForm
 
 
 class ProductoForm(FlaskForm):
-    """Formulario del módulo de servicios CTI.
-
-    La misma clase se reutiliza para registrar y para editar un registro: la
-    ruta de edición carga los datos actuales con ProductoForm(data=producto).
-    Las opciones de los SelectField se llenan desde las tablas de catálogo.
-    """
+    """Formulario de servicios; se usa para registrar y para editar."""
 
     nombre = StringField('Nombre del servicio', validators=[
         DataRequired(message='El nombre del servicio es requerido'),

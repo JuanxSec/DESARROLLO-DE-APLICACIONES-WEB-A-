@@ -1,16 +1,4 @@
-{# ---------------------------------------------------------------------------
-   Componentes reutilizables de formularios y listados (Semanas 10, 11 y 15).
-
-   campo()          etiqueta, campo y mensajes de validación de WTForms con las
-                    clases is-invalid / invalid-feedback de Bootstrap (en rojo).
-   campos_*()       agrupan los campos de cada módulo y siempre empiezan con
-                    form.hidden_tag(), que incluye el token CSRF. Cada macro se
-                    usa en el registro y en la edición: el formulario no se
-                    duplica.
-   barra_listado()  buscador, filtro de vista y botón Nuevo de los listados.
-   acciones()       botones con iconos: editar, dar de baja/reactivar, eliminar.
-   paginador()      navegación entre páginas de un listado.
---------------------------------------------------------------------------- #}
+{# Macros de campos, botones y listados que comparten el registro y la edición. #}
 
 {% macro campo(field, clase="form-control", rows=None, ayuda=None, placeholder=None, extra={}) %}
 <div class="mb-3">
@@ -197,7 +185,7 @@
 {% endmacro %}
 
 
-{# ------------------------------- Listados ------------------------------- #}
+{# Listados #}
 
 {% macro barra_listado(endpoint, ver, q, nuevo=None, texto_nuevo='Nuevo', con_vista=True) %}
 <div class="d-flex flex-wrap gap-2 align-items-center">

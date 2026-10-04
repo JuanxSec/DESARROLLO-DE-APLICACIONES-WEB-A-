@@ -7,10 +7,7 @@ from conexion.conexion import motor
 from modelos.base import consultar, contar, ejecutar, id_por_nombre
 
 
-# El despliegue de Render tiene una base creada con versiones anteriores del
-# esquema. Al arrancar se agregan las columnas y tablas nuevas y se completan
-# los catálogos, sin tocar los datos existentes. Todo es idempotente: si ya
-# está hecho, no cambia nada.
+# Agrega a una base antigua las columnas y tablas nuevas sin tocar los datos.
 COLUMNAS_NUEVAS = [
     ('productos', 'activo', 'BOOLEAN NOT NULL DEFAULT TRUE'),
     ('clientes', 'activo', 'BOOLEAN NOT NULL DEFAULT TRUE'),

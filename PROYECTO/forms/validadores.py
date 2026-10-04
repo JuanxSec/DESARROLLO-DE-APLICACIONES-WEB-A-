@@ -1,17 +1,10 @@
-"""Validadores reutilizables de WTForms.
-
-Repiten en el servidor las mismas reglas que static/js/script.js aplica en el
-navegador: la validación del cliente da respuesta inmediata y la del servidor
-garantiza que a la base de datos solo llegue información limpia.
-"""
+"""Validadores de WTForms, con las mismas reglas que script.js."""
 
 import re
 
 from wtforms.validators import ValidationError, Regexp
 
-# Letras (con tildes y ñ), espacios y los signos habituales en nombres de
-# organizaciones. No admite dígitos: el docente pidió que un campo de nombre
-# rechace valores como "3250".
+# Solo letras, espacios y signos comunes; no admite números.
 SOLO_LETRAS = Regexp(
     r"^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ .,&\-]*$",
     message='Solo se admiten letras, espacios y los signos . , & -'

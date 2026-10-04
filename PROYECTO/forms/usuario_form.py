@@ -7,11 +7,7 @@ from forms.validadores import SOLO_LETRAS, contrasena_segura
 
 
 class UsuarioForm(FlaskForm):
-    """Registro de usuarios del sistema (Semana 14).
-
-    Además del usuario y la contraseña recoge los datos del perfil, que se
-    guardan en la tabla perfiles_usuario (relación uno a uno con usuarios).
-    """
+    """Registro de usuarios con los datos de su perfil (Semana 14)."""
 
     usuario = StringField('Usuario', validators=[
         DataRequired(message='El usuario es requerido'),

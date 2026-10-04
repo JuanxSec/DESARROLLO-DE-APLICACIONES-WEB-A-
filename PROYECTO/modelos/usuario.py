@@ -7,11 +7,7 @@ from modelos.base import consultar, ejecutar, insertar
 
 
 class Usuario(UserMixin):
-    """Representa un registro de la tabla usuarios para Flask-Login.
-
-    Incluye el rol y los datos del perfil (relación uno a uno con
-    perfiles_usuario) para mostrarlos en la interfaz mediante current_user.
-    """
+    """Usuario de Flask-Login con su rol y los datos del perfil."""
 
     def __init__(self, id, usuario, password, rol=None, nombre_completo=None, correo=None):
         self.id = id

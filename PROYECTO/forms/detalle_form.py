@@ -4,12 +4,7 @@ from flask_wtf import FlaskForm
 
 
 class DetalleFacturaForm(FlaskForm):
-    """Formulario de la tabla intermedia detalle_factura (relación N:N).
-
-    Permite agregar los servicios que componen una suscripción: una factura
-    puede incluir varios servicios y un mismo servicio puede estar en varias
-    facturas. La cantidad se valida además contra los cupos disponibles.
-    """
+    """Servicios de una suscripción (tabla intermedia detalle_factura)."""
 
     id_producto = SelectField('Servicio', coerce=int, validators=[
         InputRequired(message='Debe seleccionar un servicio')

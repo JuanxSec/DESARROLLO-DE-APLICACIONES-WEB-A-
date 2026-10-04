@@ -1,21 +1,7 @@
-"""Pruebas del sistema - Avance 16/16 (Semana 16).
+"""Pruebas del sistema (Semana 16).
 
-Comprueba, contra la base de datos que esté configurada, que la aplicación
-funciona de punta a punta: páginas públicas, registro e inicio de sesión,
-protección de rutas y roles, CRUD completo con baja lógica en los seis módulos,
-la relación muchos a muchos del detalle con control de cupos, reportes
-exportables, comprobante en PDF y bitácora de auditoría.
-
-La prueba es NO DESTRUCTIVA: crea sus propios registros con un prefijo
-reconocible, los verifica y los borra al terminar. Los cupos de los servicios
-existentes no se tocan porque se trabaja con un servicio creado por la prueba.
-
-Uso, desde la carpeta PROYECTO:
-
-    python pruebas/prueba_sistema.py
-
-Lee la configuración del archivo .env o de las variables de entorno, igual que
-la aplicación. Funciona con MySQL, PostgreSQL y SQLite (DB_ENGINE).
+Crea registros de prueba, revisa cada módulo y los borra al terminar.
+Uso: python pruebas/prueba_sistema.py
 """
 
 import os

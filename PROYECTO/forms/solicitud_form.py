@@ -6,11 +6,7 @@ from forms.validadores import SOLO_LETRAS, TELEFONO_EC
 
 
 class SolicitudForm(FlaskForm):
-    """Solicitud de información desde la página pública.
-
-    La misma clase la usa el panel para editar una solicitud; ahí se muestra
-    también el campo de estado.
-    """
+    """Solicitud de información de la página pública y del panel."""
 
     nombre = StringField('Nombre completo', validators=[
         DataRequired(message='El nombre es requerido'),

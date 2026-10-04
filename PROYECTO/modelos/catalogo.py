@@ -5,9 +5,7 @@ from flask import abort
 from modelos.base import contar
 
 
-# Las tres tablas tienen la misma estructura (nombre único y descripción), así
-# que comparten rutas, formulario y plantillas. Cada entrada indica su tabla,
-# su clave primaria y las tablas hijas que la referencian por clave foránea.
+# Catálogos con la misma estructura: tabla, clave primaria y tablas hijas.
 CATALOGOS = {
     'categorias': {
         'tabla': 'categorias', 'id': 'id_categoria', 'titulo': 'Categorías de servicio',

@@ -1,16 +1,6 @@
-/* ===========================================================================
-   JuansecCTI - JavaScript del proyecto
-   Semanas 5 a 8: manipulación del DOM, eventos, validaciones dinámicas,
-   renderizado de contenido y componentes de Bootstrap.
-   Semanas 9 a 16: apoyo a las plantillas de Flask (validación en vivo de los
-   formularios WTForms, menú lateral del panel, modal de eliminación y gráfico).
+/* JavaScript de JuansecCTI: validaciones, eventos y componentes de Bootstrap */
 
-   El archivo se carga en todas las páginas (base.html y la versión estática
-   de GitHub Pages), por eso cada bloque comprueba primero que sus elementos
-   existan en la página actual. Así ninguna pantalla genera errores en consola.
-   =========================================================================== */
-
-/* --------------------------- Datos del proyecto --------------------------- */
+/* Datos del proyecto */
 
 // Arreglo que se recorre con un bucle y una condición (Semana 7) para pintar
 // los boletines destacados de la versión estática.
@@ -47,7 +37,7 @@ const boletinesCTI = [
 
 let registrosCTI = [];
 
-/* ------------------------------- Utilidades ------------------------------- */
+/* Utilidades */
 
 function elemento(id) {
     return document.getElementById(id);
@@ -76,7 +66,7 @@ function obtenerClasePrioridad(prioridad) {
     return "text-bg-secondary";
 }
 
-/* ---------------- Barra pública: se vuelve sólida al bajar ----------------- */
+/* Barra pública: se vuelve sólida al bajar */
 
 function inicializarNavbar() {
     const barra = elemento("navbarPublica");
@@ -108,7 +98,7 @@ function inicializarNavbar() {
     revisar();
 }
 
-/* -------------------- Menú lateral del panel (móvil) ---------------------- */
+/* Menú lateral del panel (móvil) */
 
 function inicializarMenuLateral() {
     const boton = elemento("botonMenu");
@@ -144,7 +134,7 @@ function inicializarMenuLateral() {
     });
 }
 
-/* ------------------------ Componentes de Bootstrap ------------------------- */
+/* Componentes de Bootstrap */
 
 function inicializarTooltips() {
     if (typeof bootstrap === "undefined") {
@@ -201,10 +191,7 @@ function cerrarAlertasAutomaticamente() {
     });
 }
 
-/* ------------- Validación en vivo de los formularios de Flask -------------- */
-/* Los formularios marcados con data-validacion-viva se revisan con los eventos
-   input y blur (Semana 6). Flask-WTF vuelve a validar en el servidor, así que
-   este control solo mejora la experiencia; no reemplaza la validación real.   */
+/* Validación en vivo de los formularios (el servidor vuelve a validar con Flask-WTF) */
 
 const REGLAS = {
     letras: {
@@ -333,7 +320,7 @@ function inicializarValidacionViva() {
     });
 }
 
-/* --------------------- Contador de caracteres en textos -------------------- */
+/* Contador de caracteres en textos */
 
 function inicializarContadores() {
     document.querySelectorAll("[data-contador]").forEach(function (campo) {
@@ -353,7 +340,7 @@ function inicializarContadores() {
     });
 }
 
-/* --------------- Contraseña: mostrar/ocultar y medidor de fuerza ----------- */
+/* Contraseña: mostrar/ocultar y medidor de fuerza */
 
 function inicializarContrasenas() {
     document.querySelectorAll("[data-mostrar]").forEach(function (boton) {
@@ -402,7 +389,7 @@ function inicializarContrasenas() {
     });
 }
 
-/* ------------------- Vista previa de la imagen del servicio ---------------- */
+/* Vista previa de la imagen del servicio */
 
 function inicializarVistaPrevia() {
     document.querySelectorAll("[data-vista-previa]").forEach(function (selector) {
@@ -416,7 +403,7 @@ function inicializarVistaPrevia() {
     });
 }
 
-/* ------------------------- Gráfico del panel (Chart.js) -------------------- */
+/* Gráfico del panel (Chart.js) */
 
 function inicializarGrafico() {
     const lienzo = elemento("graficoIngresos");
@@ -446,9 +433,9 @@ function inicializarGrafico() {
     });
 }
 
-/* =================== Versión estática (GitHub Pages) ======================= */
+/* Versión estática (GitHub Pages) */
 
-/* ------------------- Modal de detalle (vive en index.html) ----------------- */
+/* Modal de detalle (vive en index.html) */
 
 let modalDetalle = null;
 
@@ -503,7 +490,7 @@ function abrirModalSimple(titulo, descripcion) {
     modalDetalle.show();
 }
 
-/* ------------------ Mensaje de bienvenida de la cabecera ------------------ */
+/* Mensaje de bienvenida de la cabecera */
 
 function inicializarBienvenida() {
     const boton = elemento("botonBienvenida");
@@ -519,7 +506,7 @@ function inicializarBienvenida() {
     });
 }
 
-/* ------- Formulario dinámico con validaciones (Semanas 5, 6 y 8) --------- */
+/* Formulario dinámico con validaciones (Semanas 5, 6 y 8) */
 
 function inicializarFormularioRegistro() {
     const formulario = elemento("formularioRegistro");
@@ -724,7 +711,7 @@ function renderizarRegistros() {
     });
 }
 
-/* --------- Boletines destacados: tarjetas, tabla y spinner (Semana 8) ------ */
+/* Boletines destacados: tarjetas, tabla y spinner (Semana 8) */
 
 function renderizarBoletines() {
     const contenedor = elemento("contenedorBoletines");
@@ -802,7 +789,7 @@ function renderizarBoletines() {
     }, 900);
 }
 
-/* ------------- Formulario de contacto con validación (Semana 4) ------------ */
+/* Formulario de contacto con validación (Semana 4) */
 
 function inicializarFormularioContacto() {
     const formulario = elemento("formularioContacto");
@@ -922,7 +909,7 @@ function inicializarFormularioContacto() {
     });
 }
 
-/* ------------------------------ Arranque ---------------------------------- */
+/* Arranque */
 
 document.addEventListener("DOMContentLoaded", function () {
     // Sitio Flask y versión estática

@@ -56,14 +56,7 @@ def expr_mes(columna):
     return "CONCAT(YEAR(" + columna + "), '-', LPAD(MONTH(" + columna + "), 2, '0'))"
 
 
-# Las guías piden la operación DELETE, pero en la Clase Encuentro de la Semana 15
-# el docente indicó que el botón de eliminar no debe borrar físicamente el
-# registro, sino ejecutar un UPDATE que cambie su estado para conservar el
-# histórico. El sistema implementa las dos operaciones:
-#
-#   Dar de baja   -> UPDATE ... SET activo = FALSE WHERE ...   (se conserva)
-#   Reactivar     -> UPDATE ... SET activo = TRUE  WHERE ...
-#   Eliminar      -> DELETE FROM ... WHERE ...                 (definitivo)
+# Dar de baja y reactivar cambian el campo activo; eliminar hace un DELETE.
 VISTAS = {
     'activos': 'activo = TRUE',
     'baja': 'activo = FALSE',
