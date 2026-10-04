@@ -55,9 +55,29 @@ todos, **baja lógica**, reactivación y eliminación definitiva con confirmaci�
 
 ```
 PROYECTO/
-├── app.py                      Rutas, lógica, consultas SQL y migración al arrancar
-├── models.py                   Clase Usuario para Flask-Login
+├── app.py                      Punto de entrada: registra las rutas y migra la base al arrancar
+├── extensiones.py              Creación de la app, configuración, CSRF y Flask-Login
 ├── init_db.py                  Carga el esquema en la base configurada
+│
+├── rutas/                      Vistas, un módulo por sección
+│   ├── comun.py                Paginación, filtros de vista, roles y filtros de Jinja2
+│   ├── publico.py              Portada, catálogo, boletines, solicitud y términos
+│   ├── autenticacion.py        Registro, login y logout (Flask-Login)
+│   ├── panel.py                Panel de control, prueba de conexión y páginas de error
+│   ├── servicios.py, fuentes.py, boletines.py, organizaciones.py,
+│   │   suscripciones.py, solicitudes.py, catalogos.py      CRUD de cada módulo
+│   ├── reportes.py             Reportes y exportación a CSV, JSON y PDF
+│   └── usuarios.py             Usuarios, roles y bitácora (Administrador)
+│
+├── modelos/                    Acceso a datos con SQL parametrizado, uno por entidad
+│   ├── base.py                 consultar(), ejecutar(), insertar() y baja lógica
+│   ├── usuario.py              Clase Usuario (Flask-Login) y consultas de usuarios
+│   ├── servicio.py, fuente.py, boletin.py, organizacion.py,
+│   │   suscripcion.py, solicitud.py, catalogo.py, reporte.py
+│   ├── opciones.py             Catálogos para los SelectField de los formularios
+│   ├── bitacora.py             Registro de auditoría
+│   └── migracion.py            Actualización automática de la base desplegada
+│
 ├── index.html                  Versión estática publicada en GitHub Pages
 ├── requirements.txt            Dependencias con versión fija
 ├── .python-version             Versión de Python del despliegue
@@ -158,7 +178,7 @@ una versión anterior del proyecto (columnas nuevas, tablas `boletines`, `solici
 ### Tres motores, un mismo código
 
 `DB_ENGINE` elige el motor y `conexion/conexion.py` adapta las diferencias, de modo que
-las funciones `consultar()`, `ejecutar()` e `insertar()` de `app.py` no cambian:
+las funciones `consultar()`, `ejecutar()` e `insertar()` de `modelos/base.py` no cambian:
 
 - **MySQL**: motor de la asignatura y de desarrollo local (valor por defecto).
 - **PostgreSQL**: motor del despliegue en Render; el identificador nuevo se obtiene con `lastval()`.
@@ -197,14 +217,14 @@ MySQL y **138 de 138** con SQLite.
 | 6 | Validaciones dinámicas | Eventos `input`, `blur` y `submit`, clases `is-valid` / `is-invalid`, alertas de éxito y error |
 | 7 | Plantillas y contenido dinámico | Arreglo `boletinesCTI` recorrido con bucle y condición; secciones comentadas en `base.html` |
 | 8 | Interfaces con Bootstrap | Navbar, grid, cards, tabla, alertas, modal, spinner, carrusel, dropdown y tooltips |
-| 9 | Proyecto Flask y rutas | `app.py`, `templates/`, `static/`, una ruta por módulo |
+| 9 | Proyecto Flask y rutas | `app.py`, carpetas `rutas/`, `modelos/`, `templates/` y `static/`, un módulo de rutas por sección |
 | 10 | Jinja2 | Herencia de `base.html`, bloques, `include`, macros, filtros propios, `for`, `if` |
 | 11 | Flask-WTF | Carpeta `forms/`, validadores propios, `validate_on_submit()`, CSRF |
 | 12 | Persistencia local | `DB_ENGINE=sqlite`, `sql/esquema_sqlite.sql`, `data/juanseccti.db` |
 | 13 | Base de datos relacional | `sql/esquema.sql` con 18 tablas, consultas parametrizadas con `JOIN` |
 | 14 | Login | Flask-Login, Werkzeug, `@login_required`, roles, logout |
 | 15 | CRUD completo | Seis módulos con alta, consulta, edición, baja lógica y eliminación; reportes exportables |
-| 16 | Pruebas y entrega | `pruebas/prueba_sistema.py` (138 comprobaciones), README, script SQL, despliegue en Render |
+| 16 | Pruebas y entrega | `pruebas/prueba_sistema.py` (138 comprobaciones), repositorio organizado en carpetas de rutas, modelos, plantillas y módulos, README, script SQL y despliegue en Render |
 
 ## Seguridad
 
